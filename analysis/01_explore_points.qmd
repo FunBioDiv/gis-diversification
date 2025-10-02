@@ -1,0 +1,258 @@
+---
+title: "First exploration of RPG dataset"
+author: Romain Frelat
+date: today
+execute:
+  echo: false
+  warning: false
+---
+
+
+```{r setup}
+library(terra) |> suppressWarnings()
+library(sf) |> suppressWarnings()
+library(here) |> suppressWarnings()
+library(mapview)
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data")
+pts <- vect(here(datafolder, "all_points.gpkg"))
+
+# get department from IGN
+# library(happign)
+# pts_sf <- st_as_sf(pts)
+# meta <- get_layers_metadata("wfs")
+# meta$Name[grep("departement", meta$Name)]
+# adm <- get_wfs(
+#   pts_sf,
+#   "ADMINEXPRESS-COG.LATEST:departement",
+#   filename = here::here(datafolder, "departement.gpkg"),
+#   overwrite = TRUE
+# )
+departments <- vect(here(datafolder, "departement.gpkg"))
+```
+
+
+## Identification of the case study
+
+```{r}
+pt_dep <- extract(departments, pts)
+# merge columns in pts
+pts_full <- cbind(pts, pt_dep)
+
+n_points <- as.numeric(table(pts_full$code_insee))
+n_study <- tapply(pts_full$Study_ID, pts_full$code_insee, function(x) {
+  length(unique(x))
+})
+```
+
+On October 2nd, there were ```r length(pts)``` coordinates, spread over ```r length(n_points)``` French departments. Two departments seems to offer ideal case study : Ille-et-Vilaine (35) with 4 different studies and 227 points; and Gironde (33) with 3 different studies, and 338 points.
+
+```{r}
+#| fig-cap: "Distribution of coordinates per department comparing the number of sites per department and the number of different projects per department. The numbers shown in the plot are the number of the department."
+plot(
+  n_points,
+  n_study,
+  type = "n",
+  xlab = "Number of sites",
+  ylab = "Number of projects"
+)
+sel = c(33, 35)
+text(
+  n_points,
+  n_study,
+  names(n_study),
+  xpd = NA,
+  font = ifelse(names(n_study) %in% sel, 2, 1)
+)
+```
+
+
+```{r}
+pts_35 <- pts[pt_dep$code_insee == "35", ]
+pts_35 <- project(pts_35, "EPSG:2154")
+# writeVector(pts_35, here::here(datafolder, "pts_35.gpkg"), overwrite = TRUE)
+
+pts_33 <- pts[pt_dep$code_insee == "33", ]
+pts_33 <- project(pts_33, "EPSG:2154")
+# writeVector(pts_33, here::here(datafolder, "pts_33.gpkg"), overwrite = TRUE)
+```
+
+
+## RPG sequence de culture
+
+Let's try using the `RPG sequence de culture` from    
+Girault, Baptiste; Martin, Philippe, 2025, "Séquences de culture, France, 2015-2023", <https://doi.org/10.57745/VMYCYM>, Recherche Data Gouv, V2 
+
+The main advantages are that (1) it is very easy to download (one file per department), (2) relatively light (100Mb per file), (3) can retrieve the full crop sequence in a single operation.    
+The main drawbacks are that (1) it doesn't contain `RPG complété` information (coordinates might fall outside the dataset) and (2) the fields are subdivided so it's harder to get information on field size.  
+
+To get more information about the crop classes, the following companion dataset is needed:  
+Girault, Baptiste; Martin, Philippe, 2023, "Référentiel des cultures RPG", <https://doi.org/10.57745/FMP8GU>, Recherche Data Gouv, V1
+
+
+
+### Spatial coverage
+
+```{r}
+#| tbl-cap: "Number of sites in Ille-et-vilaine with information from RPG Sequences de culture"
+rpg_35 <- vect(here(datafolder, "d35.gpkg"))
+pt_rpg_35 <- extract(rpg_35, pts_35)
+table(!is.na(pt_rpg_35$id_unique), pts_35$Study_ID) |> knitr::kable()
+```
+
+```{r}
+#| tbl-cap: "Number of sites in Gironde with information from RPG Sequences de culture"
+rpg_33 <- vect(here(datafolder, "d33.gpkg"))
+pt_rpg_33 <- extract(rpg_33, pts_33)
+table(!is.na(pt_rpg_33$id_unique), pts_33$Study_ID) |> knitr::kable()
+```
+
+The coverage of `RPG sequence de culture` is very good in Ille-et-vilaine (only ```r sum(is.na(pt_rpg_35$id_unique))``` missing fields), but less complete in Gironde (```r sum(is.na(pt_rpg_33$id_unique))``` missing fields).
+
+
+### RPG Complete
+
+A team from INRAE works at completing the RPG with fields that are not included originally. For each of these fields, the crop sequence is also retrieve since 2016.
+
+The [RPG complete 2023](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2023
+https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2019) is not fully complete, so we will explore the [dataset of 2022](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022).  
+
+Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Nouvelle-Aquitaine", https://doi.org/10.57745/6FNRWO, Recherche Data Gouv, V5  (d33: 47Mb compressed, 171Mb extracted)    
+Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Bretagne", https://doi.org/10.57745/DL3O6C, Recherche Data Gouv, V1 (d35, 53Mb compressed, 180Mb extracted)  
+
+```{r}
+#| tbl-cap: "Number of sites in Ille-et-vilaine with information from RPG Complété"
+rpg_35_c <- vect(here(datafolder, "rpg_complete_2022_d35.shp"))
+pt_rpgc_35 <- extract(rpg_35_c, pts_35)
+
+pts_35$cover <- ifelse(
+  is.na(pt_rpg_35$id_unique),
+  ifelse(is.na(pt_rpgc_35$id_parc), "None", "RPG Complete"),
+  "RPG"
+)
+table(pts_35$cover, pts_35$Study_ID) |> knitr::kable()
+```
+
+```{r}
+#| tbl-cap: "Number of sites in Gironde with information from RPG Complété"
+rpg_33_c <- vect(here(datafolder, "rpg_complete_2022_d33.shp"))
+pt_rpgc_33 <- extract(rpg_33_c, pts_33)
+
+pts_33$cover <- ifelse(
+  is.na(pt_rpg_33$id_unique),
+  ifelse(is.na(pt_rpgc_33$id_parc), "None", "RPG Complete"),
+  "RPG"
+)
+table(pts_33$cover, pts_33$Study_ID) |> knitr::kable()
+```
+
+The RPG complete doesn`t solve all the issues of points not fitting within fields...
+
+A first visual exploration seems to indicate sampling from forested area. That might be due to errors in GPS coordinates...
+
+```{r}
+#| tbl-cap: "Interactive map of the sampling fields in Gironde"
+st_as_sf(pts_33) |>
+  mapview(
+    z = "cover",
+    layer.name = "cover",
+    map.types = c("Esri.WorldImagery", "OpenStreetMap")
+  )
+```
+
+
+
+### Crop rotation (2015-2023)
+
+Let's zoom in Ille-et-vilaine (35) with the `RPG sequence de culture` on the crop rotation.
+
+
+The most common crops are:   
+
+```{r}
+#| tbl-cap: "Top ten crop in the fields sampled in Ille-et-vilaine"
+ref_rpg <- read.csv(here(datafolder, "ref_rpg.csv"))
+
+info_rot <- pt_rpg_35[, grep("cult", names(pt_rpg_35))]
+
+pop_crop <- as.data.frame(table(unlist(info_rot)))
+pop_crop$Nom <- ref_rpg$nom_culture[match(pop_crop$Var1, ref_rpg$code_culture)]
+pop_crop[order(pop_crop$Freq, decreasing = TRUE)[1:10], ] |> knitr::kable()
+```
+
+The most common crop sequences are: 
+
+```{r}
+#| tbl-cap: "Top ten crop sequences in the fields sampled in Ille-et-vilaine"
+
+rotation <- apply(info_rot, 1, concat)
+head(sort(table(rotation), decreasing = TRUE), 10) |> knitr::kable()
+```
+
+The most common crop varieties cultivated on the same fields are: 
+
+```{r}
+#| tbl-cap: "Top ten crop diversity on field (unique crop, independent of the order)"
+u_rotation <- apply(info_rot, 1, paste_unique)
+head(sort(table(u_rotation), decreasing = TRUE), 10) |> knitr::kable()
+```
+
+```{r}
+#| fig-cap: "Distribution of the number of different crops cultivated per field in the period 2015-2023"
+n_rot <- apply(info_rot, 1, lunique)
+
+barplot(table(n_rot), xlab = "Number of crops", ylab = "Number of fields")
+```
+
+
+*This is only exploratory.* To get relevant indicators, we need to:  
+- decide whether we simplify the crop types (e.g. merging MIE and MIS)   
+- subset the crop sequence for each field between N-5 and N  
+
+
+### Area and perimeter of the field
+
+Fields in the dataset might be sub-divided depending in the time period 2015-2023. So we have to consider the size of the field of the year when the study was carried out which is more complicated.
+Let's try with ```r median(pts_35$Year)```, which is the median year of the field samples.
+
+For the area, it is easy because it is available in the variable `seq_surf`.
+```{r}
+#| fig-cap: "Relations between field size area. The subarea is the area from sub field provided directly in the RPG sequence de culture. The areas area calculated from all the fields with the same ID in a given year"
+subarea <- pt_rpg_35$seq_surf
+
+area_2015 <- tapply(rpg_35$seq_surf, rpg_35$parcel2015, sum, na.rm = TRUE)
+area_2019 <- tapply(rpg_35$seq_surf, rpg_35$parcel2019, sum, na.rm = TRUE)
+area_2023 <- tapply(rpg_35$seq_surf, rpg_35$parcel2023, sum, na.rm = TRUE)
+
+areas <- data.frame(
+  "Subarea" = subarea,
+  "area_2015" = area_2015[pt_rpg_35$parcel2015],
+  "area_2019" = area_2019[pt_rpg_35$parcel2019],
+  "area_2023" = area_2023[pt_rpg_35$parcel2023]
+)
+# remove outlier
+areas[areas > 1000] <- NA
+
+pairs(areas, lower.panel = panel.smooth, upper.panel = panel.cor)
+
+# missing values:
+apply(is.na(areas), 2, sum)
+```
+
+To get the perimeter, and the mean field size around a buffer, it is more complicated and slower (geographical operations).  
+
+
+*to be completed...*
+
+
+
+## BD Haie
+
+Let's explore the dataset from BD Haie v2 mars 2024 from <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb).  
+The v2 is derived from images of the period 2020-2022 which is a better fit to our dataset than v1 based on images from 2011-2024.
+
+
+*to be continued ...*
+
