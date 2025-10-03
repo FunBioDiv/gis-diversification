@@ -2,6 +2,9 @@
 title: "First exploration of RPG dataset"
 author: Romain Frelat
 date: today
+format: 
+  html:
+    toc: true
 execute:
   echo: false
   warning: false
@@ -47,9 +50,10 @@ n_study <- tapply(pts_full$Study_ID, pts_full$code_insee, function(x) {
 })
 ```
 
-On October 2nd, there were ```r length(pts)``` coordinates, spread over ```r length(n_points)``` French departments. Two departments seems to offer ideal case study : Ille-et-Vilaine (35) with 4 different studies and 227 points; and Gironde (33) with 3 different studies, and 338 points.
+On October 2nd, there were ```r length(pts)``` field coordinates, spread over ```r length(n_points)``` French departments. Two departments seems to offer ideal case study (@fig-1) : Ille-et-Vilaine (35) with 4 different datasets and 227 points; and Gironde (33) with 3 different datasets, and 338 points.
 
 ```{r}
+#| label: fig-1
 #| fig-cap: "Distribution of coordinates per department comparing the number of sites per department and the number of different projects per department. The numbers shown in the plot are the number of the department."
 plot(
   n_points,
@@ -80,49 +84,51 @@ pts_33 <- project(pts_33, "EPSG:2154")
 ```
 
 
-## RPG sequence de culture
+## Spatial coverage
+
+### RPG sequence de culture
 
 Let's try using the `RPG sequence de culture` from    
-Girault, Baptiste; Martin, Philippe, 2025, "Séquences de culture, France, 2015-2023", <https://doi.org/10.57745/VMYCYM>, Recherche Data Gouv, V2 
+> Girault, Baptiste; Martin, Philippe, 2025, "Séquences de culture, France, 2015-2023", <https://doi.org/10.57745/VMYCYM>, Recherche Data Gouv, V2 
 
-The main advantages are that (1) it is very easy to download (one file per department), (2) relatively light (100Mb per file), (3) can retrieve the full crop sequence in a single operation.    
+The main advantages are that (1) it is very easy to download (one file per department), (2) relatively light (100Mb per file), (3) can retrieve the full crop sequence (2015-2023) in a single operation.    
 The main drawbacks are that (1) it doesn't contain `RPG complété` information (coordinates might fall outside the dataset) and (2) the fields are subdivided so it's harder to get information on field size.  
 
 To get more information about the crop classes, the following companion dataset is needed:  
-Girault, Baptiste; Martin, Philippe, 2023, "Référentiel des cultures RPG", <https://doi.org/10.57745/FMP8GU>, Recherche Data Gouv, V1
+> Girault, Baptiste; Martin, Philippe, 2023, "Référentiel des cultures RPG", <https://doi.org/10.57745/FMP8GU>, Recherche Data Gouv, V1
 
-
-
-### Spatial coverage
 
 ```{r}
-#| tbl-cap: "Number of sites in Ille-et-vilaine with information from RPG Sequences de culture"
+#| label: tbl-1
+#| tbl-cap: "Number of sites in Ille-et-vilaine with information from RPG Sequences de culture (TRUE) or not (FALSE)"
 rpg_35 <- vect(here(datafolder, "d35.gpkg"))
 pt_rpg_35 <- extract(rpg_35, pts_35)
 table(!is.na(pt_rpg_35$id_unique), pts_35$Study_ID) |> knitr::kable()
 ```
 
 ```{r}
-#| tbl-cap: "Number of sites in Gironde with information from RPG Sequences de culture"
+#| label: tbl-2
+#| fig-cap: "Number of sites in Gironde with information from RPG Sequences de culture (TRUE) or not (FALSE)"
 rpg_33 <- vect(here(datafolder, "d33.gpkg"))
 pt_rpg_33 <- extract(rpg_33, pts_33)
 table(!is.na(pt_rpg_33$id_unique), pts_33$Study_ID) |> knitr::kable()
 ```
 
-The coverage of `RPG sequence de culture` is very good in Ille-et-vilaine (only ```r sum(is.na(pt_rpg_35$id_unique))``` missing fields), but less complete in Gironde (```r sum(is.na(pt_rpg_33$id_unique))``` missing fields).
+The coverage of `RPG sequence de culture` is very good in Ille-et-vilaine (@tbl-1,  only ```r sum(is.na(pt_rpg_35$id_unique))``` missing fields), but less complete in Gironde (@tbl-2, with ```r sum(is.na(pt_rpg_33$id_unique))``` missing fields).
 
 
 ### RPG Complete
 
-A team from INRAE works at completing the RPG with fields that are not included originally. For each of these fields, the crop sequence is also retrieve since 2016.
+A team from INRAE are completing the RPG with fields that are not included originally. For each of these fields, the crop sequence is also provided since 2016.
 
 The [RPG complete 2023](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2023
-https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2019) is not fully complete, so we will explore the [dataset of 2022](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022).  
+https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2019) is not fully complete (missing regions), so we will explore the [dataset of 2022](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022).  
 
-Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Nouvelle-Aquitaine", https://doi.org/10.57745/6FNRWO, Recherche Data Gouv, V5  (d33: 47Mb compressed, 171Mb extracted)    
-Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Bretagne", https://doi.org/10.57745/DL3O6C, Recherche Data Gouv, V1 (d35, 53Mb compressed, 180Mb extracted)  
+> Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Nouvelle-Aquitaine", https://doi.org/10.57745/6FNRWO, Recherche Data Gouv, V5  (d33: 47Mb compressed, 171Mb extracted)    
+> Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Bretagne", https://doi.org/10.57745/DL3O6C, Recherche Data Gouv, V1 (d35, 53Mb compressed, 180Mb extracted)  
 
 ```{r}
+#| label: tbl-3
 #| tbl-cap: "Number of sites in Ille-et-vilaine with information from RPG Complété"
 rpg_35_c <- vect(here(datafolder, "rpg_complete_2022_d35.shp"))
 pt_rpgc_35 <- extract(rpg_35_c, pts_35)
@@ -136,6 +142,7 @@ table(pts_35$cover, pts_35$Study_ID) |> knitr::kable()
 ```
 
 ```{r}
+#| label: tbl-4
 #| tbl-cap: "Number of sites in Gironde with information from RPG Complété"
 rpg_33_c <- vect(here(datafolder, "rpg_complete_2022_d33.shp"))
 pt_rpgc_33 <- extract(rpg_33_c, pts_33)
@@ -148,12 +155,15 @@ pts_33$cover <- ifelse(
 table(pts_33$cover, pts_33$Study_ID) |> knitr::kable()
 ```
 
-The RPG complete doesn`t solve all the issues of points not fitting within fields...
+The RPG complete doesn`t solve all the issues of points not fitting within agricultural fields (@tab-3, @tab-4)...  
 
-A first visual exploration seems to indicate sampling from forested area. That might be due to errors in GPS coordinates...
+A first visual exploration seems to indicate samplings from vineyard or forested areas.
 
+
+### Visual exploration
 ```{r}
-#| tbl-cap: "Interactive map of the sampling fields in Gironde"
+#| label: fig-2
+#| fig-cap: "Interactive map of the fields sampled in Gironde"
 st_as_sf(pts_33) |>
   mapview(
     z = "cover",
@@ -163,15 +173,48 @@ st_as_sf(pts_33) |>
 ```
 
 
+```{r}
+#| label: fig-3
+#| fig-cap: "Zoom in an area with multiple fields around Langon"
+sub <- pts_33[
+  pts_33$Site %in% c("C10", "C05", "C06", "C07")
+]
+# medium:c("C06", "33_2022_00004", "33_2018_00003", "C10")
+# large: c("C06", "V01", "M09", "Tri07C", "01C15")]
+zoom <- vect(ext(sub) + 1000, crs = crs(pts_33))
+rpgc_zoom <- crop(rpg_33_c, zoom)
+rpg_zoom <- crop(rpg_33, zoom)
+pts_zoom <- crop(pts_33, zoom)
+mapview(
+  rpg_zoom,
+  color = "blue",
+  alpha.regions = 0,
+  map.types = c("Esri.WorldImagery", "OpenStreetMap")
+) +
+  mapview(rpgc_zoom, color = "red", col.regions = "red", alpha.regions = 0) +
+  mapview(st_as_sf(pts_zoom), z = "cover", layer.name = "cover") +
+  mapview(
+    zoom,
+    color = "black",
+    col.regions = "black",
+    alpha.regions = 0,
+    layer.name = "extent"
+  )
+```
 
-### Crop rotation (2015-2023)
 
-Let's zoom in Ille-et-vilaine (35) with the `RPG sequence de culture` on the crop rotation.
+**TO BE DISCUSSED**:   
+- fields in `RPG sequence` and `RPG complete` seems very patchy from @fig-3, yet the coverage is not bad (>80%). **Should we complete the data with other data sources, e.g. OSO land cover? If yes, how?**.  So far, OSO only available for 2018-2021 [here](https://www.theia-land.fr/en/blog/product/land-cover-map/), but there might exist other access. Or **should we discard points with missing information / possibly incorrect coordinates?**
+- that is an important question for the buffer areas (500 to 1500m). How do we handle percentage of land cover?
 
+## Crop rotation (2015-2023)
+
+Let's zoom in Ille-et-vilaine (35) with the `RPG sequence de culture` on crop rotation.
 
 The most common crops are:   
 
 ```{r}
+#| label: tbl-5
 #| tbl-cap: "Top ten crop in the fields sampled in Ille-et-vilaine"
 ref_rpg <- read.csv(here(datafolder, "ref_rpg.csv"))
 
@@ -182,9 +225,10 @@ pop_crop$Nom <- ref_rpg$nom_culture[match(pop_crop$Var1, ref_rpg$code_culture)]
 pop_crop[order(pop_crop$Freq, decreasing = TRUE)[1:10], ] |> knitr::kable()
 ```
 
-The most common crop sequences are: 
+The most common crop sequences are (@tbl-6): 
 
 ```{r}
+#| label: tbl-6
 #| tbl-cap: "Top ten crop sequences in the fields sampled in Ille-et-vilaine"
 
 rotation <- apply(info_rot, 1, concat)
@@ -194,12 +238,14 @@ head(sort(table(rotation), decreasing = TRUE), 10) |> knitr::kable()
 The most common crop varieties cultivated on the same fields are: 
 
 ```{r}
+#| label: tbl-7
 #| tbl-cap: "Top ten crop diversity on field (unique crop, independent of the order)"
 u_rotation <- apply(info_rot, 1, paste_unique)
 head(sort(table(u_rotation), decreasing = TRUE), 10) |> knitr::kable()
 ```
 
 ```{r}
+#| label: fig-4
 #| fig-cap: "Distribution of the number of different crops cultivated per field in the period 2015-2023"
 n_rot <- apply(info_rot, 1, lunique)
 
@@ -207,18 +253,25 @@ barplot(table(n_rot), xlab = "Number of crops", ylab = "Number of fields")
 ```
 
 
-*This is only exploratory.* To get relevant indicators, we need to:  
+**TO BE DISCUSSED**:    
 - decide whether we simplify the crop types (e.g. merging MIE and MIS)   
+
+**TO BE IMPROVED**:  
 - subset the crop sequence for each field between N-5 and N  
 
 
-### Area and perimeter of the field
+
+## Field size
+
+
+### Area 
 
 Fields in the dataset might be sub-divided depending in the time period 2015-2023. So we have to consider the size of the field of the year when the study was carried out which is more complicated.
-Let's try with ```r median(pts_35$Year)```, which is the median year of the field samples.
 
-For the area, it is easy because it is available in the variable `seq_surf`.
+For the area, it is simplified thanks to the variable `seq_surf` giving the area of the sub-fields in ha, and `parcelYYYY` with the ID of the parcel for each year.
+
 ```{r}
+#| label: fig-5
 #| fig-cap: "Relations between field size area. The subarea is the area from sub field provided directly in the RPG sequence de culture. The areas area calculated from all the fields with the same ID in a given year"
 subarea <- pt_rpg_35$seq_surf
 
@@ -238,17 +291,127 @@ areas[areas > 1000] <- NA
 pairs(areas, lower.panel = panel.smooth, upper.panel = panel.cor)
 
 # missing values:
-apply(is.na(areas), 2, sum)
+# apply(is.na(areas), 2, sum)
 ```
 
-To get the perimeter, and the mean field size around a buffer, it is more complicated and slower (geographical operations).  
+
+### Perimeter 
 
 
-*to be completed...*
+```{r}
+#| label: fig-6
+#| fig-cap: "Exploration of how to merge sub-fields"
+df35 <- as.data.frame(rpg_35)
+
+par(mfrow = c(3, 3))
+# issue with i = 113
+# instead of 1:nrow(pt_rpg_35), select ok examples
+# okids <- which(as.numeric(pts_35$Year) > 2014 & !is.na(pt_rpg_35$id_unique))
+# for (i in sample(okids, 9)) {
+n = 1
+i = 1
+while (n < 10) {
+  # get year of point i (take only the first one for now)
+  yri <- substr(pts_35$Year[i], 1, 4)
+  coli <- paste0("parcel", yri)
+  # get the parcel id that intersect the point
+  idi <- pt_rpg_35[i, coli]
+  if (!is.na(idi) & sum(df35[, coli] == idi) > 1) {
+    # get pacrel from RPG
+    pci <- rpg_35[df35[, coli] == idi]
+    # aggregate doesn't works because holes between polygons
+    agg_pci <- aggregate(pci)
+    # convex hull works but have to fine tune the parameters
+    # have to be check if far way polygons
+    hu_pci <- hull(agg_pci, type = "concave_length")
+    # simplify helps a little
+    si_pci <- simplifyGeom(hu_pci, preserveTopology = FALSE)
+
+    plot(pci)
+    plot(agg_pci, border = "blue", add = TRUE)
+    plot(hu_pci, border = "red", add = TRUE)
+    plot(si_pci, border = "green", add = TRUE)
+    n = n + 1
+  }
+  i = i + 1
+}
+#    expanse(si_pci)
+#    perim(si_pci)
+```
+
+This is tricky operation, because sub-fields do not overlap properly (different edge), and sometimes complex geometry.
+So far, the best solution is to:  
+
+1. aggregate (or dissolve) with `aggregate()`
+2. merge non touching polygons by calculating convex hull `hull(type = "concave_length")`
+3. and simplify the geometry to remove some unecessary complicated geometries (`simplifyGeom()`)
+
+The perimeter is highly sensible to all theses steps (the area much less).
+
+```{r}
+#| label: fig-7
+#| fig-cap: "Exploration of how to merge sub-fields"
+df35 <- as.data.frame(rpg_35)
+
+rpg_simple <- vect()
+for (i in 1:nrow(pt_rpg_35)) {
+  # get year of point i (take only the first one for now)
+  yri <- substr(pts_35$Year[i], 1, 4)
+  if (yri %in% 2015:2023) {
+    coli <- paste0("parcel", yri)
+    # get the parcel id that intersect the point
+    idi <- pt_rpg_35[i, coli]
+    if (!is.na(idi)) {
+      # get pacrel from RPG
+      pci <- rpg_35[df35[, coli] == idi]
+      # aggregate doesn't properly works because holes between polygons
+      agg_pci <- aggregate(pci, atts = data.frame(df35[i, ]))
+      # convex hull works but have to fine tune the parameters
+      # have to be check if far way polygons
+      hu_pci <- hull(agg_pci, type = "concave_length")
+      # simplify helps a little bit more
+      si_pci <- simplifyGeom(hu_pci, preserveTopology = FALSE)
+      # add to rpg_simple
+      rpg_simple <- rbind(
+        rpg_simple,
+        cbind(si_pci, pts_35[i, ], pt_rpg_35[i, ])
+      )
+    }
+  }
+}
+
+```
+
+```{r}
+table(pt_rpg_35$id_unique %in% rpg_simple$id_unique)
+pts_35$hasfield <- pt_rpg_35$id_unique %in% rpg_simple$id_unique
+```
+
+Summary of the area of fields (in $m^2$)
+```{r}
+summary(expanse(rpg_simple))
+```
+
+Summary of the perimeter of fields (in $m$)
+```{r}
+summary(perim(rpg_simple))
+```
+
+```{r}
+mapview(st_as_sf(pts_35), z = "hasfield", layer.name = "cover") +
+  mapview(rpg_simple, color = "blue", col.regions = "blue", alpha.regions = 0.4)
+
+```
+
+
+**TO BE DISCUSSED**:   
+- are the area/perimeter within expected range? what about the shape of the fields? 
 
 
 
-## BD Haie
+
+
+## BD Haie and buffer
 
 Let's explore the dataset from BD Haie v2 mars 2024 from <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb).  
 The v2 is derived from images of the period 2020-2022 which is a better fit to our dataset than v1 based on images from 2011-2024.
