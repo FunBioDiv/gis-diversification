@@ -21,6 +21,11 @@ devtools::load_all()
 
 datafolder <- here("data", "raw-data")
 pts <- vect(here(datafolder, "all_points.gpkg"))
+# Create an ID per site
+pts$ID <- paste(pts$Study_ID, pts$Site, pts$Year, sep="_")
+# crds(pts)[pts$ID %in% pts$ID[duplicated(pts$ID)],]
+# remove duplicates
+pts <- pts[!duplicated(pts$ID)]
 
 # get department from IGN
 # library(happign)
@@ -50,16 +55,19 @@ n_study <- tapply(pts_full$Study_ID, pts_full$code_insee, function(x) {
 })
 ```
 
-On October 2nd, there were ```r length(pts)``` field coordinates, spread over ```r length(n_points)``` French departments. Two departments seems to offer ideal case study (@fig-1) : Ille-et-Vilaine (35) with 4 different datasets and 227 points; and Gironde (33) with 3 different datasets, and 338 points.
+On October 2nd, the dataset consisted of ```r length(pts)``` field coordinates, spread over ```r length(n_points)``` French departments. Two departments seems to offer ideal case study (@fig-1) :   
+
+- Ille-et-Vilaine (35) with 4 different datasets and 227 points;   
+- Gironde (33) with 3 different datasets, and 338 points.  
 
 ```{r}
 #| label: fig-1
-#| fig-cap: "Distribution of coordinates per department comparing the number of sites per department and the number of different projects per department. The numbers shown in the plot are the number of the department."
+#| fig-cap: "Distribution of the fields per department represented as the number of fields (x-axis) and the number of projects per department (y-axis). The numbers shown in the plot are the number of the department."
 plot(
   n_points,
   n_study,
   type = "n",
-  xlab = "Number of sites",
+  xlab = "Number of fields",
   ylab = "Number of projects"
 )
 sel = c(33, 35)
@@ -88,19 +96,21 @@ pts_33 <- project(pts_33, "EPSG:2154")
 
 ### RPG sequence de culture
 
-Let's try using the `RPG sequence de culture` from    
+Let's try using the `RPG sequence de culture` from   
+
 > Girault, Baptiste; Martin, Philippe, 2025, "Séquences de culture, France, 2015-2023", <https://doi.org/10.57745/VMYCYM>, Recherche Data Gouv, V2 
 
 The main advantages are that (1) it is very easy to download (one file per department), (2) relatively light (100Mb per file), (3) can retrieve the full crop sequence (2015-2023) in a single operation.    
 The main drawbacks are that (1) it doesn't contain `RPG complété` information (coordinates might fall outside the dataset) and (2) the fields are subdivided so it's harder to get information on field size.  
 
 To get more information about the crop classes, the following companion dataset is needed:  
+
 > Girault, Baptiste; Martin, Philippe, 2023, "Référentiel des cultures RPG", <https://doi.org/10.57745/FMP8GU>, Recherche Data Gouv, V1
 
 
 ```{r}
 #| label: tbl-1
-#| tbl-cap: "Number of sites in Ille-et-vilaine with information from RPG Sequences de culture (TRUE) or not (FALSE)"
+#| tbl-cap: "Number of fields in Ille-et-vilaine with information from RPG Sequences de culture (TRUE) or not (FALSE)"
 rpg_35 <- vect(here(datafolder, "d35.gpkg"))
 pt_rpg_35 <- extract(rpg_35, pts_35)
 table(!is.na(pt_rpg_35$id_unique), pts_35$Study_ID) |> knitr::kable()
@@ -108,7 +118,7 @@ table(!is.na(pt_rpg_35$id_unique), pts_35$Study_ID) |> knitr::kable()
 
 ```{r}
 #| label: tbl-2
-#| fig-cap: "Number of sites in Gironde with information from RPG Sequences de culture (TRUE) or not (FALSE)"
+#| tbl-cap: "Number of fields in Gironde with information from RPG Sequences de culture (TRUE) or not (FALSE)"
 rpg_33 <- vect(here(datafolder, "d33.gpkg"))
 pt_rpg_33 <- extract(rpg_33, pts_33)
 table(!is.na(pt_rpg_33$id_unique), pts_33$Study_ID) |> knitr::kable()
@@ -122,14 +132,14 @@ The coverage of `RPG sequence de culture` is very good in Ille-et-vilaine (@tbl-
 A team from INRAE are completing the RPG with fields that are not included originally. For each of these fields, the crop sequence is also provided since 2016.
 
 The [RPG complete 2023](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2023
-https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2019) is not fully complete (missing regions), so we will explore the [dataset of 2022](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022).  
+https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2019) is not fully released yet (missing regions), so we will explore the [dataset of 2022](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022).  
 
-> Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Nouvelle-Aquitaine", https://doi.org/10.57745/6FNRWO, Recherche Data Gouv, V5  (d33: 47Mb compressed, 171Mb extracted)    
-> Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Bretagne", https://doi.org/10.57745/DL3O6C, Recherche Data Gouv, V1 (d35, 53Mb compressed, 180Mb extracted)  
+> Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Nouvelle-Aquitaine", <https://doi.org/10.57745/6FNRWO>, Recherche Data Gouv, V5  (d33: 47Mb compressed, 171Mb extracted)    
+> Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Bretagne", <https://doi.org/10.57745/DL3O6C>, Recherche Data Gouv, V1 (d35, 53Mb compressed, 180Mb extracted)  
 
 ```{r}
 #| label: tbl-3
-#| tbl-cap: "Number of sites in Ille-et-vilaine with information from RPG Complété"
+#| tbl-cap: "Number of fields in Ille-et-vilaine with information from RPG"
 rpg_35_c <- vect(here(datafolder, "rpg_complete_2022_d35.shp"))
 pt_rpgc_35 <- extract(rpg_35_c, pts_35)
 
@@ -143,7 +153,7 @@ table(pts_35$cover, pts_35$Study_ID) |> knitr::kable()
 
 ```{r}
 #| label: tbl-4
-#| tbl-cap: "Number of sites in Gironde with information from RPG Complété"
+#| tbl-cap: "Number of fields in Gironde with information from RPG Complété"
 rpg_33_c <- vect(here(datafolder, "rpg_complete_2022_d33.shp"))
 pt_rpgc_33 <- extract(rpg_33_c, pts_33)
 
@@ -155,9 +165,9 @@ pts_33$cover <- ifelse(
 table(pts_33$cover, pts_33$Study_ID) |> knitr::kable()
 ```
 
-The RPG complete doesn`t solve all the issues of points not fitting within agricultural fields (@tab-3, @tab-4)...  
+The RPG complete doesn`t solve all the issues of sites not fitting within agricultural fields (@tbl-3, @tbl-4)...  
 
-A first visual exploration seems to indicate samplings from vineyard or forested areas.
+A first visual exploration seems to indicate samplings from vineyard or forested areas (@fig-2, @fig-3).  
 
 
 ### Visual exploration
@@ -177,8 +187,9 @@ st_as_sf(pts_33) |>
 #| label: fig-3
 #| fig-cap: "Zoom in an area with multiple fields around Langon"
 sub <- pts_33[
-  pts_33$Site %in% c("C10", "C05", "C06", "C07")
+  pts_33$Site %in% c("Tri04C", "Tri02V", "33_2018_00002", "Tri06M")
 ]
+# small missing: c("C10", "C05", "C06", "C07")
 # medium:c("C06", "33_2022_00004", "33_2018_00003", "C10")
 # large: c("C06", "V01", "M09", "Tri07C", "01C15")]
 zoom <- vect(ext(sub) + 1000, crs = crs(pts_33))
@@ -204,14 +215,16 @@ mapview(
 
 
 **TO BE DISCUSSED**:   
-- fields in `RPG sequence` and `RPG complete` seems very patchy from @fig-3, yet the coverage is not bad (>80%). **Should we complete the data with other data sources, e.g. OSO land cover? If yes, how?**.  So far, OSO only available for 2018-2021 [here](https://www.theia-land.fr/en/blog/product/land-cover-map/), but there might exist other access. Or **should we discard points with missing information / possibly incorrect coordinates?**
-- that is an important question for the buffer areas (500 to 1500m). How do we handle percentage of land cover?
+
+- fields in `RPG sequence de culture` and `RPG complete` seems very patchy from @fig-3, yet the coverage is not bad (>80%). **Should we complete the data with other data sources, e.g. OSO land cover? If yes, how?**.  So far, OSO only available for 2018-2021 [here](https://www.theia-land.fr/en/blog/product/land-cover-map/), but there might exist other access. Or **should we discard points with missing information / possibly incorrect coordinates?**    
+- this is an important question for the buffer areas (500 to 1500m). How do we handle percentage of land cover when so many areas are missing?
+
 
 ## Crop rotation (2015-2023)
 
 Let's zoom in Ille-et-vilaine (35) with the `RPG sequence de culture` on crop rotation.
 
-The most common crops are:   
+The most common crops are shown in @tbl-5.   
 
 ```{r}
 #| label: tbl-5
@@ -225,7 +238,7 @@ pop_crop$Nom <- ref_rpg$nom_culture[match(pop_crop$Var1, ref_rpg$code_culture)]
 pop_crop[order(pop_crop$Freq, decreasing = TRUE)[1:10], ] |> knitr::kable()
 ```
 
-The most common crop sequences are (@tbl-6): 
+The most common crop sequences are shown in @tbl-6. 
 
 ```{r}
 #| label: tbl-6
@@ -235,7 +248,7 @@ rotation <- apply(info_rot, 1, concat)
 head(sort(table(rotation), decreasing = TRUE), 10) |> knitr::kable()
 ```
 
-The most common crop varieties cultivated on the same fields are: 
+The most common crop varieties cultivated on the same fields are shown in @tbl-7. 
 
 ```{r}
 #| label: tbl-7
@@ -252,12 +265,15 @@ n_rot <- apply(info_rot, 1, lunique)
 barplot(table(n_rot), xlab = "Number of crops", ylab = "Number of fields")
 ```
 
+On most fields, there are between 3 and 4 different crops cultivated within the 2015-2023 period. 
+
 
 **TO BE DISCUSSED**:    
 - decide whether we simplify the crop types (e.g. merging MIE and MIS)   
+- is the order of the successive crops important? (e.g. CZH,BTH,MIE different from BTH,CZH,MIE ?)
 
 **TO BE IMPROVED**:  
-- subset the crop sequence for each field between N-5 and N  
+- subset the crop sequence for each field between N-5 and N. 
 
 
 
@@ -266,13 +282,13 @@ barplot(table(n_rot), xlab = "Number of crops", ylab = "Number of fields")
 
 ### Area 
 
-Fields in the dataset might be sub-divided depending in the time period 2015-2023. So we have to consider the size of the field of the year when the study was carried out which is more complicated.
+Fields in the `RPG sequence de culture` can be sub-divided depending in the time period 2015-2023. So we have to re-calculate the size of the entire field of the year when the study was carried out.   
 
 For the area, it is simplified thanks to the variable `seq_surf` giving the area of the sub-fields in ha, and `parcelYYYY` with the ID of the parcel for each year.
 
 ```{r}
 #| label: fig-5
-#| fig-cap: "Relations between field size area. The subarea is the area from sub field provided directly in the RPG sequence de culture. The areas area calculated from all the fields with the same ID in a given year"
+#| fig-cap: "Correlations among field areas in the time series. The subarea is the area from sub-fields provided directly in the RPG sequence de culture. The areas are calculated from all the fields with the same ID in a given year."
 subarea <- pt_rpg_35$seq_surf
 
 area_2015 <- tapply(rpg_35$seq_surf, rpg_35$parcel2015, sum, na.rm = TRUE)
@@ -295,8 +311,19 @@ pairs(areas, lower.panel = panel.smooth, upper.panel = panel.cor)
 ```
 
 
+**TO BE DISCUSSED**:    
+- the correlation in field areas in the successive years are (relatively) low compared to my expectations (field size shouldn't change so much in 10-year period, and more closely related years should be more correlated). Are the results shown in @fig-5 normal or does it indicate possible errors in merging subfields?
+
+
 ### Perimeter 
 
+This is a tricky operation, because sub-fields do not overlap properly (different edges), and sometimes they have complex geometry. So far, the best solution that I found is to:   
+
+1. aggregate (or dissolve) with `aggregate()`  
+2. merge non touching polygons by calculating convex hull `hull(type = "concave_length")`  
+3. and simplify the geometry to remove some unecessary complicated geometries with `simplifyGeom()`  
+
+The perimeter is highly sensible to all theses steps (the area much less).
 
 ```{r}
 #| label: fig-6
@@ -327,7 +354,7 @@ while (n < 10) {
     # simplify helps a little
     si_pci <- simplifyGeom(hu_pci, preserveTopology = FALSE)
 
-    plot(pci)
+    plot(pci, main=pts_35$ID[i])
     plot(agg_pci, border = "blue", add = TRUE)
     plot(hu_pci, border = "red", add = TRUE)
     plot(si_pci, border = "green", add = TRUE)
@@ -339,14 +366,7 @@ while (n < 10) {
 #    perim(si_pci)
 ```
 
-This is tricky operation, because sub-fields do not overlap properly (different edge), and sometimes complex geometry.
-So far, the best solution is to:  
 
-1. aggregate (or dissolve) with `aggregate()`
-2. merge non touching polygons by calculating convex hull `hull(type = "concave_length")`
-3. and simplify the geometry to remove some unecessary complicated geometries (`simplifyGeom()`)
-
-The perimeter is highly sensible to all theses steps (the area much less).
 
 ```{r}
 #| label: fig-7
@@ -382,40 +402,173 @@ for (i in 1:nrow(pt_rpg_35)) {
 
 ```
 
+Number of sites with fields found in `RPG sequence de culture`
 ```{r}
 table(pt_rpg_35$id_unique %in% rpg_simple$id_unique)
 pts_35$hasfield <- pt_rpg_35$id_unique %in% rpg_simple$id_unique
 ```
 
-Summary of the area of fields (in $m^2$)
+Summary of the area of fields (in $ha$)
 ```{r}
-summary(expanse(rpg_simple))
+rpg_simple$area_ha <- expanse(rpg_simple) * 0.0001
+summary(rpg_simple$area_ha)
 ```
 
 Summary of the perimeter of fields (in $m$)
 ```{r}
-summary(perim(rpg_simple))
+rpg_simple$perimeter_m <- perim(rpg_simple)
+summary(rpg_simple$perimeter_m)
 ```
 
 ```{r}
-mapview(st_as_sf(pts_35), z = "hasfield", layer.name = "cover") +
+#| label: fig-8
+#| fig-cap: "Interactive map with the sites and the corresponding field from RPG sequence de culture."
+mapview(
+  st_as_sf(pts_35),
+  z = "hasfield",
+  layer.name = "cover",
+  map.types = c("Esri.WorldImagery", "OpenStreetMap")
+) +
   mapview(rpg_simple, color = "blue", col.regions = "blue", alpha.regions = 0.4)
 
 ```
 
 
 **TO BE DISCUSSED**:   
-- are the area/perimeter within expected range? what about the shape of the fields? 
 
-
+- are the areas and perimeters within expected range? what about the shape of the fields?   
+- how do we deal with issues identified visually, e.g. BIOHME_43_2020 (multiple fields + road)?
 
 
 
 ## BD Haie and buffer
 
-Let's explore the dataset from BD Haie v2 mars 2024 from <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb).  
-The v2 is derived from images of the period 2020-2022 which is a better fit to our dataset than v1 based on images from 2011-2024.
+Let's explore the dataset from BD Haie v2 mars 2024 from <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb). BD Haie v2 is derived from images of the period 2020-2022 which is a better fit to our dataset than v1 based on images from 2011-2024.
+
+```{r}
+# haie needs to be filtered to load fast
+ext_35 <- vect(ext(pts_35) + 1000, crs = crs(pts_35))
+haie <- vect(here(datafolder, "haie.gpkg"), filter = ext_35)
+```
+
+### Visualization
+
+Let's zoom in an area around Pleine-Fougères to visualize the hedges in BD HAIE (@fig-9).
+
+```{r}
+#| label: fig-9
+#| fig-cap: "Interactive map with the hedges and the sampled fields around Trans-la-Foret"
+sub <- pts_35[
+  pts_35$Site %in% c("86", "157", "149", "20") & pts_35$Study_ID == "BISCO"
+]
+zoom <- vect(ext(sub) + 1000, crs = crs(pts_35))
+haie_zoom <- crop(haie, zoom)
+fields_zoom <- crop(rpg_simple, zoom)
+
+mapview(
+  haie_zoom,
+  color = "black",
+  alpha.regions = 0,
+  map.types = c("Esri.WorldImagery", "OpenStreetMap")
+) +
+  mapview(
+    fields_zoom,
+    color = "blue",
+    col.regions = "blue",
+    alpha.regions = 0.4
+  )
+
+```
+  
+  
+### Length of hedges
+    
+Summary of the length of hedges in the sampled field (m)
+```{r}
+haie_0 <- intersect(haie, rpg_simple)
+length_haie <- tapply(perim(haie_0), haie_0$ID, sum)
+summary(length_haie[rpg_simple$ID]) 
+```
 
 
-*to be continued ...*
+Summary of the density of hedges in the sampled field (km/ha)
+```{r}
+density_haie <-length_haie[rpg_simple$ID]/expanse(rpg_simple)*10
+summary(density_haie)
+```
 
+
+```{r}
+#| label: fig-10
+#| fig-cap: "Relation between field size and length of hedges within the field"
+plot(expanse(rpg_simple)/10000, length_haie[rpg_simple$ID], xlab="Field size (ha)", ylab="Length of hedges (m)")
+```
+
+Some fields (N=```r sum(is.na(density_haie))```) don't have hedges around the field (e.g. @fig-11)
+
+```{r}
+#| label: fig-11
+#| fig-cap: "Example of a field with no hedges within the cropping area"
+no_hedge <- which(!rpg_simple$ID%in%names(length_haie))[2]
+plot(rpg_simple[no_hedge])
+plot(haie, add=TRUE, col="red")
+legend("bottomleft", legend=c("field", "hedge"), col=c("black", "red"), lwd=1, xpd=NA)
+```
+
+
+### Buffers
+
+Let's create four different buffers: 10m, 500m, 1000m, and 1500m (@fig-12) and calculate the density of hedge within the buffer (@fig-13).
+
+```{r}
+#| label: fig-12
+#| fig-cap: "Representation of the different buffer size"
+field_buff10 <- buffer(rpg_simple, 10)
+field_buff500 <- buffer(rpg_simple, 500)
+field_buff1000 <- buffer(rpg_simple, 1000)
+field_buff1500 <- buffer(rpg_simple, 1500)
+
+plot(field_buff1500[1])
+plot(field_buff1000[1], add=TRUE, border="blue")
+plot(field_buff500[1], add=TRUE, border="red")
+plot(field_buff10[1], add=TRUE, border = "darkgreen")
+plot(rpg_simple[1], add=TRUE, col="grey")
+legend("topleft", legend=c(1500, 1000, 500, 10), col=c("black", "blue", "red", "darkgreen"), lwd=1, title="Buffer size")
+```
+
+
+```{r}
+#| label: fig-13
+#| fig-cap: "Relationships among hedge density calculated with different buffer sizes (1500m, 1000m, 500m, 10m, and no buffer)."
+
+
+haie_1500 <- intersect(haie, field_buff1500)
+length_1500 <- tapply(perim(haie_1500), haie_1500$ID, sum)
+
+haie_1000 <- intersect(haie, field_buff1000)
+length_1000 <- tapply(perim(haie_1000), haie_1000$ID, sum)
+
+haie_500 <- intersect(haie, field_buff500)
+length_500 <- tapply(perim(haie_500), haie_500$ID, sum)
+
+haie_10 <- intersect(haie, field_buff10)
+length_10 <- tapply(perim(haie_10), haie_10$ID, sum)
+
+#in km/ha (0.1 m/m2) 
+density_buffer <- data.frame(
+  b1500 = length_1500[rpg_simple$ID]/expanse(field_buff1500)*10,
+  b1000 = length_1000[rpg_simple$ID]/expanse(field_buff1000)*10,
+  b500 = length_500[rpg_simple$ID]/expanse(field_buff500)*10,
+  b10 = length_10[rpg_simple$ID]/expanse(field_buff10)*10,
+  b0 = length_haie[rpg_simple$ID]/expanse(rpg_simple)*10
+)
+
+pairs(density_buffer, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+The edge densities calculated with a large buffer (>500m) are highly correlated, especially the buffers 1000m and 1500m. The local hedge density might be better estimated with a buffer of 10m around the field (it will solve the issue seen in @fig-11). 
+
+**TO BE DISCUSSED**:   
+
+- are the hedge density within expected range?
+- from @fig-9, it seems that not all hedges are mapped, but maybe only the *interesting* one. Are the results representing what we want? or should we complete with another dataset?
