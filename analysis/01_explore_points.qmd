@@ -374,6 +374,7 @@ while (n < 10) {
 df35 <- as.data.frame(rpg_35)
 
 rpg_simple <- vect()
+rpg_full <- vect()
 for (i in 1:nrow(pt_rpg_35)) {
   # get year of point i (take only the first one for now)
   yri <- substr(pts_35$Year[i], 1, 4)
@@ -396,10 +397,19 @@ for (i in 1:nrow(pt_rpg_35)) {
         rpg_simple,
         cbind(si_pci, pts_35[i, ], pt_rpg_35[i, ])
       )
+
+      # keep track of original data
+      rpg_full <- rbind(
+        rpg_full,
+        cbind(pci, pts_35[rep(i, length(pci))])
+      )
     }
   }
 }
 
+writeVector(rpg_simple, here::here(datafolder, "rpg_aggregated_field_35.gpkg"), overwrite = TRUE)
+writeVector(rpg_full, here::here(datafolder, "rpg_all_fields_35.gpkg"), overwrite = TRUE)
+mapview::mapview(rpg_full)
 ```
 
 Number of sites with fields found in `RPG sequence de culture`
