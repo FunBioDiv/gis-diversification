@@ -216,7 +216,7 @@ mapview(
 Fields in `RPG sequence de culture` and `RPG complete` are very patchy from @fig-3. We will complete the data with OSO land cover (see [land cover exploration]((https://funbiodiv.github.io/gis-diversification/analysis/02_land_cover.html))).  
 
 **TO BE DISCUSSED**:   
-- should we remove points that don't fit within a RPG / RPG complété field (e.g. incorrect coordinates, or non interesting sampling site)? 
+- should we remove points that don't fit within a RPG / RPG complété field (e.g. incorrect coordinates, or non-interesting sampling site - urban or forest)? 
 
 
 ## Crop rotation (2015-2023)
@@ -276,41 +276,6 @@ On most fields, there are between 3 and 4 different crops cultivated within the 
 
 
 ## Field size
-
-
-### Area 
-
-Fields in the `RPG sequence de culture` can be sub-divided depending in the time period 2015-2023. So we have to re-calculate the size of the entire field of the year when the study was carried out.   
-
-For the area, it is simplified thanks to the variable `seq_surf` giving the area of the sub-fields in ha, and `parcelYYYY` with the ID of the parcel for each year.
-
-```{r}
-#| label: fig-5
-#| fig-cap: "Correlations among field areas in the time series. The subarea is the area from sub-fields provided directly in the RPG sequence de culture. The areas are calculated from all the fields with the same ID in a given year."
-subarea <- pt_rpg_35$seq_surf
-
-area_2015 <- tapply(rpg_35$seq_surf, rpg_35$parcel2015, sum, na.rm = TRUE)
-area_2019 <- tapply(rpg_35$seq_surf, rpg_35$parcel2019, sum, na.rm = TRUE)
-area_2023 <- tapply(rpg_35$seq_surf, rpg_35$parcel2023, sum, na.rm = TRUE)
-
-areas <- data.frame(
-  "Subarea" = subarea,
-  "area_2015" = area_2015[pt_rpg_35$parcel2015],
-  "area_2019" = area_2019[pt_rpg_35$parcel2019],
-  "area_2023" = area_2023[pt_rpg_35$parcel2023]
-)
-# remove outlier
-areas[areas > 1000] <- NA
-
-pairs(areas, lower.panel = panel.smooth, upper.panel = panel.cor)
-
-# missing values:
-# apply(is.na(areas), 2, sum)
-```
-
-
-**TO BE DISCUSSED**:    
-- the correlation in field areas in the successive years are (relatively) low compared to my expectations (field size shouldn't change so much in 10-year period, and more closely related years should be more correlated). Are the results shown in @fig-5 normal or does it indicate possible errors in merging subfields?
 
 
 ### Perimeter 
@@ -531,50 +496,53 @@ Let's create four different buffers: 10m, 500m, 1000m, and 1500m (@fig-12) and c
 ```{r}
 #| label: fig-12
 #| fig-cap: "Representation of the different buffer size"
+field_buff1 <- buffer(rpg_simple, 1)
+field_buff2 <- buffer(rpg_simple, 2)
+field_buff5 <- buffer(rpg_simple, 5)
 field_buff10 <- buffer(rpg_simple, 10)
-field_buff500 <- buffer(rpg_simple, 500)
-field_buff1000 <- buffer(rpg_simple, 1000)
-field_buff1500 <- buffer(rpg_simple, 1500)
 
-plot(field_buff1500[1])
-plot(field_buff1000[1], add=TRUE, border="blue")
-plot(field_buff500[1], add=TRUE, border="red")
-plot(field_buff10[1], add=TRUE, border = "darkgreen")
+zoom <- vect(ext(field_buff10[1]), crs = crs(field_buff10))
+haie_buffzoom <- crop(haie, zoom)
+
+plot(field_buff10[1])
+plot(field_buff5[1], add=TRUE, border="blue")
+plot(field_buff2[1], add=TRUE, border="red")
+plot(field_buff1[1], add=TRUE, border = "darkgreen")
 plot(rpg_simple[1], add=TRUE, col="grey")
-legend("topleft", legend=c(1500, 1000, 500, 10), col=c("black", "blue", "red", "darkgreen"), lwd=1, title="Buffer size")
+plot(haie_buffzoom, col="green", add=TRUE, lwd=2)
+legend("center", legend=c(10, 5, 2, 1), col=c("black", "blue", "red", "darkgreen"), lwd=1, title="Buffer size")
 ```
 
 
 ```{r}
 #| label: fig-13
-#| fig-cap: "Relationships among hedge density calculated with different buffer sizes (1500m, 1000m, 500m, 10m, and no buffer)."
-
-
-haie_1500 <- intersect(haie, field_buff1500)
-length_1500 <- tapply(perim(haie_1500), haie_1500$ID, sum)
-
-haie_1000 <- intersect(haie, field_buff1000)
-length_1000 <- tapply(perim(haie_1000), haie_1000$ID, sum)
-
-haie_500 <- intersect(haie, field_buff500)
-length_500 <- tapply(perim(haie_500), haie_500$ID, sum)
+#| fig-cap: "Relationships among hedge density calculated with different buffer sizes (10m, 5m, 2m, 1m, and no buffer)."
 
 haie_10 <- intersect(haie, field_buff10)
 length_10 <- tapply(perim(haie_10), haie_10$ID, sum)
 
+haie_5 <- intersect(haie, field_buff5)
+length_5 <- tapply(perim(haie_5), haie_5$ID, sum)
+
+haie_2 <- intersect(haie, field_buff2)
+length_2 <- tapply(perim(haie_2), haie_2$ID, sum)
+
+haie_1 <- intersect(haie, field_buff1)
+length_1 <- tapply(perim(haie_1), haie_1$ID, sum)
+
 #in km/ha (0.1 m/m2) 
 density_buffer <- data.frame(
-  b1500 = length_1500[rpg_simple$ID]/expanse(field_buff1500)*10,
-  b1000 = length_1000[rpg_simple$ID]/expanse(field_buff1000)*10,
-  b500 = length_500[rpg_simple$ID]/expanse(field_buff500)*10,
   b10 = length_10[rpg_simple$ID]/expanse(field_buff10)*10,
+  b5 = length_5[rpg_simple$ID]/expanse(field_buff5)*10,
+  b2 = length_2[rpg_simple$ID]/expanse(field_buff2)*10,
+  b1 = length_1[rpg_simple$ID]/expanse(field_buff1)*10,
   b0 = length_haie[rpg_simple$ID]/expanse(rpg_simple)*10
 )
 
 pairs(density_buffer, lower.panel = panel.smooth, upper.panel = panel.cor)
 ```
 
-The edge densities calculated with a large buffer (>500m) are highly correlated, especially the buffers 1000m and 1500m. The local hedge density might be better estimated with a buffer of 10m around the field (it will solve the issue seen in @fig-11). 
+The local hedge density might be better estimated with a buffer of 10m around the field (it will solve the issue seen in @fig-11). 
 
 **TO BE DISCUSSED**:   
 

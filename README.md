@@ -21,3 +21,9 @@ quarto::quarto_render("analysis/02_land_cover.qmd")
 ```r
 quarto::quarto_render("analysis/03_field_size.qmd")
 ```
+
+
+Et mise à jour de l'index:
+```r
+quarto::quarto_render("index.qmd")
+```

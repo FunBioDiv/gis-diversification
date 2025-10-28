@@ -411,7 +411,7 @@ pairs(meansize_35, lower.panel = panel.smooth, upper.panel = panel.cor)
 En moyenne en Ille-et-Vilaine, il y a 268 parcelles de 2.3 ha dans une rayon de 1500m autour des sites d'échantillonage. L'ajout du `RPG complété` augmente très faiblement le nombre de parcelles et diminue leur taille moyenne mais la différence est minime.
 
 
-## Résumé :  
+## Résumé  
 
 La distribution de la taille des parcelles autour des sites d’échantillonnage n'est pas sensible à la source des données. Voici un petit récapitulatif des points forts des différents jeux de données:  
 
