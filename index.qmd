@@ -4,3 +4,4 @@ Explorations des jeux de données en cours:
 
 1. [Données RPG, RPG complété et BD haies](https://funbiodiv.github.io/gis-diversification/analysis/01_explore_points.html)  
 2. [Croisement RPG+OSO](https://funbiodiv.github.io/gis-diversification/analysis/02_land_cover.html)
+3. [Comparaison taille des parcelles RPG](https://funbiodiv.github.io/gis-diversification/analysis/03_field_size.html)

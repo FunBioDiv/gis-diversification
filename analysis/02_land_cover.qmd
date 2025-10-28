@@ -17,14 +17,29 @@ library(sf) |> suppressWarnings()
 library(here) |> suppressWarnings()
 library(mapview)
 library(tmap)
+library(exactextractr)
 # Load home made functions
 devtools::load_all()
 
 datafolder <- here("data", "raw-data")
 outfolder <- here("data", "derived-data")
-pts <- vect(here(datafolder, "pts_33.gpkg"))
-# Create an ID per site
-pts$ID <- paste(pts$Study_ID, pts$Site, pts$Year, sep = "_")
+pts35 <- vect(here(datafolder, "pts_35.gpkg"))
+pts35$ID <- paste(
+  pts35$Study_ID,
+  pts35$Site,
+  substr(pts35$Year, 1, 4),
+  sep = "_"
+)
+buff35 <- buffer(pts35, 1500)
+
+pts33 <- vect(here(datafolder, "pts_33.gpkg"))
+pts33$ID <- paste(
+  pts33$Study_ID,
+  pts33$Site,
+  substr(pts33$Year, 1, 4),
+  sep = "_"
+)
+buff33 <- buffer(pts33, 1500)
 ```
 
 ## Objectif
@@ -32,79 +47,18 @@ pts$ID <- paste(pts$Study_ID, pts$Site, pts$Year, sep = "_")
 L'objectif de ce document est d'explorer comment évaluer la couverture du sol autour des sites d’échantillonnage et leur historique dans les années précédant les relevés.
 L'idée est d'utiliser différentes sources de données, listés selon leur priorités:  
 
-1. Le RPG qui provient du jeu de donnees `RPG sequence de culture` (Girault, B. et Philippe M. 2025 <https://doi.org/10.57745/VMYCYM>)
-2. Le RPG complété (Cantelaube, P. et Lardot B. 2024 <https://doi.org/10.57745/6FNRWO>)
-3. La carte d’occupation des sols du [CES OSO – THEIA](https://artificialisation.developpement-durable.gouv.fr/bases-donnees/oso-theia) (Inglada, J., et al. (2017). <https://geodes-portal.cnes.fr/>)
+1. Le RPG qui provient du jeu de donnees `RPG sequence de culture` (Girault, B. et Philippe M. 2025 <https://doi.org/10.57745/VMYCYM>)  
+2. Le RPG complété (Cantelaube, P. et Lardot B. 2024 <https://doi.org/10.57745/6FNRWO>)  
+3. La carte d’occupation des sols du [CES OSO – THEIA](https://artificialisation.developpement-durable.gouv.fr/bases-donnees/oso-theia) (Inglada, J., et al. (2017). <https://geodes-portal.cnes.fr/>)  
 
 
-Les ```r length(pts)``` sites de la Gironde (33) seront utilisés comme cas d'étude.
+Les sites d’échantillonnage de Gironde (d33, N=```r nrow(pts33)```) et d'Ille-et-Vilaine (d35 N=```r nrow(pts35)```), seront utilisés comme cas d'étude.
 
-
-## Couverture du sol en Gironde en 2022
-
-Pour obtenir la couverture du sol aux coordonnées des sites, nous pouvons utiliser directement les données en vecteur puis extraire la classe (1) du RPG, ou (2) du RPG complété, ou (3) des données OSO selon leur disponibilité (@tbl-1).
-
-
-```{r load}
-rpg <- vect(here(datafolder, "d33.gpkg"))
-ref_rpg <- read.csv(here(datafolder, "ref_rpg.csv"))
-
-rpg_c <- vect(here(datafolder, "rpg_complete_2022_d33.shp"))
-
-oso_22 <- vect(here(datafolder, "OSO_2022_departement_33.shp"))
-nolab <- c("Classe", "Validmean", "Validstd", "Confidence", "Aire")
-lab_oso <- names(oso_22)[!names(oso_22) %in% nolab]
-```
+Pour pouvoir calculer l'occupation du sol sur un buffer, il faut superposer les données vectoriels. Un des enjeux majeur est **l'harmonisation des classes entre RPG, RPG complété et OSO**. Pour le moment, l'harmonisation et la simplification des classes d'occupation du sol est dans le fichier [`classes.csv`](https://github.com/FunBioDiv/gis-diversification/raw/refs/heads/main/data/derived-data/classes.csv). Il y a 38 classes différentes (@tbl-1).
 
 
 ```{r}
 #| label: tbl-1
-#| tbl-cap: "Source d'information de couverture du sol en 2022 pour les sites de Gironde"
-pt_rpg <- extract(rpg, pts)
-pt_rpgc <- extract(rpg_c, pts)
-pt_oso22 <- extract(oso_22, pts)
-
-so22 <- ifelse(
-  is.na(pt_rpg$cult2022),
-  ifelse(is.na(pt_rpgc$culture), "OSO", "RPG_C"),
-  "RPG"
-) |>
-  factor(levels = c("RPG", "RPG_C", "OSO"))
-
-table(so22, pts$Study_ID, useNA = "ifany") |> knitr::kable()
-```
-
-
-```{r}
-#| label: tbl-2
-#| tbl-cap: "Couverture du sol en 2022 pour les sites de Gironde"
-
-# fmt: skip
-lc23 <- ifelse(
-  is.na(pt_rpg$cult2022),
-  ifelse(is.na(pt_rpgc$culture), 
-    paste0("OSO_", lab_oso[pt_oso22$Classe]), 
-    paste0("RPGC_",pt_rpgc$culture)),
-  paste0("RPG_", ref_rpg$nom_grp_culture[match(pt_rpg$cult2022, ref_rpg$code_culture)])
-)
-
-table(lc23, pts$Study_ID, useNA = "ifany") |> knitr::kable()
-```
-
-
-La plupart des relevés ont été effectués dans des vignes dans des parcelles inclues dans le RPG (@tbl-2). Pour 61 sites, l'information n'était disponible que dans le RPG Complété. Il y a aussi 17 relevés effectués dans des forêts de conifères (données OSO), et 8 dans des champs de mais (données RPG).
-
-
-## Harmonization de la couverture du sol
-
-### Création d'une couche raster
-
-Pour pouvoir calculer l'occupation du sol sur un buffer, il faut superposer les données vectoriels. Le plus simple est de faire le croisement en raster, avec une grille de 10m de résolution spatiale. Un des enjeux majeur est **l'harmonisation des classes entre RPG, RPG complété et OSO**.  
-
-Pour le moment, l'harmonisation et la simplification des classes d'occupation du sol est dans le fichier [`classes.csv`](https://github.com/FunBioDiv/gis-diversification/raw/refs/heads/main/data/derived-data/classes.csv). Il y a 38 classes différentes (@tbl-3).
-
-```{r}
-#| label: tbl-3
 #| tbl-cap: "Les classes d'occupation du sol simplifiées et harmonisées"
 ref <- read.csv(here(outfolder, "classes.csv"))
 miniref <- ref[, c("info_grp_id", "nom_grp_culture")]
@@ -113,150 +67,351 @@ miniref <- miniref[order(miniref$info_grp_id), ]
 knitr::kable(miniref, row.names = FALSE)
 ```
 
-```{r}
-# create a grid at 10m resolution
-grd <- terra::rast(oso_22, res = 10)
+
+
+## Couverture du sol en vectoriel
+
+Pour obtenir la couverture du sol aux coordonnées des sites, nous pouvons utiliser directement les données en vecteur puis extraire la classe (1) du RPG, ou (2) du RPG complété, ou (3) des données OSO selon leur disponibilité.
+
+```{r load}
+rpg35_seq <- vect(here(datafolder, "d35.gpkg"))
+rpg33_seq <- vect(here(datafolder, "d33.gpkg"))
+
+rpg35_comp <- vect(here(datafolder, "rpg_complete_2022_d35.shp"))
+rpg33_comp <- vect(here(datafolder, "rpg_complete_2022_d33.shp"))
+
+ref_rpg <- read.csv(here(datafolder, "ref_rpg.csv"))
+
+oso35_22 <- vect(here(datafolder, "OSO_2022_departement_35.shp"))
+oso33_22 <- vect(here(datafolder, "OSO_2022_departement_33.shp"))
+nolab <- c("Classe", "Validmean", "Validstd", "Confidence", "Aire")
+lab_oso <- names(oso33_22)[!names(oso33_22) %in% nolab]
+# same as
+# nolab <- c("Classe", "Validmean", "Validstd", "Confidence", "Aire")
+# lab_oso <- names(oso35_22)[!names(oso35_22) %in% nolab]
 ```
 
+
 ```{r}
-#| eval: false
-# rasterize RPG with group culture
-# unique(rpg$cult2022[!rpg$cult2022 %in% ref$code_culture]) # NA
-rpg$label <- ref$info_grp_id[match(rpg$cult2022, ref$code_culture)]
-rpg_r <- rasterize(
-  rpg,
-  grd,
-  "label",
-  filename = "temp_rpg22_10m.tif",
-  overwrite = TRUE
-)
-# not sure why but there are some negative values
-rpg_r <- clamp(rpg_r, 1, max(ref$info_grp_id), values = FALSE)
+#| label: tbl-2
+#| tbl-cap: "Couverture du sol en 2022 et source d'information pour les sites de Gironde (d33)"
+pt33_rpg <- extract(rpg33_seq, pts33)
+pt33_rpg_22 <- ref$nom_grp_culture[match(pt33_rpg$cult2022, ref$code_culture)]
 
-# rasterize RPG complete
-m_rpc <- ifelse(
-  is.na(match(rpg_c$culture, ref$code_culture)),
-  match(rpg_c$culture, ref$nom_culture),
-  match(rpg_c$culture, ref$code_culture)
-)
-# unique(rpg_c$culture[is.na(m_rpc)]) # none
-rpg_c$label <- ref$info_grp_id[m_rpc]
+pt33_rpgc <- extract(rpg33_comp, pts33)
+pt33_rpgc_22 <- ref$nom_grp_culture[match(pt33_rpgc$culture, ref$code_culture)]
 
-rpc_r <- rasterize(
-  rpg_c,
-  grd,
-  "label",
-  filename = "temp_rpgc22_10m.tif",
-  overwrite = TRUE
+pt33_oso22 <- extract(oso33_22, pts33)
+pt33_oso_22 <- ref$nom_grp_culture[match(
+  lab_oso[pt33_oso22$Classe],
+  ref$code_culture
+)]
+
+#fmt: skip
+landcover_33 <- ifelse(is.na(pt33_rpg_22),
+  ifelse(is.na(pt33_rpgc_22),
+    paste0("OSO_", pt33_oso_22), paste0("RPGC_", pt33_rpgc_22)),
+  paste0("RPG_", pt33_rpg_22)
 )
 
-# rasterize oso with labels
-oso_22$name <- lab_oso[oso_22$Classe]
-# rasterize RPG complete
-m_oso <- ifelse(
-  is.na(match(oso_22$name, ref$code_culture)),
-  match(oso_22$name, ref$nom_culture),
-  match(oso_22$name, ref$code_culture)
-)
-# unique(oso_22$name[is.na(m_oso)]) # none
-oso_22$label <- ref$info_grp_id[m_oso]
-
-oso_r <- rasterize(
-  oso_22,
-  grd,
-  "label",
-  filename = "temp_oso22_10m.tif",
-  overwrite = TRUE
+# order the levels
+lev <- sort(unique(landcover_33))
+landcover_33 <- factor(
+  landcover_33,
+  levels = lev[c(grep("RPG_", lev), grep("RPGC_", lev), grep("OSO", lev))]
 )
 
-all <- merge(
-  rpg_r,
-  rpc_r,
-  oso_r,
-  first = TRUE,
-  filename = "merge_d33_2022_10m.tif",
-  overwrite = TRUE
-)
-
-set.cats(all, value = miniref)
-
-writeRaster(
-  all,
-  filename = here(outfolder, "Merged_d33_2022_10m.tif"),
-  overwrite = TRUE
-)
-# plot(rpg_r)
-# plot(rpc_r)
-# plot(oso_r)
-# plot(all)
+table(landcover_33, pts33$Study_ID, useNA = "ifany") |> knitr::kable()
 ```
 
+La plupart des relevés en Gironde ont été effectués dans des vignes sur des parcelles du RPG (@tbl-2). Pour 61 sites, l'information de la parcelle n'était disponible que dans le RPG Complété. Les données OSO permettent de completer l'occupation du sol pour tous les sites. Il y a 17 relevés effectués dans des forêts de conifères (projet LepiBats), un relevé dans une vigne qui n'est pas dans le RPG (ID: ```r pts33$ID[landcover_33 == "OSO_Vignes"]```), une prairie permanente (ID: ```r pts33$ID[landcover_33 == "OSO_Prairies permanentes"]```) et sur du batis diffus (erreur de coordonnées? ID: ```r pts33$ID[landcover_33 == "OSO_Batis diffus"]```).
+
+
+```{r}
+#| label: tbl-3
+#| tbl-cap: "Couverture du sol en 2022 et source d'information pour les sites de d'Ille-et-Vilaine (d35)"
+
+pt35_rpg <- extract(rpg35_seq, pts35)
+pt35_rpg_22 <- ref$nom_grp_culture[match(pt35_rpg$cult2022, ref$code_culture)]
+
+pt35_rpgc <- extract(rpg35_comp, pts35)
+pt35_rpgc_22 <- ref$nom_grp_culture[match(pt35_rpgc$culture, ref$code_culture)]
+
+pt35_oso22 <- extract(oso35_22, pts35)
+pt35_oso_22 <- ref$nom_grp_culture[match(
+  lab_oso[pt35_oso22$Classe],
+  ref$code_culture
+)]
+
+#fmt: skip
+landcover_35 <- ifelse(is.na(pt35_rpg_22),
+  ifelse(is.na(pt35_rpgc_22),
+    paste0("OSO_", pt35_oso_22), paste0("RPGC_", pt35_rpgc_22)),
+  paste0("RPG_", pt35_rpg_22)
+)
+
+# order the levels
+lev <- sort(unique(landcover_35))
+landcover_35 <- factor(
+  landcover_35,
+  levels = lev[c(grep("RPG_", lev), grep("RPGC_", lev), grep("OSO", lev))]
+)
+
+table(landcover_35, pts35$Study_ID, useNA = "ifany") |> knitr::kable()
+
+```
+
+La plupart des sites d’échantillonnages sont couverts par le RPG (@tbl-3) et concernent des cultures de céréales. Le RPG Complété permet de compléter deux parcelles, une de mais (ID: ```r pts35$ID[landcover_35 == "RPGC_Maïs"]```) et une prairie temporaire (ID: ```r pts35$ID[landcover_35 == "RPGC_Prairies temporaires"]```). Enfin OSO permet d'obtenir la couverture du sol d'un seul site en prairie permanente (ID: ```r pts35$ID[landcover_35 == "OSO_Prairies permanentes"]```).
+
+
+## Harmonization de la couverture du sol
+
+### Création d'une couche raster
+
+Pour pouvoir calculer l'occupation du sol sur un buffer, il faut superposer les données vectoriels. Le plus simple est de faire le croisement en raster. Les données OSO proviennent d'un raster à 10m. Cependant les données RPG sont plus précises et il peut être intéressant de créer une couche raster de résolution plus fine, à 5m ou à 2m. 
+
+```{r}
+r33_10 <- rast(here(outfolder, "Merged_d33_2022_10m.tif"))
+r33_5 <- rast(here(outfolder, "Merged_d33_2022_5m.tif"))
+r33_2 <- rast(here(outfolder, "Merged_d33_2022_2m.tif"))
+
+r35_10 <- rast(here(outfolder, "Merged_d35_2022_10m.tif"))
+r35_5 <- rast(here(outfolder, "Merged_d35_2022_5m.tif"))
+r35_2 <- rast(here(outfolder, "Merged_d35_2022_2m.tif"))
+```
 
 ```{r}
 #| label: fig-1
-#| fig-cap: "Occupation du sol harmonisée en raster 10m"
-all <- rast(here(outfolder, "Merged_d33_2022_10m.tif"))
+#| fig-cap: "Occupation du sol harmonisée en raster 10m pour la Gironde (à gauche) et l'Ille-et-Vilaine (à droite)"
+par(mfrow = c(1, 2))
 par(cex = 0.8)
-plot(all, main = "Occupation du sol 2022", all_levels = FALSE)
-plot(pts, add = TRUE, col = "red")
+plot(r33_10, main = "Occupation du sol 2022 - Gironde", legend = FALSE)
+plot(pts33, add = TRUE, col = "red")
+
+plot(r35_10, main = "Occupation du sol 2022 - Ille-et-Vilaine", legend = FALSE)
+plot(pts35, add = TRUE, col = "red")
 ```
+
 
 ```{r}
 #| label: tbl-4
-#| tbl-cap: "Occupation du sol extraite depuis la donnée agrégée en raster"
-pt_merge <- extract(all, pts)
-table(as.character(pt_merge$nom_grp_culture), pts$Study_ID) |> knitr::kable()
+#| tbl-cap: "Caractéristiques des rasters d'occupation du sol à différente résolutions spatiales"
+#fmt: skip
+info <- data.frame(
+  "departement" = c(rep(33,3), rep(35,3)),
+  "resolution" = c(res(r33_10)[1], res(r33_5)[1], res(r33_2)[1],res(r35_10)[1], res(r35_5)[1], res(r35_2)[1]),
+  "nx" = c(nrow(r33_10), nrow(r33_5), nrow(r33_2), nrow(r35_10), nrow(r35_5), nrow(r35_2)),
+  "ny" = c(ncol(r33_10), ncol(r33_5), ncol(r33_2), ncol(r35_10), ncol(r35_5), ncol(r35_2)),
+  "file_Mb" = round(c(
+    file.info(here(outfolder, "Merged_d33_2022_10m.tif"))$size,
+    file.info(here(outfolder, "Merged_d33_2022_5m.tif"))$size,
+    file.info(here(outfolder, "Merged_d33_2022_2m.tif"))$size,
+    file.info(here(outfolder, "Merged_d35_2022_10m.tif"))$size,
+    file.info(here(outfolder, "Merged_d35_2022_5m.tif"))$size,
+    file.info(here(outfolder, "Merged_d35_2022_2m.tif"))$size
+  )/1000000,2)
+)
+knitr::kable(info)
 ```
 
-L'occupation du sol issue des données en raster (@tbl-4) est similaire aux données extraites des couches vectorielles (@tbl-2).
-
-### Buffer
-
-A partir de cette couche raster, il est facile d'extraire l'occupation du sol par buffer.
-
-```{r}
-buff500 <- buffer(pts, 500)
-buff1000 <- buffer(pts, 1000)
-buff1500 <- buffer(pts, 1500)
-
-e500 <- exactextractr::exact_extract(
-  all,
-  st_as_sf(buff500),
-  fun = 'frac',
-  progress = FALSE
-)
-
-e1000 <- exactextractr::exact_extract(
-  all,
-  st_as_sf(buff1000),
-  fun = 'frac',
-  progress = FALSE
-)
-
-e1500 <- exactextractr::exact_extract(
-  all,
-  st_as_sf(buff1500),
-  fun = 'frac',
-  progress = FALSE
-)
-```
-
+Pour un département et une année, les données rasters sont rapide à créer et assez légère avec une résolution de 10m (<50Mb) mais deviennent très lourde avec une résolution de 2m (>500Mb) (@tbl-4). On peut se rendre compte de la différence en zoomant sur une petite zone de 10ha (@fig-2).
 
 ```{r}
 #| label: fig-2
-#| fig-cap: "Distribution moyenne des classes de couverture du sol par taille de buffer"
-m1 <- apply(e500, 2, mean)
-m2 <- apply(e1000, 2, mean)
-m3 <- apply(e1500, 2, mean)
+#| fig-cap: "Zoom sur une petite zone de 17 ha en Gironde. Les points rouges correspondent à des sites d'échantillonage."
+sub <- pts33[
+  pts33$ID %in% c("LepiBats_Tri06C_2021", "LepiBats_Tri06V_2021")
+]
+# sub <- pts33[
+#   pts33$ID %in% c("BACCHUS_17C24_2024")
+# ]
+
+# original zoom: c("Tri04C", "Tri02V", "33_2018_00002", "Tri06M")
+zoom <- vect(ext(sub) + 50, crs = crs(pts33))
+# expanse(zoom) * 0.0001
+par(mfrow = c(2, 3))
+plot(crop(rpg33_seq, zoom), "cult2022", legend = FALSE, main = "RPG - Vector")
+plot(pts33, add = TRUE, col = "red")
+plot(
+  crop(rpg33_comp, zoom),
+  "culture",
+  legend = FALSE,
+  main = "RPG Complete - Vector",
+  xlim = ext(zoom)[1:2],
+  ylim = ext(zoom)[3:4]
+)
+plot(pts33, add = TRUE, col = "red")
+plot(crop(oso33_22, zoom), "Classe", legend = FALSE, main = "OSO - Vector")
+plot(pts33, add = TRUE, col = "red")
+plot(crop(r33_10, zoom), legend = FALSE, main = "Raster 10m")
+plot(pts33, add = TRUE, col = "red")
+plot(crop(r33_5, zoom), legend = FALSE, main = "Raster 5m")
+plot(pts33, add = TRUE, col = "red")
+plot(crop(r33_2, zoom), legend = FALSE, main = "Raster 2m")
+plot(pts33, add = TRUE, col = "red")
+```
+
+```{r}
+#| label: tbl-5
+#| tbl-cap: "Nombre de classification correct par resolution de raster"
+ras10_lc33 <- extract(r33_10, pts33)$nom_grp_culture
+ras5_lc33 <- extract(r33_5, pts33)$nom_grp_culture
+ras2_lc33 <- extract(r33_2, pts33)$nom_grp_culture
+vec_lc33 <- sapply(
+  strsplit(as.character(landcover_33), split = "_"),
+  function(x) x[[2]]
+)
+
+ras10_lc35 <- extract(r35_10, pts35)$nom_grp_culture
+ras5_lc35 <- extract(r35_5, pts35)$nom_grp_culture
+ras2_lc35 <- extract(r35_2, pts35)$nom_grp_culture
+vec_lc35 <- sapply(
+  strsplit(as.character(landcover_35), split = "_"),
+  function(x) x[[2]]
+)
+
+info <- data.frame(
+  "10m" = c(sum(ras10_lc33 == vec_lc33), sum(ras10_lc35 == vec_lc35)),
+  "5m" = c(sum(ras5_lc33 == vec_lc33), sum(ras5_lc35 == vec_lc35)),
+  "2m" = c(sum(ras2_lc33 == vec_lc33), sum(ras2_lc35 == vec_lc35)),
+  check.names = FALSE
+)
+row.names(info) <- c("d33", "d35")
+
+knitr::kable(info)
+# pts33$ID[ras10_lc33 != vec_lc33]
+# ras10_lc33[ras10_lc33 != vec_lc33]
+# vec_lc33[ras10_lc33 != vec_lc33]
+```
+
+L'occupation du sol issue des données en raster est similaire aux données extraites des couches vectorielles quelque soit la résolution (@tbl-5), sauf pour ```r pts33$ID[ras10_lc33 != vec_lc33]``` qui est anormalement attribué dans la classe ```r ras10_lc33[ras10_lc33 != vec_lc33]``` avec le raster à 10m, alors que le site est en ```r vec_lc33[ras10_lc33 != vec_lc33]```.
+En général, il est recommendé d'extraire l'occupation du sol ponctuelle à partir des couches vectorielles. L'avantage de l'approche raster est plus évidente pour extraire l'occupation du sol par buffer.
+
+### Buffer
+
+
+#### Comparaison de la resolution spatiale
+
+Le buffer de 1000m est utilisé pour évaluer l'influence de la résolution spatiale des rasters sur l'occupation du sol. 
+
+```{r}
+buff33_1000 <- buffer(pts33, 1000) |> st_as_sf()
+
+e1000_10m <- exactextractr::exact_extract(
+  r33_10,
+  st_as_sf(buff33_1000),
+  fun = 'frac',
+  progress = FALSE
+)
+
+e1000_5m <- exactextractr::exact_extract(
+  r33_5,
+  st_as_sf(buff33_1000),
+  fun = 'frac',
+  progress = FALSE
+)
+
+e1000_2m <- exactextractr::exact_extract(
+  r33_2,
+  st_as_sf(buff33_1000),
+  fun = 'frac',
+  progress = FALSE
+)
+```
+
+
+```{r}
+#| label: fig-3
+#| fig-cap: "Couverture du sol moyenne pour les buffer de 1km  en Gironde selon la résolution spatiale des rasters"
+m1 <- apply(e1000_10m, 2, mean)
+m2 <- apply(e1000_5m, 2, mean)
+m3 <- apply(e1000_2m, 2, mean)
+
 catall <- sort(unique(c(names(m1), names(m2), names(m3))))
 lab <- miniref$nom_grp_culture[match(
   gsub("frac_", "", catall),
   miniref$info_grp_id
 )]
 mean_cover <- rbind(
-  "b500" = m1[match(catall, names(m1))],
-  "b1000" = m2[match(catall, names(m2))],
-  "b1500" = m3[match(catall, names(m3))]
+  "10m" = m1[match(catall, names(m1))],
+  "5m" = m2[match(catall, names(m2))],
+  "2m" = m3[match(catall, names(m3))]
+)
+mean_cover[is.na(mean_cover)] <- 0
+
+par(mar = c(4, 4, 1, 9))
+barplot(
+  t(mean_cover * 100),
+  col = rainbow(length(catall)),
+  ylab = "Percentage land cover",
+  xlab = "Spatial resolution (m)"
+)
+leg_keep <- apply(mean_cover, 2, sum) > 0.05
+legend(
+  3.6,
+  60,
+  legend = rev(lab[leg_keep]),
+  fill = rev(rainbow(length(catall))[leg_keep]),
+  cex = 0.9,
+  xpd = NA
+)
+```
+
+```{r}
+#| label: fig-4
+#| fig-cap: "Correlation des couvertures du sol pour les buffer de 1km en Gironde selon la résolution spatiale des rasters"
+
+comp <- data.frame(
+  "10m" = unlist(e1000_10m),
+  "5m" = unlist(e1000_5m),
+  "2m" = unlist(e1000_2m),
+  check.names = FALSE
+)
+pairs(comp, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+
+L'occupation des sols dans les buffers n'est pas influencée par la résolution spatiale des rasters (@fig-3, @fig-4). Les calculs sont beaucoup plus long pour les résolutions fines, donc cela oriente pour l'utilisation du raster à 10m.
+
+
+#### Comparaison de la taille du buffer
+
+Le raster à 10m est utilisé pour évaluer l'influence de la taille du buffer sur l'occupation du sol. 
+
+```{r}
+buff33_500 <- buffer(pts33, 500) |> st_as_sf()
+buff33_1000 <- buffer(pts33, 1000) |> st_as_sf()
+buff33_1500 <- buffer(pts33, 1500) |> st_as_sf()
+
+buff35_500 <- buffer(pts35, 500) |> st_as_sf()
+buff35_1000 <- buffer(pts35, 1000) |> st_as_sf()
+buff35_1500 <- buffer(pts35, 1500) |> st_as_sf()
+
+e33_1500 <- exact_extract(r33_10, buff33_1500, fun = 'frac', progress = FALSE)
+e33_1000 <- exact_extract(r33_10, buff33_1000, fun = 'frac', progress = FALSE)
+e33_500 <- exact_extract(r33_10, buff33_500, fun = 'frac', progress = FALSE)
+
+e35_1500 <- exact_extract(r35_10, buff35_1500, fun = 'frac', progress = FALSE)
+e35_1000 <- exact_extract(r35_10, buff35_1000, fun = 'frac', progress = FALSE)
+e35_500 <- exact_extract(r35_10, buff35_500, fun = 'frac', progress = FALSE)
+```
+
+```{r}
+#| label: fig-5
+#| fig-cap: "Couverture du sol moyenne en Gironde selon la taille du buffer"
+m1 <- apply(e33_500, 2, mean)
+m2 <- apply(e33_1000, 2, mean)
+m3 <- apply(e33_1500, 2, mean)
+
+catall <- sort(unique(c(names(m1), names(m2), names(m3))))
+lab <- miniref$nom_grp_culture[match(
+  gsub("frac_", "", catall),
+  miniref$info_grp_id
+)]
+mean_cover <- rbind(
+  "500m" = m1[match(catall, names(m1))],
+  "1000m" = m2[match(catall, names(m2))],
+  "1500m" = m3[match(catall, names(m3))]
 )
 mean_cover[is.na(mean_cover)] <- 0
 
@@ -278,190 +433,137 @@ legend(
 )
 ```
 
-Le pourcentage de vignes diminue avec la taille du buffer, et à l'inverse, le pourcentage de forêts de feuillus augmente, ce qui semble cohérent (@fig-2).
-
-Les proportions de vignes par taille de buffer sont très corrélés (@fig-3), ce qui suggère l'utilisation d'une seule taille de buffer. 
+En Gironde, le pourcentage de vignes diminue avec la taille du buffer, et à l'inverse, le pourcentage de forêts de feuillus augmente, ce qui semble cohérent (@fig-5).
 
 ```{r}
-#| label: fig-3
-#| fig-cap: "Pourcentage de vignes selon la taille du buffer"
+#| label: fig-6
+#| fig-cap: "Couverture du sol moyenne en Ille-et-Vilaine selon la taille du buffer"
+m1 <- apply(e35_500, 2, mean)
+m2 <- apply(e35_1000, 2, mean)
+m3 <- apply(e35_1500, 2, mean)
 
-frac_vignes <- data.frame(
-  b1500 = e1500$frac_21 * 100,
-  b1000 = e1000$frac_21 * 100,
-  b500 = e500$frac_21 * 100
+catall <- sort(unique(c(names(m1), names(m2), names(m3))))
+lab <- miniref$nom_grp_culture[match(
+  gsub("frac_", "", catall),
+  miniref$info_grp_id
+)]
+mean_cover <- rbind(
+  "500m" = m1[match(catall, names(m1))],
+  "1000m" = m2[match(catall, names(m2))],
+  "1500m" = m3[match(catall, names(m3))]
 )
+mean_cover[is.na(mean_cover)] <- 0
 
-pairs(frac_vignes, lower.panel = panel.smooth, upper.panel = panel.cor)
+par(mar = c(4, 4, 1, 9))
+barplot(
+  t(mean_cover * 100),
+  col = rainbow(length(catall)),
+  ylab = "Percentage land cover",
+  xlab = "Buffer size (m)"
+)
+leg_keep <- apply(mean_cover, 2, sum) > 0.05
+legend(
+  3.6,
+  60,
+  legend = rev(lab[leg_keep]),
+  fill = rev(rainbow(length(catall))[leg_keep]),
+  cex = 0.9,
+  xpd = NA
+)
 ```
+
+En Ille-et-Vilaine, l'occupation du sol n'est pas très influencée par la taille des buffers (@fig-6).   
+
+Ces deux observations (@fig-5, @fig-6) semblent suggérées l'utilisation d'une seule taille de buffer (sinon les indicateurs seront très corrélés).
 
 
 ## Série temporelle
 
 Nous avons besoin de l'historique de l'occupation du sol sur la plus grande période possible. Les données RPG sont disponibles de 2015 à 2023. Les données RPG complété sont disponible de 2016 à 2022. Les données OSO sont disponibles de 2016 à 2023. La période commune est donc **2016-2022**.    
 
-La classification OSO n'est pas constante sur la période et passe de 17 à 23 classes. Cela affecte surtout les cultures qui seront majoritairement masquées par les donnees RPG.
+La classification OSO n'est pas constante sur la période et passe de 17 à 23 classes. Cela affecte surtout les cultures qui, heureusement, seront majoritairement masquées par les donnees RPG.
 
 ```{r}
-#| eval: false
-all <- rast()
-for (i in 2016:2022) {
-  print(i)
-  # RPG
-  m_rpg <- match(
-    unlist(rpg[, paste0("cult", i), drop = TRUE]),
-    ref$code_culture
-  )
-  # check if missing values
-  missing <- unique(unlist(rpg[is.na(m_rpg), paste0("cult", i), drop = TRUE]))
-  missing <- missing[!is.na(missing)]
-  if (length(missing) > 0) {
-    warning(paste("Missing values for RPG", i))
-  }
-  rpg$labi <- ref$info_grp_id[m_rpg]
-  rpg_r <- rasterize(rpg, grd, "labi")
-  rpg_r <- clamp(rpg_r, 1, max(ref$info_grp_id, na.rm = TRUE), values = FALSE)
-
-  #RPG Complete
-  lay <- ifelse(
-    i == "2022",
-    "culture",
-    paste0("rpg", substr(i, 3, 4), "_cult")
-  )
-  dati <- unlist(rpg_c[, lay, drop = TRUE])
-  m_rpc <- ifelse(
-    is.na(match(dati, ref$code_culture)),
-    match(dati, ref$nom_culture),
-    match(dati, ref$code_culture)
-  )
-  missing <- unique(dati[is.na(m_rpc)])
-  missing <- missing[!is.na(missing)]
-  if (length(missing) > 0) {
-    warning(paste("Missing values for RPG Complete", i))
-  }
-  rpg_c$labi <- ref$info_grp_id[m_rpc]
-  rpc_r <- rasterize(rpg_c, grd, "labi")
-  rpc_r <- clamp(rpc_r, 1, max(ref$info_grp_id, na.rm = TRUE), values = FALSE)
-
-  # OSO
-  oso_i <- vect(here(datafolder, paste0("OSO_", i, "_departement_33.shp")))
-  lab_i <- names(oso_i)[!names(oso_i) %in% nolab]
-  # complex finding of which class for which label
-  df <- oso_i[, lab_i, drop = TRUE]
-  ndf <- apply(is.na(df), 1, sum)
-  mdf <- apply(df, 1, which.max)
-  ct <- table(unlist(mdf), oso_i$Classe[unlist(ndf) < ncol(df)])
-  conv_classes <- lab_i[as.numeric(row.names(ct)[apply(ct, 2, which.max)])]
-  names(conv_classes) <- colnames(ct)
-  # rasterize oso with labels
-  oso_i$name <- conv_classes[as.character(oso_i$Classe)]
-  # rasterize RPG complete
-  m_oso <- ifelse(
-    is.na(match(oso_i$name, ref$code_culture)),
-    match(oso_i$name, ref$nom_culture),
-    match(oso_i$name, ref$code_culture)
-  )
-  missing <- unique(oso_i$name[is.na(m_oso)])
-  missing <- missing[!is.na(missing)]
-  if (length(missing) > 0) {
-    warning(paste("Missing values for OSO", i))
-  }
-  # unique(oso_22$name[is.na(m_oso)]) # none
-  oso_i$labi <- ref$info_grp_id[m_oso]
-  oso_r <- rasterize(oso_i, grd, "labi")
-
-  # MERGE
-  all_i <- merge(rpg_r, rpc_r, oso_r, first = TRUE)
-  # set factor values
-  set.cats(all_i, value = miniref)
-  # add to time series
-  all <- c(all, all_i)
-  names(all)[nlyr(all)] <- i
-}
-# tmpFiles(current = TRUE, orphan = TRUE, old = TRUE, remove = TRUE)
-# export
-writeRaster(
-  all,
-  filename = here(outfolder, "Landcover_d33_2016_2022_10m.tif"),
-  overwrite = TRUE
-)
-```
-
-```{r}
-#| label: fig-4
-#| fig-cap: "Occupation du sol harmonisée sur la période 2016-2022"
-all <- rast(here(outfolder, "Landcover_d33_2016_2022_10m.tif"))
-plot(all, legend = FALSE)
+all_33 <- rast(here(outfolder, "Landcover_d33_2016_2022_10m.tif"))
+all_35 <- rast(here(outfolder, "Landcover_d35_2016_2022_10m.tif"))
 ```
 
 ### Extraction ponctuelle
 
 ```{r}
-pt_ts <- extract(all, pts)
+pt_ts_33 <- extract(all_33, pts33, ID = FALSE)
+pt_ts_35 <- extract(all_35, pts35, ID = FALSE)
 ```
 
 ```{r}
-#| label: fig-5
-#| fig-cap: "Nombre de couverture du sol differente sur la periode 2016-2022"
-ncov_ts <- apply(pt_ts[, -1], 1, lunique)
+#| label: fig-7
+#| fig-cap: "Nombre de classes de couverture du sol differentes sur la periode 2016-2022"
+ncov_ts_33 <- apply(pt_ts_33, 1, lunique)
+ncov_ts_35 <- apply(pt_ts_35, 1, lunique)
 
+par(mfrow = c(1, 2))
 barplot(
-  table(ncov_ts),
+  table(ncov_ts_33),
+  main = "Gironde",
+  xlab = "Number of land cover",
+  ylab = "Number of fields"
+)
+barplot(
+  table(ncov_ts_35),
+  main = "Ille-et-Vilaine",
   xlab = "Number of land cover",
   ylab = "Number of fields"
 )
 ```
 
 
-La majorité des parcelles a un seul type d'occupation du sol sur la période d'étude: surtout des vignes, ou des forêts de conifères (@fig-5, @tbl-6).   
+La majorité des parcelles en Gironde a un seul type d'occupation du sol sur la période d'étude: surtout des vignes, ou des forêts de conifères (@fig-7, @tbl-6, @tbl-7). En Ille-et-Vilaine, la majorité des sites d'échantillonage ont entre 2 et 4 cultures de céréales différentes sur la période 2016-2022 (@fig-7, @tbl-8, @tbl-9).   
+
 Il peut y avoir des incohérences de classification comme le batis diffus en 2016 qui devient des vignes sur le reste de la période d'étude (@tbl-5).  
 
-
 ```{r}
-#| label: tbl-5
-#| tbl-cap: "Séquences de couvertures du sol les plus fréquentes de 2016 à 2022 séparées par une virgules"
-fcov_ts <- apply(pt_ts[, -1], 1, concat)
+#| label: tbl-6
+#| tbl-cap: "Séquences de couvertures du sol les plus fréquentes en Gironde de 2016 à 2022 séparées par une virgules"
+fcov_ts <- apply(pt_ts_33, 1, concat)
 head(sort(table(fcov_ts), decreasing = TRUE), 10) |> knitr::kable()
 ```
 
 ```{r}
-#| label: tbl-6
-#| tbl-cap: "Diversité de couvertures du sol les plus fréquentes (sans tenir compte de la temporalité)"
-ucov_ts <- apply(pt_ts[, -1], 1, paste_unique)
+#| label: tbl-7
+#| tbl-cap: "Diversité de couvertures du sol les plus fréquentes en Gironde (sans tenir compte de la temporalité)"
+ucov_ts <- apply(pt_ts_33, 1, paste_unique)
 head(sort(table(ucov_ts), decreasing = TRUE), 10) |> knitr::kable()
 ```
 
 
+```{r}
+#| label: tbl-8
+#| tbl-cap: "Séquences de couvertures du sol les plus fréquentes en Ille-et-Vilaine de 2016 à 2022 séparées par une virgules"
+fcov_ts <- apply(pt_ts_35, 1, concat)
+head(sort(table(fcov_ts), decreasing = TRUE), 10) |> knitr::kable()
+```
 
+```{r}
+#| label: tbl-9
+#| tbl-cap: "Diversité de couvertures du sol les plus fréquentes en Ille-et-Vilaine (sans tenir compte de la temporalité)"
+ucov_ts <- apply(pt_ts_35, 1, paste_unique)
+head(sort(table(ucov_ts), decreasing = TRUE), 10) |> knitr::kable()
+```
 
 
 ### Extraction par buffer de 1000m
 
 ```{r}
-bf_ts <- exactextractr::exact_extract(
-  all,
-  st_as_sf(buff1000),
-  fun = 'frac',
-  progress = FALSE
-)
+bf33_ts <- exact_extract(all_33, buff33_1000, fun = 'frac', progress = FALSE)
+bf35_ts <- exact_extract(all_35, buff35_1000, fun = 'frac', progress = FALSE)
 ```
 
 
 ```{r}
-#| label: fig-6
-#| fig-cap: "Pourcentage de vignes pour un buffer de 1km par année"
-
-frac_vignes <- bf_ts[, grep("frac_21", names(bf_ts))] * 100
-names(frac_vignes) <- gsub("frac_21.", "", names(frac_vignes))
-pairs(frac_vignes, lower.panel = panel.smooth, upper.panel = panel.cor)
-```
-
-
-```{r}
-#| label: fig-7
-#| fig-cap: "Distribution moyenne de l'occupation du sol par année"
+#| label: fig-8
+#| fig-cap: "Moyenne de l'occupation du sol par année en Gironde sur les buffer de 1km"
 #|
-mbf <- apply(bf_ts, 2, mean)
+mbf <- apply(bf33_ts, 2, mean)
 len_lab <- nchar(names(mbf))
 
 yr <- substr(names(mbf), len_lab - 3, len_lab)
@@ -491,15 +593,55 @@ legend(
 )
 ```
 
-Le pourcentage de vignes sur les buffer de 1km est très constant sur la période d'étude (@fig-6).
+Le pourcentage de vignes sur les buffer de 1km est assez constant sur la période d'étude (@fig-8). La présence d'*autres céréales* est plus importante en 2016-2017 que sur 2018-2022. Les *batis diffus* sont aussi plus nombreux en 2016-2019 que sur la periode 2020-2022. Y a t-il un effet de changement de protocole pour mesurer ces classes ?
 
-La présence d'*autres céréales* est plus importante en 2016-2017 que sur 2018-2022 (@fig-7). Les *batis diffus* sont aussi plus nombreux en 2016-2019 que sur la periode 2020-2022. Y a t-il un effet de changement de protocole pour mesurer ces classes ?
+
+```{r}
+#| label: fig-9
+#| fig-cap: "Moyenne de l'occupation du sol par année en Ille-et-Vilaine sur les buffer de 1km"
+
+mbf <- apply(bf35_ts, 2, mean)
+len_lab <- nchar(names(mbf))
+
+yr <- substr(names(mbf), len_lab - 3, len_lab)
+cl <- substr(names(mbf), 6, len_lab - 5)
+df <- data.frame("perc" = mbf, "year" = yr, "class" = cl)
+mean_cover <- tapply(df$perc, list(df$class, df$year), mean) * 100
+
+par(mar = c(4, 4, 1, 15))
+barplot(
+  mean_cover,
+  col = rainbow(nrow(mean_cover)),
+  ylab = "Percentage land cover",
+  xlab = "Buffer size (m)"
+)
+leg_keep <- apply(mean_cover, 1, sum) > 5
+lab_keep <- miniref$nom_grp_culture[match(
+  row.names(mean_cover)[leg_keep],
+  miniref$info_grp_id
+)]
+legend(
+  x = 9,
+  y = 60,
+  legend = rev(lab_keep),
+  fill = rev(rainbow(nrow(mean_cover))[leg_keep]),
+  xpd = NA,
+  cex = 0.9
+)
+```
+
+En général, l'occupation du sol est assez stable sur la période 2016-2022 (@fig-9). Cependant, il y a quelques variations annuelles : beaucoup d'*autres cereales* en 2016, peu de *blé* et beaucoup de *mais* en 2020, augmentation des prairies permanentes entre 2016 et 2022.
+
+A partir des deux cas d'étude, il semble y avoir une sur-représentation de la classe `autres céréales` en 2016, qui diminue de moitié en 2017, puis arrive à un niveau constant sur la période 2018-2022. Cela serait-il causé par un nombre réduit de classes des données OSO, ou un changement de protocole en 2016-2017?  
+On peut aussi observer une recrudescence de zones industrielles et commerciales en 2018-2019 pour les deux départements (les pourcentages restent cependant très faibles). Il pourrait etre judicieux de les regrouper avec les autres classes de batis ou zones imperméables.  
 
 
 ## Résumé
 
-- Il est possible de créer une couche d'occupation du sol en combinant les données RPG, RPG complété et OSO, avec une résolution fine de 10m. L'opération est assez rapide et produit un raster de 215Mo pour la periode 2016-2022 sur un département (Gironde).
-- Les extractions de la couverture du sol par buffer et pour les series temporelles sont simplifiées.
+- Il est possible de créer une couche d'occupation du sol en combinant les données RPG, RPG complété et OSO, avec une résolution fine de 10m, 5m ou 2m.  
+- Les extractions de la couverture du sol par buffer et pour les series temporelles sont ainsi simplifiées.  
+- La résolution du raster n'a pas d'influence sur l'extraction de la couverture du sol par buffer mais les résolutions fines produisent des données très lourdes, difficile à stocker et à manipuler.
+- La resolution de 10m semble la plus appropriée pour nos objectifs et l'étendue du jeu de données.
 - **L'étape d'homogénéisation des classes est critique et doit être vérifiée/completée par tous.**
 - Il faut aussi **s'assurer que les données OSO et RPG ont un protocole constant sur la période d'étude**, sinon cela peut créer des biais dans les futures analyses.
 

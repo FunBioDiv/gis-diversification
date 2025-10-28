@@ -213,11 +213,10 @@ mapview(
   )
 ```
 
+Fields in `RPG sequence de culture` and `RPG complete` are very patchy from @fig-3. We will complete the data with OSO land cover (see [land cover exploration]((https://funbiodiv.github.io/gis-diversification/analysis/02_land_cover.html))).  
 
 **TO BE DISCUSSED**:   
-
-- fields in `RPG sequence de culture` and `RPG complete` seems very patchy from @fig-3, yet the coverage is not bad (>80%). **Should we complete the data with other data sources, e.g. OSO land cover? If yes, how?**.  So far, OSO only available for 2018-2021 [here](https://www.theia-land.fr/en/blog/product/land-cover-map/), but there might exist other access. Or **should we discard points with missing information / possibly incorrect coordinates?**    
-- this is an important question for the buffer areas (500 to 1500m). How do we handle percentage of land cover when so many areas are missing?
+- should we remove points that don't fit within a RPG / RPG complété field (e.g. incorrect coordinates, or non interesting sampling site)? 
 
 
 ## Crop rotation (2015-2023)
@@ -266,7 +265,6 @@ barplot(table(n_rot), xlab = "Number of crops", ylab = "Number of fields")
 ```
 
 On most fields, there are between 3 and 4 different crops cultivated within the 2015-2023 period. 
-
 
 **TO BE DISCUSSED**:    
 - decide whether we simplify the crop types (e.g. merging MIE and MIS)   
@@ -407,9 +405,9 @@ for (i in 1:nrow(pt_rpg_35)) {
   }
 }
 
-writeVector(rpg_simple, here::here(datafolder, "rpg_aggregated_field_35.gpkg"), overwrite = TRUE)
-writeVector(rpg_full, here::here(datafolder, "rpg_all_fields_35.gpkg"), overwrite = TRUE)
-mapview::mapview(rpg_full)
+# writeVector(rpg_simple, here::here(datafolder, "rpg_aggregated_field_35.gpkg"), overwrite = TRUE)
+# writeVector(rpg_full, here::here(datafolder, "rpg_all_fields_35.gpkg"), overwrite = TRUE)
+# mapview::mapview(rpg_full)
 ```
 
 Number of sites with fields found in `RPG sequence de culture`

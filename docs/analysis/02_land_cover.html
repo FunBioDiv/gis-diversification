@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Romain Frelat">
-<meta name="dcterms.date" content="2025-10-15">
+<meta name="dcterms.date" content="2025-10-28">
 
 <title>Exploration de la couverture du sol : RPG + OSO</title>
 <style>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#objectif" id="toc-objectif" class="nav-link active" data-scroll-target="#objectif">Objectif</a></li>
-  <li><a href="#couverture-du-sol-en-gironde-en-2022" id="toc-couverture-du-sol-en-gironde-en-2022" class="nav-link" data-scroll-target="#couverture-du-sol-en-gironde-en-2022">Couverture du sol en Gironde en 2022</a></li>
+  <li><a href="#couverture-du-sol-en-vectoriel" id="toc-couverture-du-sol-en-vectoriel" class="nav-link" data-scroll-target="#couverture-du-sol-en-vectoriel">Couverture du sol en vectoriel</a></li>
   <li><a href="#harmonization-de-la-couverture-du-sol" id="toc-harmonization-de-la-couverture-du-sol" class="nav-link" data-scroll-target="#harmonization-de-la-couverture-du-sol">Harmonization de la couverture du sol</a>
   <ul class="collapse">
   <li><a href="#création-dune-couche-raster" id="toc-création-dune-couche-raster" class="nav-link" data-scroll-target="#création-dune-couche-raster">Création d’une couche raster</a></li>
@@ -121,7 +121,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 15, 2025</p>
+      <p class="date">October 28, 2025</p>
     </div>
   </div>
   
@@ -137,170 +137,21 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="objectif">Objectif</h2>
 <p>L’objectif de ce document est d’explorer comment évaluer la couverture du sol autour des sites d’échantillonnage et leur historique dans les années précédant les relevés. L’idée est d’utiliser différentes sources de données, listés selon leur priorités:</p>
 <ol type="1">
-<li>Le RPG qui provient du jeu de donnees <code>RPG sequence de culture</code> (Girault, B. et Philippe M. 2025 <a href="https://doi.org/10.57745/VMYCYM" class="uri">https://doi.org/10.57745/VMYCYM</a>)</li>
-<li>Le RPG complété (Cantelaube, P. et Lardot B. 2024 <a href="https://doi.org/10.57745/6FNRWO" class="uri">https://doi.org/10.57745/6FNRWO</a>)</li>
+<li>Le RPG qui provient du jeu de donnees <code>RPG sequence de culture</code> (Girault, B. et Philippe M. 2025 <a href="https://doi.org/10.57745/VMYCYM" class="uri">https://doi.org/10.57745/VMYCYM</a>)<br>
+</li>
+<li>Le RPG complété (Cantelaube, P. et Lardot B. 2024 <a href="https://doi.org/10.57745/6FNRWO" class="uri">https://doi.org/10.57745/6FNRWO</a>)<br>
+</li>
 <li>La carte d’occupation des sols du <a href="https://artificialisation.developpement-durable.gouv.fr/bases-donnees/oso-theia">CES OSO – THEIA</a> (Inglada, J., et al.&nbsp;(2017). <a href="https://geodes-portal.cnes.fr/" class="uri">https://geodes-portal.cnes.fr/</a>)</li>
 </ol>
-<p>Les <code>338</code> sites de la Gironde (33) seront utilisés comme cas d’étude.</p>
-</section>
-<section id="couverture-du-sol-en-gironde-en-2022" class="level2">
-<h2 class="anchored" data-anchor-id="couverture-du-sol-en-gironde-en-2022">Couverture du sol en Gironde en 2022</h2>
-<p>Pour obtenir la couverture du sol aux coordonnées des sites, nous pouvons utiliser directement les données en vecteur puis extraire la classe (1) du RPG, ou (2) du RPG complété, ou (3) des données OSO selon leur disponibilité (<a href="#tbl-1" class="quarto-xref">Table&nbsp;1</a>).</p>
+<p>Les sites d’échantillonnage de Gironde (d33, N=<code>338</code>) et d’Ille-et-Vilaine (d35 N=<code>227</code>), seront utilisés comme cas d’étude.</p>
+<p>Pour pouvoir calculer l’occupation du sol sur un buffer, il faut superposer les données vectoriels. Un des enjeux majeur est <strong>l’harmonisation des classes entre RPG, RPG complété et OSO</strong>. Pour le moment, l’harmonisation et la simplification des classes d’occupation du sol est dans le fichier <a href="https://github.com/FunBioDiv/gis-diversification/raw/refs/heads/main/data/derived-data/classes.csv"><code>classes.csv</code></a>. Il y a 38 classes différentes (<a href="#tbl-1" class="quarto-xref">Table&nbsp;1</a>).</p>
 <div class="cell">
 <div id="tbl-1" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Source d’information de couverture du sol en 2022 pour les sites de Gironde
+Table&nbsp;1: Les classes d’occupation du sol simplifiées et harmonisées
 </figcaption>
 <div aria-describedby="tbl-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output-display">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">BACCHUS</th>
-<th style="text-align: right;">LepiBats</th>
-<th style="text-align: right;">OSCAR</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">RPG</td>
-<td style="text-align: right;">215</td>
-<td style="text-align: right;">25</td>
-<td style="text-align: right;">17</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RPG_C</td>
-<td style="text-align: right;">57</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">OSO</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">3</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<div class="cell">
-<div id="tbl-2" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Couverture du sol en 2022 pour les sites de Gironde
-</figcaption>
-<div aria-describedby="tbl-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output-display">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">BACCHUS</th>
-<th style="text-align: right;">LepiBats</th>
-<th style="text-align: right;">OSCAR</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">OSO_Coniferes</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">OSO_Prairie</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">OSO_UrbainDiff</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">OSO_Vignes</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">RPG_Blé tendre</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RPG_Divers</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">RPG_Légumes ou fleurs</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RPG_Maïs grain et ensilage</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">RPG_Orge</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RPG_Tournesol</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">RPG_Vignes</td>
-<td style="text-align: right;">212</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">14</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RPGC_Vignes</td>
-<td style="text-align: right;">57</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>La plupart des relevés ont été effectués dans des vignes dans des parcelles inclues dans le RPG (<a href="#tbl-2" class="quarto-xref">Table&nbsp;2</a>). Pour 61 sites, l’information n’était disponible que dans le RPG Complété. Il y a aussi 17 relevés effectués dans des forêts de conifères (données OSO), et 8 dans des champs de mais (données RPG).</p>
-</section>
-<section id="harmonization-de-la-couverture-du-sol" class="level2">
-<h2 class="anchored" data-anchor-id="harmonization-de-la-couverture-du-sol">Harmonization de la couverture du sol</h2>
-<section id="création-dune-couche-raster" class="level3">
-<h3 class="anchored" data-anchor-id="création-dune-couche-raster">Création d’une couche raster</h3>
-<p>Pour pouvoir calculer l’occupation du sol sur un buffer, il faut superposer les données vectoriels. Le plus simple est de faire le croisement en raster, avec une grille de 10m de résolution spatiale. Un des enjeux majeur est <strong>l’harmonisation des classes entre RPG, RPG complété et OSO</strong>.</p>
-<p>Pour le moment, l’harmonisation et la simplification des classes d’occupation du sol est dans le fichier <a href="https://github.com/FunBioDiv/gis-diversification/raw/refs/heads/main/data/derived-data/classes.csv"><code>classes.csv</code></a>. Il y a 38 classes différentes (<a href="#tbl-3" class="quarto-xref">Table&nbsp;3</a>).</p>
-<div class="cell">
-<div id="tbl-3" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Les classes d’occupation du sol simplifiées et harmonisées
-</figcaption>
-<div aria-describedby="tbl-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
@@ -449,27 +300,17 @@ Table&nbsp;3: Les classes d’occupation du sol simplifiées et harmonisées
 </figure>
 </div>
 </div>
+</section>
+<section id="couverture-du-sol-en-vectoriel" class="level2">
+<h2 class="anchored" data-anchor-id="couverture-du-sol-en-vectoriel">Couverture du sol en vectoriel</h2>
+<p>Pour obtenir la couverture du sol aux coordonnées des sites, nous pouvons utiliser directement les données en vecteur puis extraire la classe (1) du RPG, ou (2) du RPG complété, ou (3) des données OSO selon leur disponibilité.</p>
 <div class="cell">
-<div class="cell-output-display">
-<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="02_land_cover_files/figure-html/fig-1-1.png" class="img-fluid figure-img" width="672">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Occupation du sol harmonisée en raster 10m
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div id="tbl-4" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-2" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: Occupation du sol extraite depuis la donnée agrégée en raster
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Couverture du sol en 2022 et source d’information pour les sites de Gironde (d33)
 </figcaption>
-<div aria-describedby="tbl-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="tbl-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
@@ -482,64 +323,76 @@ Table&nbsp;4: Occupation du sol extraite depuis la donnée agrégée en raster
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Batis diffus</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Blé</td>
+<td style="text-align: left;">RPG_Blé</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">Divers</td>
+<tr class="even">
+<td style="text-align: left;">RPG_Divers</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">3</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Foret conifères</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">0</td>
-</tr>
 <tr class="odd">
-<td style="text-align: left;">Légumes ou fleurs</td>
+<td style="text-align: left;">RPG_Légumes ou fleurs</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Maïs</td>
+<td style="text-align: left;">RPG_Maïs</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Orge</td>
+<td style="text-align: left;">RPG_Orge</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Prairies permanentes</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: left;">RPG_Tournesol</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Tournesol</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: left;">RPG_Vignes</td>
+<td style="text-align: right;">212</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">14</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Vignes</td>
-<td style="text-align: right;">268</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">15</td>
+<td style="text-align: left;">RPGC_Vignes</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OSO_Batis diffus</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OSO_Forêts conifères</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OSO_Prairies permanentes</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OSO_Vignes</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
 </tr>
 </tbody>
 </table>
@@ -548,11 +401,228 @@ Table&nbsp;4: Occupation du sol extraite depuis la donnée agrégée en raster
 </figure>
 </div>
 </div>
-<p>L’occupation du sol issue des données en raster (<a href="#tbl-4" class="quarto-xref">Table&nbsp;4</a>) est similaire aux données extraites des couches vectorielles (<a href="#tbl-2" class="quarto-xref">Table&nbsp;2</a>).</p>
+<p>La plupart des relevés en Gironde ont été effectués dans des vignes sur des parcelles du RPG (<a href="#tbl-2" class="quarto-xref">Table&nbsp;2</a>). Pour 61 sites, l’information de la parcelle n’était disponible que dans le RPG Complété. Les données OSO permettent de completer l’occupation du sol pour tous les sites. Il y a 17 relevés effectués dans des forêts de conifères (projet LepiBats), un relevé dans une vigne qui n’est pas dans le RPG (ID: <code>OSCAR_33_2011_00002_2018</code>), une prairie permanente (ID: <code>OSCAR_33_2017_00002_2019</code>) et sur du batis diffus (erreur de coordonnées? ID: <code>OSCAR_33_2022_00004_2023</code>).</p>
+<div class="cell">
+<div id="tbl-3" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Couverture du sol en 2022 et source d’information pour les sites de d’Ille-et-Vilaine (d35)
+</figcaption>
+<div aria-describedby="tbl-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">BIOMHE</th>
+<th style="text-align: right;">BISCO</th>
+<th style="text-align: right;">DIVAG</th>
+<th style="text-align: right;">SEBIOPAG_ZAAr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RPG_Autres céréales</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG_Blé</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG_Colza</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG_Fourrage</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG_Légumes ou fleurs</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG_Maïs</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG_Orge</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG_Plantes à fibres</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG_Prairies permanentes</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG_Prairies temporaires</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG_Protéagineux</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG_Soja</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPGC_Maïs</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPGC_Prairies temporaires</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OSO_Prairies permanentes</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>La plupart des sites d’échantillonnages sont couverts par le RPG (<a href="#tbl-3" class="quarto-xref">Table&nbsp;3</a>) et concernent des cultures de céréales. Le RPG Complété permet de compléter deux parcelles, une de mais (ID: <code>BISCO_75_2017</code>) et une prairie temporaire (ID: <code>BIOMHE_43_2020</code>). Enfin OSO permet d’obtenir la couverture du sol d’un seul site en prairie permanente (ID: <code>BIOMHE_39_2020</code>).</p>
 </section>
-<section id="buffer" class="level3">
-<h3 class="anchored" data-anchor-id="buffer">Buffer</h3>
-<p>A partir de cette couche raster, il est facile d’extraire l’occupation du sol par buffer.</p>
+<section id="harmonization-de-la-couverture-du-sol" class="level2">
+<h2 class="anchored" data-anchor-id="harmonization-de-la-couverture-du-sol">Harmonization de la couverture du sol</h2>
+<section id="création-dune-couche-raster" class="level3">
+<h3 class="anchored" data-anchor-id="création-dune-couche-raster">Création d’une couche raster</h3>
+<p>Pour pouvoir calculer l’occupation du sol sur un buffer, il faut superposer les données vectoriels. Le plus simple est de faire le croisement en raster. Les données OSO proviennent d’un raster à 10m. Cependant les données RPG sont plus précises et il peut être intéressant de créer une couche raster de résolution plus fine, à 5m ou à 2m.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="02_land_cover_files/figure-html/fig-1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Occupation du sol harmonisée en raster 10m pour la Gironde (à gauche) et l’Ille-et-Vilaine (à droite)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-4" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Caractéristiques des rasters d’occupation du sol à différente résolutions spatiales
+</figcaption>
+<div aria-describedby="tbl-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">departement</th>
+<th style="text-align: right;">resolution</th>
+<th style="text-align: right;">nx</th>
+<th style="text-align: right;">ny</th>
+<th style="text-align: right;">file_Mb</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">15590</td>
+<td style="text-align: right;">12612</td>
+<td style="text-align: right;">41.90</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">31179</td>
+<td style="text-align: right;">25224</td>
+<td style="text-align: right;">124.37</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">77948</td>
+<td style="text-align: right;">63061</td>
+<td style="text-align: right;">529.25</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">11865</td>
+<td style="text-align: right;">9471</td>
+<td style="text-align: right;">32.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">23729</td>
+<td style="text-align: right;">18941</td>
+<td style="text-align: right;">98.30</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">59323</td>
+<td style="text-align: right;">47353</td>
+<td style="text-align: right;">411.64</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Pour un département et une année, les données rasters sont rapide à créer et assez légère avec une résolution de 10m (&lt;50Mb) mais deviennent très lourde avec une résolution de 2m (&gt;500Mb) (<a href="#tbl-4" class="quarto-xref">Table&nbsp;4</a>). On peut se rendre compte de la différence en zoomant sur une petite zone de 10ha (<a href="#fig-2" class="quarto-xref">Figure&nbsp;2</a>).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-2" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -561,14 +631,56 @@ Table&nbsp;4: Occupation du sol extraite depuis la donnée agrégée en raster
 <img src="02_land_cover_files/figure-html/fig-2-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Distribution moyenne des classes de couverture du sol par taille de buffer
+Figure&nbsp;2: Zoom sur une petite zone de 17 ha en Gironde. Les points rouges correspondent à des sites d’échantillonage.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Le pourcentage de vignes diminue avec la taille du buffer, et à l’inverse, le pourcentage de forêts de feuillus augmente, ce qui semble cohérent (<a href="#fig-2" class="quarto-xref">Figure&nbsp;2</a>).</p>
-<p>Les proportions de vignes par taille de buffer sont très corrélés (<a href="#fig-3" class="quarto-xref">Figure&nbsp;3</a>), ce qui suggère l’utilisation d’une seule taille de buffer.</p>
+<div class="cell">
+<div id="tbl-5" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Nombre de classification correct par resolution de raster
+</figcaption>
+<div aria-describedby="tbl-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">10m</th>
+<th style="text-align: right;">5m</th>
+<th style="text-align: right;">2m</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">d33</td>
+<td style="text-align: right;">337</td>
+<td style="text-align: right;">338</td>
+<td style="text-align: right;">338</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d35</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">227</td>
+<td style="text-align: right;">227</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>L’occupation du sol issue des données en raster est similaire aux données extraites des couches vectorielles quelque soit la résolution (<a href="#tbl-5" class="quarto-xref">Table&nbsp;5</a>), sauf pour <code>BACCHUS_17C24_2024</code> qui est anormalement attribué dans la classe <code>Prairies permanentes</code> avec le raster à 10m, alors que le site est en <code>Vignes</code>. En général, il est recommendé d’extraire l’occupation du sol ponctuelle à partir des couches vectorielles. L’avantage de l’approche raster est plus évidente pour extraire l’occupation du sol par buffer.</p>
+</section>
+<section id="buffer" class="level3">
+<h3 class="anchored" data-anchor-id="buffer">Buffer</h3>
+<section id="comparaison-de-la-resolution-spatiale" class="level4">
+<h4 class="anchored" data-anchor-id="comparaison-de-la-resolution-spatiale">Comparaison de la resolution spatiale</h4>
+<p>Le buffer de 1000m est utilisé pour évaluer l’influence de la résolution spatiale des rasters sur l’occupation du sol.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -577,18 +689,12 @@ Figure&nbsp;2: Distribution moyenne des classes de couverture du sol par taille 
 <img src="02_land_cover_files/figure-html/fig-3-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Pourcentage de vignes selon la taille du buffer
+Figure&nbsp;3: Couverture du sol moyenne pour les buffer de 1km en Gironde selon la résolution spatiale des rasters
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-</section>
-</section>
-<section id="série-temporelle" class="level2">
-<h2 class="anchored" data-anchor-id="série-temporelle">Série temporelle</h2>
-<p>Nous avons besoin de l’historique de l’occupation du sol sur la plus grande période possible. Les données RPG sont disponibles de 2015 à 2023. Les données RPG complété sont disponible de 2016 à 2022. Les données OSO sont disponibles de 2016 à 2023. La période commune est donc <strong>2016-2022</strong>.</p>
-<p>La classification OSO n’est pas constante sur la période et passe de 17 à 23 classes. Cela affecte surtout les cultures qui seront majoritairement masquées par les donnees RPG.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-4" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -597,14 +703,17 @@ Figure&nbsp;3: Pourcentage de vignes selon la taille du buffer
 <img src="02_land_cover_files/figure-html/fig-4-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Occupation du sol harmonisée sur la période 2016-2022
+Figure&nbsp;4: Correlation des couvertures du sol pour les buffer de 1km en Gironde selon la résolution spatiale des rasters
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<section id="extraction-ponctuelle" class="level3">
-<h3 class="anchored" data-anchor-id="extraction-ponctuelle">Extraction ponctuelle</h3>
+<p>L’occupation des sols dans les buffers n’est pas influencée par la résolution spatiale des rasters (<a href="#fig-3" class="quarto-xref">Figure&nbsp;3</a>, <a href="#fig-4" class="quarto-xref">Figure&nbsp;4</a>). Les calculs sont beaucoup plus long pour les résolutions fines, donc cela oriente pour l’utilisation du raster à 10m.</p>
+</section>
+<section id="comparaison-de-la-taille-du-buffer" class="level4">
+<h4 class="anchored" data-anchor-id="comparaison-de-la-taille-du-buffer">Comparaison de la taille du buffer</h4>
+<p>Le raster à 10m est utilisé pour évaluer l’influence de la taille du buffer sur l’occupation du sol.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-5" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -613,21 +722,61 @@ Figure&nbsp;4: Occupation du sol harmonisée sur la période 2016-2022
 <img src="02_land_cover_files/figure-html/fig-5-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Nombre de couverture du sol differente sur la periode 2016-2022
+Figure&nbsp;5: Couverture du sol moyenne en Gironde selon la taille du buffer
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>La majorité des parcelles a un seul type d’occupation du sol sur la période d’étude: surtout des vignes, ou des forêts de conifères (<a href="#fig-5" class="quarto-xref">Figure&nbsp;5</a>, <a href="#tbl-6" class="quarto-xref">Table&nbsp;6</a>).<br>
-Il peut y avoir des incohérences de classification comme le batis diffus en 2016 qui devient des vignes sur le reste de la période d’étude (<a href="#tbl-5" class="quarto-xref">Table&nbsp;5</a>).</p>
+<p>En Gironde, le pourcentage de vignes diminue avec la taille du buffer, et à l’inverse, le pourcentage de forêts de feuillus augmente, ce qui semble cohérent (<a href="#fig-5" class="quarto-xref">Figure&nbsp;5</a>).</p>
 <div class="cell">
-<div id="tbl-5" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5: Séquences de couvertures du sol les plus fréquentes de 2016 à 2022 séparées par une virgules
+<div class="cell-output-display">
+<div id="fig-6" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="02_land_cover_files/figure-html/fig-6-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Couverture du sol moyenne en Ille-et-Vilaine selon la taille du buffer
 </figcaption>
-<div aria-describedby="tbl-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+</figure>
+</div>
+</div>
+</div>
+<p>En Ille-et-Vilaine, l’occupation du sol n’est pas très influencée par la taille des buffers (<a href="#fig-6" class="quarto-xref">Figure&nbsp;6</a>).</p>
+<p>Ces deux observations (<a href="#fig-5" class="quarto-xref">Figure&nbsp;5</a>, <a href="#fig-6" class="quarto-xref">Figure&nbsp;6</a>) semblent suggérées l’utilisation d’une seule taille de buffer (sinon les indicateurs seront très corrélés).</p>
+</section>
+</section>
+</section>
+<section id="série-temporelle" class="level2">
+<h2 class="anchored" data-anchor-id="série-temporelle">Série temporelle</h2>
+<p>Nous avons besoin de l’historique de l’occupation du sol sur la plus grande période possible. Les données RPG sont disponibles de 2015 à 2023. Les données RPG complété sont disponible de 2016 à 2022. Les données OSO sont disponibles de 2016 à 2023. La période commune est donc <strong>2016-2022</strong>.</p>
+<p>La classification OSO n’est pas constante sur la période et passe de 17 à 23 classes. Cela affecte surtout les cultures qui, heureusement, seront majoritairement masquées par les donnees RPG.</p>
+<section id="extraction-ponctuelle" class="level3">
+<h3 class="anchored" data-anchor-id="extraction-ponctuelle">Extraction ponctuelle</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-7" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="02_land_cover_files/figure-html/fig-7-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Nombre de classes de couverture du sol differentes sur la periode 2016-2022
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>La majorité des parcelles en Gironde a un seul type d’occupation du sol sur la période d’étude: surtout des vignes, ou des forêts de conifères (<a href="#fig-7" class="quarto-xref">Figure&nbsp;7</a>, <a href="#tbl-6" class="quarto-xref">Table&nbsp;6</a>, <a href="#tbl-7" class="quarto-xref">Table&nbsp;7</a>). En Ille-et-Vilaine, la majorité des sites d’échantillonage ont entre 2 et 4 cultures de céréales différentes sur la période 2016-2022 (<a href="#fig-7" class="quarto-xref">Figure&nbsp;7</a>, <a href="#tbl-8" class="quarto-xref">Table&nbsp;8</a>, <a href="#tbl-9" class="quarto-xref">Table&nbsp;9</a>).</p>
+<p>Il peut y avoir des incohérences de classification comme le batis diffus en 2016 qui devient des vignes sur le reste de la période d’étude (<a href="#tbl-5" class="quarto-xref">Table&nbsp;5</a>).</p>
+<div class="cell">
+<div id="tbl-6" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Séquences de couvertures du sol les plus fréquentes en Gironde de 2016 à 2022 séparées par une virgules
+</figcaption>
+<div aria-describedby="tbl-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <colgroup>
@@ -689,12 +838,12 @@ Table&nbsp;5: Séquences de couvertures du sol les plus fréquentes de 2016 à 2
 </div>
 </div>
 <div class="cell">
-<div id="tbl-6" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<div id="tbl-7" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;6: Diversité de couvertures du sol les plus fréquentes (sans tenir compte de la temporalité)
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7: Diversité de couvertures du sol les plus fréquentes en Gironde (sans tenir compte de la temporalité)
 </figcaption>
-<div aria-describedby="tbl-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="tbl-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
@@ -751,46 +900,182 @@ Table&nbsp;6: Diversité de couvertures du sol les plus fréquentes (sans tenir 
 </figure>
 </div>
 </div>
+<div class="cell">
+<div id="tbl-8" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;8: Séquences de couvertures du sol les plus fréquentes en Ille-et-Vilaine de 2016 à 2022 séparées par une virgules
+</figcaption>
+<div aria-describedby="tbl-8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 96%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">fcov_ts</th>
+<th style="text-align: right;">Freq</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Blé,Maïs,Blé,Maïs,Blé,Maïs,Blé</td>
+<td style="text-align: right;">34</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blé,Maïs,Blé,Prairies temporaires,Prairies temporaires,Prairies temporaires,Prairies temporaires</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Autres céréales,Colza,Autres céréales,Autres céréales,Colza,Fourrage,Blé</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blé,Maïs,Blé,Maïs,Blé,Fourrage,Fourrage</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Maïs,Blé,Orge,Maïs,Blé,Orge,Maïs</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Prairies temporaires,Prairies temporaires,Prairies temporaires,Prairies temporaires,Prairies temporaires,Blé,Autres céréales</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Autres céréales,Fourrage,Fourrage,Fourrage,Prairies temporaires,Prairies temporaires,Blé</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Autres céréales,Prairies temporaires,Prairies temporaires,Prairies temporaires,Prairies temporaires,Prairies temporaires,Prairies temporaires</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Blé,Maïs,Maïs,Blé,Maïs,Blé,Maïs</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Colza,Blé,Légumes ou fleurs,Blé,Orge,Colza,Blé</td>
+<td style="text-align: right;">6</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-9" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;9: Diversité de couvertures du sol les plus fréquentes en Ille-et-Vilaine (sans tenir compte de la temporalité)
+</figcaption>
+<div aria-describedby="tbl-9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">ucov_ts</th>
+<th style="text-align: right;">Freq</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Blé,Maïs</td>
+<td style="text-align: right;">50</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blé,Maïs,Prairies temporaires</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Autres céréales,Blé,Prairies temporaires</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blé,Colza,Maïs</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Blé,Fourrage,Maïs</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blé,Maïs,Orge</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Autres céréales,Prairies temporaires</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Autres céréales,Blé,Colza,Fourrage</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Autres céréales,Blé,Fourrage,Prairies temporaires</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Autres céréales,Blé,Colza,Orge,Protéagineux</td>
+<td style="text-align: right;">6</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
 </section>
 <section id="extraction-par-buffer-de-1000m" class="level3">
 <h3 class="anchored" data-anchor-id="extraction-par-buffer-de-1000m">Extraction par buffer de 1000m</h3>
 <div class="cell">
 <div class="cell-output-display">
-<div id="fig-6" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-8" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="02_land_cover_files/figure-html/fig-6-1.png" class="img-fluid figure-img" width="672">
+<div aria-describedby="fig-8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="02_land_cover_files/figure-html/fig-8-1.png" class="img-fluid figure-img" width="672">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6: Pourcentage de vignes pour un buffer de 1km par année
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Moyenne de l’occupation du sol par année en Gironde sur les buffer de 1km
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>Le pourcentage de vignes sur les buffer de 1km est assez constant sur la période d’étude (<a href="#fig-8" class="quarto-xref">Figure&nbsp;8</a>). La présence d’<em>autres céréales</em> est plus importante en 2016-2017 que sur 2018-2022. Les <em>batis diffus</em> sont aussi plus nombreux en 2016-2019 que sur la periode 2020-2022. Y a t-il un effet de changement de protocole pour mesurer ces classes ?</p>
 <div class="cell">
 <div class="cell-output-display">
-<div id="fig-7" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-9" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="02_land_cover_files/figure-html/fig-7-1.png" class="img-fluid figure-img" width="672">
+<div aria-describedby="fig-9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="02_land_cover_files/figure-html/fig-9-1.png" class="img-fluid figure-img" width="672">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7: Distribution moyenne de l’occupation du sol par année
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Moyenne de l’occupation du sol par année en Ille-et-Vilaine sur les buffer de 1km
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Le pourcentage de vignes sur les buffer de 1km est très constant sur la période d’étude (<a href="#fig-6" class="quarto-xref">Figure&nbsp;6</a>).</p>
-<p>La présence d’<em>autres céréales</em> est plus importante en 2016-2017 que sur 2018-2022 (<a href="#fig-7" class="quarto-xref">Figure&nbsp;7</a>). Les <em>batis diffus</em> sont aussi plus nombreux en 2016-2019 que sur la periode 2020-2022. Y a t-il un effet de changement de protocole pour mesurer ces classes ?</p>
+<p>En général, l’occupation du sol est assez stable sur la période 2016-2022 (<a href="#fig-9" class="quarto-xref">Figure&nbsp;9</a>). Cependant, il y a quelques variations annuelles : beaucoup d’<em>autres cereales</em> en 2016, peu de <em>blé</em> et beaucoup de <em>mais</em> en 2020, augmentation des prairies permanentes entre 2016 et 2022.</p>
+<p>A partir des deux cas d’étude, il semble y avoir une sur-représentation de la classe <code>autres céréales</code> en 2016, qui diminue de moitié en 2017, puis arrive à un niveau constant sur la période 2018-2022. Cela serait-il causé par un nombre réduit de classes des données OSO, ou un changement de protocole en 2016-2017?<br>
+On peut aussi observer une recrudescence de zones industrielles et commerciales en 2018-2019 pour les deux départements (les pourcentages restent cependant très faibles). Il pourrait etre judicieux de les regrouper avec les autres classes de batis ou zones imperméables.</p>
 </section>
 </section>
 <section id="résumé" class="level2">
 <h2 class="anchored" data-anchor-id="résumé">Résumé</h2>
 <ul>
-<li>Il est possible de créer une couche d’occupation du sol en combinant les données RPG, RPG complété et OSO, avec une résolution fine de 10m. L’opération est assez rapide et produit un raster de 215Mo pour la periode 2016-2022 sur un département (Gironde).</li>
-<li>Les extractions de la couverture du sol par buffer et pour les series temporelles sont simplifiées.</li>
+<li>Il est possible de créer une couche d’occupation du sol en combinant les données RPG, RPG complété et OSO, avec une résolution fine de 10m, 5m ou 2m.<br>
+</li>
+<li>Les extractions de la couverture du sol par buffer et pour les series temporelles sont ainsi simplifiées.<br>
+</li>
+<li>La résolution du raster n’a pas d’influence sur l’extraction de la couverture du sol par buffer mais les résolutions fines produisent des données très lourdes, difficile à stocker et à manipuler.</li>
+<li>La resolution de 10m semble la plus appropriée pour nos objectifs et l’étendue du jeu de données.</li>
 <li><strong>L’étape d’homogénéisation des classes est critique et doit être vérifiée/completée par tous.</strong></li>
 <li>Il faut aussi <strong>s’assurer que les données OSO et RPG ont un protocole constant sur la période d’étude</strong>, sinon cela peut créer des biais dans les futures analyses.</li>
 </ul>

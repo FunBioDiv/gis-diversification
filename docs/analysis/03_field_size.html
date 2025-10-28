@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Romain Frelat">
+<meta name="dcterms.date" content="2025-10-28">
+
+<title>Exploration de la taille des parcelles</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9ac0fa60fcd2ae55f2ddd9f231fc218f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c9f8864e19c44bc06d5aea6819f2f394.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#objectif" id="toc-objectif" class="nav-link active" data-scroll-target="#objectif">Objectif</a></li>
+  <li><a href="#présentation-des-jeux-de-données" id="toc-présentation-des-jeux-de-données" class="nav-link" data-scroll-target="#présentation-des-jeux-de-données">Présentation des jeux de données</a>
+  <ul class="collapse">
+  <li><a href="#rpg-original" id="toc-rpg-original" class="nav-link" data-scroll-target="#rpg-original">RPG original</a></li>
+  <li><a href="#rpg-séquence-de-culture" id="toc-rpg-séquence-de-culture" class="nav-link" data-scroll-target="#rpg-séquence-de-culture">RPG séquence de culture</a></li>
+  <li><a href="#rpg-complété" id="toc-rpg-complété" class="nav-link" data-scroll-target="#rpg-complété">RPG complété</a></li>
+  <li><a href="#rpg-séquence-complété" id="toc-rpg-séquence-complété" class="nav-link" data-scroll-target="#rpg-séquence-complété">RPG séquence + complété</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
+  </ul></li>
+  <li><a href="#intersection-avec-les-buffer-à-1500m" id="toc-intersection-avec-les-buffer-à-1500m" class="nav-link" data-scroll-target="#intersection-avec-les-buffer-à-1500m">Intersection avec les buffer à 1500m</a>
+  <ul class="collapse">
+  <li><a href="#gironde-33" id="toc-gironde-33" class="nav-link" data-scroll-target="#gironde-33">Gironde (33)</a></li>
+  <li><a href="#ille-et-vilaine-35" id="toc-ille-et-vilaine-35" class="nav-link" data-scroll-target="#ille-et-vilaine-35">Ille-et-Vilaine (35)</a></li>
+  </ul></li>
+  <li><a href="#résumé" id="toc-résumé" class="nav-link" data-scroll-target="#résumé">Résumé :</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploration de la taille des parcelles</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Romain Frelat </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 28, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="objectif" class="level2">
+<h2 class="anchored" data-anchor-id="objectif">Objectif</h2>
+<p>L’objectif de ce document est d’explorer comment évaluer la distribution de la taille des parcelles autour des sites d’échantillonnage en comparant les jeux de données <code>RPG original</code>, <code>RPG séquence de cultures</code> et <code>RPG completé</code>.</p>
+<p>Les comparaisons sont réalisées sur l’année 2019, sur les sites d’échantillonnage de Gironde (d33, N=338) et d’Ille-et-Vilaine (d35 N=227), en utilisant une taille de buffer de 1500m.</p>
+</section>
+<section id="présentation-des-jeux-de-données" class="level2">
+<h2 class="anchored" data-anchor-id="présentation-des-jeux-de-données">Présentation des jeux de données</h2>
+<section id="rpg-original" class="level3">
+<h3 class="anchored" data-anchor-id="rpg-original">RPG original</h3>
+<p>Les données sont disponibles par région et par année sur le portail <a href="https://geoservices.ign.fr/rpg#telechargement">IGN</a>. Le RPG est disponible sur la période 2007-2023 mais les données au niveau de la parcelle sont cohérentes seulement sur la période 2015-2023.<br>
+Téléchargement à la main (R53: 394Mb, R75: 701Mb), puis selection des parcelles par département (d33: 41Mb, d35: 119Mb).</p>
+<div class="cell">
+<div id="tbl-1" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Distribution de la taille des parcelles (en ha) du RPG original en 2019 par département
+</figcaption>
+<div aria-describedby="tbl-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">N</th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">d33</td>
+<td style="text-align: right;">81218</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.405</td>
+<td style="text-align: right;">1.008</td>
+<td style="text-align: right;">2.519</td>
+<td style="text-align: right;">2.497</td>
+<td style="text-align: right;">369.426</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d35</td>
+<td style="text-align: right;">215372</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.403</td>
+<td style="text-align: right;">1.237</td>
+<td style="text-align: right;">2.032</td>
+<td style="text-align: right;">2.739</td>
+<td style="text-align: right;">582.106</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="rpg-séquence-de-culture" class="level3">
+<h3 class="anchored" data-anchor-id="rpg-séquence-de-culture">RPG séquence de culture</h3>
+<p>Les séquences de cultures sur la période 2015-2023 sont disponibles par département (d35 : 260Mb, d33 : 97Mb).<br>
+Les sous-parcelles ont été agrégées (<code>terra::aggregate()</code>) pour l’année 2019 selon l’identifiant de parcelle <code>parcel2019</code> (d35 : 154 Mb, d33: 50Mb).</p>
+<blockquote class="blockquote">
+<p>Girault, Baptiste; Martin, Philippe, 2025, “Séquences de culture, France, 2015-2023”, <a href="https://doi.org/10.57745/VMYCYM" class="uri">https://doi.org/10.57745/VMYCYM</a>, Recherche Data Gouv, V2</p>
+</blockquote>
+<div class="cell">
+<div id="tbl-2" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Distribution de la taille des parcelles (en ha) du RPG séquence de culture en 2019 par département
+</figcaption>
+<div aria-describedby="tbl-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">N</th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">d33</td>
+<td style="text-align: right;">81293</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.397</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">2.501</td>
+<td style="text-align: right;">2.478</td>
+<td style="text-align: right;">369.200</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d35</td>
+<td style="text-align: right;">215539</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.395</td>
+<td style="text-align: right;">1.228</td>
+<td style="text-align: right;">2.018</td>
+<td style="text-align: right;">2.722</td>
+<td style="text-align: right;">582.106</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="rpg-complété" class="level3">
+<h3 class="anchored" data-anchor-id="rpg-complété">RPG complété</h3>
+<p>Le RPG complété est <a href="https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022">disponible</a> sur la période 2016-2022 par département (d35 : 182Mb, d33 : 172Mb).</p>
+<p>Pour le RPG complété, il n’y a pas d’identifiant de parcelle. Les sous-parcelles ont été agrégées spatialement (uniquement si elles se touchent) pour l’année 2019 selon le type de culture <code>rpg19_cult</code> (d35 : 14Mb Mb, d33: 8Mb).</p>
+<blockquote class="blockquote">
+<p>Cantelaube, Pierre; Lardot, Benjamin, 2024, “RPG complété 2022 Région Nouvelle-Aquitaine”, <a href="https://doi.org/10.57745/6FNRWO" class="uri">https://doi.org/10.57745/6FNRWO</a>, Recherche Data Gouv, V5 (d33: 47Mb compressed, 171Mb extracted)</p>
+</blockquote>
+<div class="cell">
+<div id="tbl-3" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Distribution de la taille des parcelles (en ha) du RPG complété en 2019 par département
+</figcaption>
+<div aria-describedby="tbl-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">N</th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">d33</td>
+<td style="text-align: right;">7847</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.234</td>
+<td style="text-align: right;">0.620</td>
+<td style="text-align: right;">1.283</td>
+<td style="text-align: right;">1.493</td>
+<td style="text-align: right;">61.337</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d35</td>
+<td style="text-align: right;">5740</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.241</td>
+<td style="text-align: right;">0.558</td>
+<td style="text-align: right;">1.054</td>
+<td style="text-align: right;">1.195</td>
+<td style="text-align: right;">68.888</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="rpg-séquence-complété" class="level3">
+<h3 class="anchored" data-anchor-id="rpg-séquence-complété">RPG séquence + complété</h3>
+<p>Il y a beaucoup de chevauchements entre les parcelles issues du <code>RPG</code> et celles du <code>RPG complété</code>. Pour ne pas ajouter de petites bandes de terrain le long de parcelles RPG, les parcelles du <code>RPG complété</code> avec un chevauchement de plus de 75% de leur surface sur le <code>RPG</code> ont été écartées. Pour les autres parcelles, seule la différence spatiale entre les deux couches a été conservée.</p>
+<div class="cell">
+<div id="tbl-4" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Distribution de la taille des parcelles (en ha) du RPG séquence+complété en 2019 par département
+</figcaption>
+<div aria-describedby="tbl-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">N</th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">d33</td>
+<td style="text-align: right;">82749</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.382</td>
+<td style="text-align: right;">0.979</td>
+<td style="text-align: right;">2.464</td>
+<td style="text-align: right;">2.433</td>
+<td style="text-align: right;">369.200</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d35</td>
+<td style="text-align: right;">217905</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.390</td>
+<td style="text-align: right;">1.214</td>
+<td style="text-align: right;">2.006</td>
+<td style="text-align: right;">2.702</td>
+<td style="text-align: right;">582.106</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="visualization" class="level3">
+<h3 class="anchored" data-anchor-id="visualization">Visualization</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03_field_size_files/figure-html/fig-1-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Parcelles cultivées dans une petite région de Gironde (33)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03_field_size_files/figure-html/fig-2-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Parcelles cultivées dans une petite région de Ille-et-Vilaine (35)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="intersection-avec-les-buffer-à-1500m" class="level2">
+<h2 class="anchored" data-anchor-id="intersection-avec-les-buffer-à-1500m">Intersection avec les buffer à 1500m</h2>
+<section id="gironde-33" class="level3">
+<h3 class="anchored" data-anchor-id="gironde-33">Gironde (33)</h3>
+<div class="cell">
+<div id="tbl-5" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Distribution du nombre de parcelles sur un buffer de 1500m en Gironde selon la source des données
+</figcaption>
+<div aria-describedby="tbl-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RPG original</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">141.75</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">179.426</td>
+<td style="text-align: right;">211.5</td>
+<td style="text-align: right;">338</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG séquence</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">141.75</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">179.240</td>
+<td style="text-align: right;">211.5</td>
+<td style="text-align: right;">337</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG seq+complété</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">150.00</td>
+<td style="text-align: right;">191</td>
+<td style="text-align: right;">182.657</td>
+<td style="text-align: right;">213.0</td>
+<td style="text-align: right;">342</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-6" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Distribution de la taille moyenne des parcelles (en ha) sur un buffer de 1500m en Gironde selon la source des données
+</figcaption>
+<div aria-describedby="tbl-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+<th style="text-align: right;">NA’s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RPG original</td>
+<td style="text-align: right;">1.067</td>
+<td style="text-align: right;">1.400</td>
+<td style="text-align: right;">1.986</td>
+<td style="text-align: right;">2.115</td>
+<td style="text-align: right;">2.717</td>
+<td style="text-align: right;">6.695</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG séquence</td>
+<td style="text-align: right;">1.066</td>
+<td style="text-align: right;">1.386</td>
+<td style="text-align: right;">1.964</td>
+<td style="text-align: right;">2.098</td>
+<td style="text-align: right;">2.701</td>
+<td style="text-align: right;">6.951</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG seq+complété</td>
+<td style="text-align: right;">1.044</td>
+<td style="text-align: right;">1.366</td>
+<td style="text-align: right;">1.918</td>
+<td style="text-align: right;">2.069</td>
+<td style="text-align: right;">2.640</td>
+<td style="text-align: right;">6.951</td>
+<td style="text-align: right;">4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03_field_size_files/figure-html/fig-3-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Example de buffer en Gironde avec des densités de parcelles extrèmes (minimum à gauche et maximum à droite)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03_field_size_files/figure-html/fig-4-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Correlation entre la taille moyenne des parcelles sur un buffer de 1500m calculée à partir de différents source de données (Gironde)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Quelque soit la source de données, le nombre et la taille des parcelles dans les buffer de 1500m sont très similaire. En moyenne en Gironde, il y a 180 parcelles de 2 ha dans une rayon de 1500m autour des sites d’échantillonage. L’ajout du <code>RPG complété</code> tend logiquement à augmenter le nombre de parcelles et diminuer leur taille moyenne (mais la différence est minime).</p>
+</section>
+<section id="ille-et-vilaine-35" class="level3">
+<h3 class="anchored" data-anchor-id="ille-et-vilaine-35">Ille-et-Vilaine (35)</h3>
+<div class="cell">
+<div id="tbl-7" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7: Distribution du nombre de parcelles sur un buffer de 1500m en Ille-et-Vilaine selon la source des données
+</figcaption>
+<div aria-describedby="tbl-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RPG original</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">248.5</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">276.189</td>
+<td style="text-align: right;">301</td>
+<td style="text-align: right;">491</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG séquence</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">247.0</td>
+<td style="text-align: right;">267</td>
+<td style="text-align: right;">275.670</td>
+<td style="text-align: right;">301</td>
+<td style="text-align: right;">491</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG seq+complété</td>
+<td style="text-align: right;">166</td>
+<td style="text-align: right;">248.0</td>
+<td style="text-align: right;">269</td>
+<td style="text-align: right;">277.978</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">497</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-8" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;8: Distribution de la taille moyenne des parcelles sur un buffer de 1500m en Ille-et-Vilaine selon la source des données
+</figcaption>
+<div aria-describedby="tbl-8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Min.</th>
+<th style="text-align: right;">1st Qu.</th>
+<th style="text-align: right;">Median</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">3rd Qu.</th>
+<th style="text-align: right;">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RPG original</td>
+<td style="text-align: right;">1.210</td>
+<td style="text-align: right;">2.016</td>
+<td style="text-align: right;">2.383</td>
+<td style="text-align: right;">2.323</td>
+<td style="text-align: right;">2.574</td>
+<td style="text-align: right;">3.008</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RPG séquence</td>
+<td style="text-align: right;">1.202</td>
+<td style="text-align: right;">2.007</td>
+<td style="text-align: right;">2.360</td>
+<td style="text-align: right;">2.305</td>
+<td style="text-align: right;">2.557</td>
+<td style="text-align: right;">2.979</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RPG seq+complété</td>
+<td style="text-align: right;">1.191</td>
+<td style="text-align: right;">1.998</td>
+<td style="text-align: right;">2.360</td>
+<td style="text-align: right;">2.297</td>
+<td style="text-align: right;">2.566</td>
+<td style="text-align: right;">3.064</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03_field_size_files/figure-html/fig-5-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Example de buffer en Ille-et-Vilaine avec des densités de parcelles extrèmes (minimum à gauche et maximum à droite)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-6" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="03_field_size_files/figure-html/fig-6-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Correlation entre la taille moyenne des parcelles sur un buffer de 1500m calculée à partir de différents source de données (Ille-et-Vilaine)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>En moyenne en Ille-et-Vilaine, il y a 268 parcelles de 2.3 ha dans une rayon de 1500m autour des sites d’échantillonage. L’ajout du <code>RPG complété</code> augmente très faiblement le nombre de parcelles et diminue leur taille moyenne mais la différence est minime.</p>
+</section>
+</section>
+<section id="résumé" class="level2">
+<h2 class="anchored" data-anchor-id="résumé">Résumé :</h2>
+<p>La distribution de la taille des parcelles autour des sites d’échantillonnage n’est pas sensible à la source des données. Voici un petit récapitulatif des points forts des différents jeux de données:</p>
+<p><strong>RPG original</strong></p>
+<ul>
+<li>données originales fournies par l’IGN, sans pré-traitement</li>
+<li>possibilité de calculer aussi les périmètres des parcelles</li>
+</ul>
+<p><strong>RPG séquence</strong></p>
+<ul>
+<li>données facilitant l’accès à la séquence de culture mais demandant une étape supplémentaire d’aggrégation des sous-parcelles par année</li>
+<li>les aires des parcelles et la couverture spatiale sont similaires à celle du RPG original</li>
+<li>pas de possibilité de calculer le périmètre des parcelles (à cause de l’étape d’aggrégation des sous-parcelles)</li>
+</ul>
+<p><strong>RPG séquence + completé</strong></p>
+<ul>
+<li>le RPG complété permet d’avoir une meilleure couverture spatiale<br>
+</li>
+<li>beaucoup de chevauchement avec le RPG et peu de parcelles supplémentaires, ce qui a un effet négligeable sur les indicateurs</li>
+<li>la definition des parcelles est moins homogène avec l’ajout de parcelles plus petites</li>
+<li>le couplage des deux jeux de données est une étape assez lourde en temps de calcul</li>
+</ul>
+<p><strong>À DISCUTER / DECIDER</strong>:</p>
+<p>Quelle source de données utiliser pour calculer la taille des parcelles autour des sites d’échantillonnage?</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

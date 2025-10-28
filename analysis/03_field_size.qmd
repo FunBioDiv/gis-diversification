@@ -1,0 +1,441 @@
+---
+title: "Exploration de la taille des parcelles"
+author: Romain Frelat
+date: today
+format: 
+  html:
+    toc: true
+execute:
+  echo: false
+  warning: false
+---
+
+```{r setup}
+library(terra) |> suppressWarnings()
+library(sf) |> suppressWarnings()
+library(here) |> suppressWarnings()
+library(mapview)
+library(tmap)
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data")
+outfolder <- here("data", "derived-data")
+pts35 <- vect(here(datafolder, "pts_35.gpkg"))
+pts35$ID <- paste(pts35$Study_ID, pts35$Site, pts35$Year, sep = "_")
+buff35 <- buffer(pts35, 1500)
+
+pts33 <- vect(here(datafolder, "pts_33.gpkg"))
+pts33$ID <- paste(pts33$Study_ID, pts33$Site, pts33$Year, sep = "_")
+buff33 <- buffer(pts33, 1500)
+```
+
+
+## Objectif
+
+L'objectif de ce document est d'explorer comment évaluer la distribution de la taille des parcelles autour des sites d’échantillonnage en comparant les jeux de données `RPG original`, `RPG séquence de cultures` et `RPG completé`. 
+
+Les comparaisons sont réalisées sur l'année 2019, sur les sites d’échantillonnage de Gironde (d33, N=338) et d'Ille-et-Vilaine (d35 N=227), en utilisant une taille de buffer de 1500m.  
+
+
+## Présentation des jeux de données
+
+```{r}
+rpg35_ori <- vect(here(datafolder, "RPG_2019_d35.gpkg"))
+rpg33_ori <- vect(here(datafolder, "RPG_2019_d33.gpkg"))
+
+rpg35_seq <- vect(here(datafolder, "RPGseq_2019_d35.gpkg"))
+rpg33_seq <- vect(here(datafolder, "RPGseq_2019_d33.gpkg"))
+
+rpg35_comp <- vect(here(datafolder, "RPGcomp_2019_d35.gpkg"))
+rpg33_comp <- vect(here(datafolder, "RPGcomp_2019_d33.gpkg"))
+
+rpg35_seq_comp <- vect(here(datafolder, "RPGseqcomp_2019_d35.gpkg"))
+rpg33_seq_comp <- vect(here(datafolder, "RPGseqcomp_2019_d33.gpkg"))
+```
+
+
+### RPG original
+Les données sont disponibles par région et par année sur le portail [IGN](https://geoservices.ign.fr/rpg#telechargement). Le RPG est disponible sur la période 2007-2023 mais les données au niveau de la parcelle sont cohérentes seulement sur la période 2015-2023.  
+Téléchargement à la main (R53: 394Mb, R75: 701Mb), puis selection des parcelles par département (d33: 41Mb, d35: 119Mb).    
+
+```{r}
+#| label: tbl-1
+#| tbl-cap: "Distribution de la taille des parcelles (en ha) du RPG original en 2019 par département"
+out <- rbind(
+  c(nrow(rpg33_ori), round(summary(rpg33_ori$area_2019_ha), 3)),
+  c(nrow(rpg35_ori), round(summary(rpg35_ori$area_2019_ha), 3))
+)
+row.names(out) <- c("d33", "d35")
+colnames(out)[1] <- "N"
+knitr::kable(out, row.names = TRUE)
+```
+
+### RPG séquence de culture
+
+Les séquences de cultures sur la période 2015-2023 sont disponibles par département (d35 : 260Mb, d33 : 97Mb).  
+Les sous-parcelles ont été agrégées (`terra::aggregate()`) pour l'année 2019 selon l'identifiant de parcelle `parcel2019` (d35 : 154 Mb, d33: 50Mb).   
+
+> Girault, Baptiste; Martin, Philippe, 2025, "Séquences de culture, France, 2015-2023", <https://doi.org/10.57745/VMYCYM>, Recherche Data Gouv, V2 
+
+
+```{r}
+#| label: tbl-2
+#| tbl-cap: "Distribution de la taille des parcelles (en ha) du RPG séquence de culture en 2019 par département"
+out <- rbind(
+  c(nrow(rpg33_seq), round(summary(rpg33_seq$area_2019_ha), 3)),
+  c(nrow(rpg35_seq), round(summary(rpg35_seq$area_2019_ha), 3))
+)
+row.names(out) <- c("d33", "d35")
+colnames(out)[1] <- "N"
+knitr::kable(out, row.names = TRUE)
+```
+
+
+### RPG complété
+
+Le RPG complété est [disponible](https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022) sur la période 2016-2022 par département (d35 : 182Mb, d33 : 172Mb).  
+
+Pour le RPG complété, il n'y a pas d'identifiant de parcelle. Les sous-parcelles ont été agrégées spatialement (uniquement si elles se touchent) pour l'année 2019 selon le type de culture `rpg19_cult` (d35 : 14Mb Mb, d33: 8Mb). 
+
+> Cantelaube, Pierre; Lardot, Benjamin, 2024, "RPG complété 2022 Région Nouvelle-Aquitaine", <https://doi.org/10.57745/6FNRWO>, Recherche Data Gouv, V5  (d33: 47Mb compressed, 171Mb extracted)    
+
+```{r}
+#| label: tbl-3
+#| tbl-cap: "Distribution de la taille des parcelles (en ha) du RPG complété en 2019 par département"
+out <- rbind(
+  c(nrow(rpg33_comp), round(summary(rpg33_comp$area_2019_ha), 3)),
+  c(nrow(rpg35_comp), round(summary(rpg35_comp$area_2019_ha), 3))
+)
+row.names(out) <- c("d33", "d35")
+colnames(out)[1] <- "N"
+knitr::kable(out, row.names = TRUE)
+```
+
+
+### RPG séquence + complété
+
+Il y a beaucoup de chevauchements entre les parcelles issues du `RPG` et celles du `RPG complété`. 
+Pour ne pas ajouter de petites bandes de terrain le long de parcelles RPG, les parcelles du `RPG complété` avec un chevauchement de plus de 75% de leur surface sur le `RPG` ont été écartées. Pour les autres parcelles, seule la différence spatiale entre les deux couches a été conservée. 
+
+```{r}
+#| label: tbl-4
+#| tbl-cap: "Distribution de la taille des parcelles (en ha) du RPG séquence+complété en 2019 par département "
+out <- rbind(
+  c(nrow(rpg33_seq_comp), round(summary(rpg33_seq_comp$area_2019_ha), 3)),
+  c(nrow(rpg35_seq_comp), round(summary(rpg35_seq_comp$area_2019_ha), 3))
+)
+row.names(out) <- c("d33", "d35")
+colnames(out)[1] <- "N"
+knitr::kable(out, row.names = TRUE)
+```
+
+### Visualization
+
+```{r}
+#| label: fig-1
+#| fig-cap: "Parcelles cultivées dans une petite région de Gironde (33)"
+
+# plot(rpg33_comp)
+# plot(pts33, add = TRUE, col = "red")
+ext_33 <- ext(c(443000, 446000, 6394000, 6398000))
+zoom_33 <- vect(ext_33, crs = crs(pts33))
+
+zori <- crop(rpg33_ori, zoom_33)
+zseq <- crop(rpg33_seq, zoom_33)
+zcomp <- crop(rpg33_comp, zoom_33)
+zseqcomp <- crop(rpg33_seq_comp, zoom_33)
+
+par(mfrow = c(2, 2))
+plot(zori, col = "grey10", main = "RPG original", border = NA)
+plot(zseq, col = "blue", main = "RPG séquence", border = NA)
+plot(zcomp, col = "red", main = "RPG complété", border = NA)
+plot(
+  zseqcomp,
+  col = ifelse(zseqcomp$ori == "RPG complete", "red", "blue"),
+  main = "RPG séquence+complété",
+  border = NA
+)
+
+# mapview(zori, color = "grey70", col.regions = "grey70", alpha.regions = 0.5) +
+#   mapview(zseq, color = "green", col.regions = "green", alpha.regions = 0.5) +
+#   mapview(
+#     zcomp,
+#     color = "red",
+#     col.regions = "red",
+#     alpha.regions = 0.7
+#   )
+# mapview(z_seq_comp, zcol = "ori")
+```
+
+```{r}
+#| label: fig-2
+#| fig-cap: "Parcelles cultivées dans une petite région de Ille-et-Vilaine (35)"
+# plot(rpg35_comp)
+# plot(pts35, add = TRUE, col = "red", pch = ".")
+ext_35 <- ext(c(360000, 365000, 6830000, 6836000))
+zoom_35 <- vect(ext_35, crs = crs(pts35))
+
+zori <- crop(rpg35_ori, zoom_35)
+zseq <- crop(rpg35_seq, zoom_35)
+zcomp <- crop(rpg35_comp, zoom_35)
+zseqcomp <- crop(rpg35_seq_comp, zoom_35)
+
+par(mfrow = c(2, 2))
+plot(zori, col = "grey10", main = "RPG original", border = NA)
+plot(zseq, col = "blue", main = "RPG séquence", border = NA)
+plot(zcomp, col = "red", main = "RPG complété", border = NA)
+plot(
+  zseqcomp,
+  col = ifelse(zseqcomp$ori == "RPG complete", "red", "blue"),
+  main = "RPG séquence+complété",
+  border = NA
+)
+
+# mapview(zori, color = "grey70", col.regions = "grey70", alpha.regions = 0.5) +
+#   mapview(zseq, color = "green", col.regions = "green", alpha.regions = 0.5) +
+#   mapview(
+#     zcomp,
+#     color = "red",
+#     col.regions = "red",
+#     alpha.regions = 0.7
+#   )
+
+```
+
+## Intersection avec les buffer à 1500m 
+
+### Gironde (33)
+
+```{r}
+ori_buff33 <- relate(rpg33_ori, buff33, "intersects")
+fsize_ori33 <- rpg33_ori$area_2019_ha * ori_buff33
+fsize_ori33[fsize_ori33 == 0] <- NA
+
+seq_buff33 <- relate(rpg33_seq, buff33, "intersects")
+fsize_seq33 <- rpg33_seq$area_2019_ha * seq_buff33
+fsize_seq33[fsize_seq33 == 0] <- NA
+
+seqcomp_buff33 <- relate(rpg33_seq_comp, buff33, "intersects")
+fsize_seqcomp33 <- rpg33_seq_comp$area_2019_ha * seqcomp_buff33
+fsize_seqcomp33[fsize_seqcomp33 == 0] <- NA
+```
+
+
+```{r}
+#| label: tbl-5
+#| tbl-cap: "Distribution du nombre de parcelles sur un buffer de 1500m en Gironde selon la source des données"
+out <- rbind(
+  round(summary(apply(!is.na(fsize_ori33), 2, sum)), 3),
+  round(summary(apply(!is.na(fsize_seq33), 2, sum)), 3),
+  round(summary(apply(!is.na(fsize_seqcomp33), 2, sum)), 3)
+)
+row.names(out) <- c("RPG original", "RPG séquence", "RPG seq+complété")
+
+knitr::kable(out, row.names = TRUE)
+```
+
+
+```{r}
+#| label: tbl-6
+#| tbl-cap: "Distribution de la taille moyenne des parcelles (en ha) sur un buffer de 1500m en Gironde selon la source des données"
+out <- rbind(
+  round(summary(apply(fsize_ori33, 2, mean, na.rm = TRUE)), 3),
+  round(summary(apply(fsize_seq33, 2, mean, na.rm = TRUE)), 3),
+  round(summary(apply(fsize_seqcomp33, 2, mean, na.rm = TRUE)), 3)
+)
+row.names(out) <- c("RPG original", "RPG séquence", "RPG seq+complété")
+
+knitr::kable(out, row.names = TRUE)
+```
+
+
+```{r}
+#| label: fig-3
+#| fig-cap: "Example de buffer en Gironde avec des densités de parcelles extrèmes (minimum à gauche et maximum à droite)"
+
+num_fields <- apply(!is.na(fsize_seqcomp33), 2, sum)
+mean_fsize <- apply(fsize_seqcomp33, 2, mean, na.rm = TRUE)
+rpg33_seq_comp$col = ifelse(rpg33_seq_comp$ori == "RPG sequence", "blue", "red")
+
+
+par(mfrow = c(2, 2))
+# number of parcelles
+plot(buff33[which.min(num_fields)], main = paste0("N=", min(num_fields)))
+temp <- crop(rpg33_seq_comp, ext(buff33[which.min(num_fields)]))
+plot(temp, border = temp$col, add = TRUE)
+
+plot(buff33[which.max(num_fields)], main = paste0("N=", max(num_fields)))
+temp <- crop(rpg33_seq_comp, ext(buff33[which.max(num_fields)]))
+plot(temp, border = temp$col, add = TRUE)
+
+# mean field size
+plot(
+  buff33[which.min(mean_fsize)],
+  main = paste0("mean =", round(min(mean_fsize, na.rm = TRUE), 2), " ha")
+)
+temp <- crop(rpg33_seq_comp, ext(buff33[which.min(mean_fsize)]))
+plot(temp, border = temp$col, add = TRUE)
+
+plot(
+  buff33[which.max(mean_fsize)],
+  main = paste0("mean =", round(max(mean_fsize, na.rm = TRUE), 2), " ha")
+)
+temp <- crop(rpg33_seq_comp, ext(buff33[which.max(mean_fsize)]))
+plot(temp, border = temp$col, add = TRUE)
+
+```
+
+
+```{r}
+#| label: fig-4
+#| fig-cap: "Correlation entre la taille moyenne des parcelles sur un buffer de 1500m calculée à partir de différents source de données (Gironde)"
+meansize_33 <- data.frame(
+  "RPG original" = apply(fsize_ori33, 2, mean, na.rm = TRUE),
+  "RPG séquence" = apply(fsize_seq33, 2, mean, na.rm = TRUE),
+  "RPG seq+complété" = apply(fsize_seqcomp33, 2, mean, na.rm = TRUE)
+)
+
+# numfield_33 <- data.frame(
+#   "RPG original" = apply(!is.na(fsize_ori33), 2, sum),
+#   "RPG séquence" = apply(!is.na(fsize_seq33), 2, sum),
+#   "RPG seq+complété" = apply(!is.na(fsize_seqcomp33), 2, sum)
+# )
+
+pairs(meansize_33, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+Quelque soit la source de données, le nombre et la taille des parcelles dans les buffer de 1500m sont très similaire. En moyenne en Gironde, il y a 180 parcelles de 2 ha dans une rayon de 1500m autour des sites d'échantillonage. L'ajout du `RPG complété` tend logiquement à augmenter le nombre de parcelles et diminuer leur taille moyenne (mais la différence est minime).
+
+
+### Ille-et-Vilaine (35)
+
+```{r}
+ori_buff35 <- relate(rpg35_ori, buff35, "intersects")
+fsize_ori35 <- rpg35_ori$area_2019_ha * ori_buff35
+fsize_ori35[fsize_ori35 == 0] <- NA
+
+seq_buff35 <- relate(rpg35_seq, buff35, "intersects")
+fsize_seq35 <- rpg35_seq$area_2019_ha * seq_buff35
+fsize_seq35[fsize_seq35 == 0] <- NA
+
+seqcomp_buff35 <- relate(rpg35_seq_comp, buff35, "intersects")
+fsize_seqcomp35 <- rpg35_seq_comp$area_2019_ha * seqcomp_buff35
+fsize_seqcomp35[fsize_seqcomp35 == 0] <- NA
+```
+
+
+```{r}
+#| label: tbl-7
+#| tbl-cap: "Distribution du nombre de parcelles sur un buffer de 1500m en Ille-et-Vilaine selon la source des données"
+out <- rbind(
+  round(summary(apply(!is.na(fsize_ori35), 2, sum)), 3),
+  round(summary(apply(!is.na(fsize_seq35), 2, sum)), 3),
+  round(summary(apply(!is.na(fsize_seqcomp35), 2, sum)), 3)
+)
+row.names(out) <- c("RPG original", "RPG séquence", "RPG seq+complété")
+
+knitr::kable(out, row.names = TRUE)
+```
+
+
+```{r}
+#| label: tbl-8
+#| tbl-cap: "Distribution de la taille moyenne des parcelles sur un buffer de 1500m en Ille-et-Vilaine selon la source des données"
+out <- rbind(
+  round(summary(apply(fsize_ori35, 2, mean, na.rm = TRUE)), 3),
+  round(summary(apply(fsize_seq35, 2, mean, na.rm = TRUE)), 3),
+  round(summary(apply(fsize_seqcomp35, 2, mean, na.rm = TRUE)), 3)
+)
+row.names(out) <- c("RPG original", "RPG séquence", "RPG seq+complété")
+
+knitr::kable(out, row.names = TRUE)
+```
+
+
+```{r}
+#| label: fig-5
+#| fig-cap: "Example de buffer en Ille-et-Vilaine avec des densités de parcelles extrèmes (minimum à gauche et maximum à droite)"
+
+num_fields <- apply(!is.na(fsize_seqcomp35), 2, sum)
+mean_fsize <- apply(fsize_seqcomp35, 2, mean, na.rm = TRUE)
+rpg35_seq_comp$col = ifelse(rpg35_seq_comp$ori == "RPG sequence", "blue", "red")
+
+
+par(mfrow = c(2, 2))
+# number of parcelles
+plot(buff35[which.min(num_fields)], main = paste0("N=", min(num_fields)))
+temp <- crop(rpg35_seq_comp, ext(buff35[which.min(num_fields)]))
+plot(temp, border = temp$col, add = TRUE)
+
+plot(buff35[which.max(num_fields)], main = paste0("N=", max(num_fields)))
+temp <- crop(rpg35_seq_comp, ext(buff35[which.max(num_fields)]))
+plot(temp, border = temp$col, add = TRUE)
+
+# mean field size
+plot(
+  buff35[which.min(mean_fsize)],
+  main = paste0("mean =", round(min(mean_fsize, na.rm = TRUE), 2), " ha")
+)
+temp <- crop(rpg35_seq_comp, ext(buff35[which.min(mean_fsize)]))
+plot(temp, border = temp$col, add = TRUE)
+
+plot(
+  buff35[which.max(mean_fsize)],
+  main = paste0("mean =", round(max(mean_fsize, na.rm = TRUE), 2), " ha")
+)
+temp <- crop(rpg35_seq_comp, ext(buff35[which.max(mean_fsize)]))
+plot(temp, border = temp$col, add = TRUE)
+```
+
+
+```{r}
+#| label: fig-6
+#| fig-cap: "Correlation entre la taille moyenne des parcelles sur un buffer de 1500m calculée à partir de différents source de données (Ille-et-Vilaine)"
+#|
+meansize_35 <- data.frame(
+  "RPG original" = apply(fsize_ori35, 2, mean, na.rm = TRUE),
+  "RPG séquence" = apply(fsize_seq35, 2, mean, na.rm = TRUE),
+  "RPG seq+complété" = apply(fsize_seqcomp35, 2, mean, na.rm = TRUE)
+)
+
+# numfield_35 <- data.frame(
+#   "RPG original" = apply(!is.na(fsize_ori35), 2, sum),
+#   "RPG séquence" = apply(!is.na(fsize_seq35), 2, sum),
+#   "RPG seq+complété" = apply(!is.na(fsize_seqcomp35), 2, sum)
+# )
+
+pairs(meansize_35, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+En moyenne en Ille-et-Vilaine, il y a 268 parcelles de 2.3 ha dans une rayon de 1500m autour des sites d'échantillonage. L'ajout du `RPG complété` augmente très faiblement le nombre de parcelles et diminue leur taille moyenne mais la différence est minime.
+
+
+## Résumé :  
+
+La distribution de la taille des parcelles autour des sites d’échantillonnage n'est pas sensible à la source des données. Voici un petit récapitulatif des points forts des différents jeux de données:  
+
+**RPG original**     
+
+- données originales fournies par l'IGN, sans pré-traitement
+- possibilité de calculer aussi les périmètres des parcelles 
+
+
+**RPG séquence**   
+
+- données facilitant l'accès à la séquence de culture mais demandant une étape supplémentaire d'aggrégation des sous-parcelles par année 
+- les aires des parcelles et la couverture spatiale sont similaires à celle du RPG original
+- pas de possibilité de calculer le périmètre des parcelles (à cause de l'étape d'aggrégation des sous-parcelles)
+
+
+**RPG séquence + completé**  
+
+- le RPG complété permet d'avoir une meilleure couverture spatiale  
+- beaucoup de chevauchement avec le RPG et peu de parcelles supplémentaires, ce qui a un effet négligeable sur les indicateurs
+- la definition des parcelles est moins homogène avec l'ajout de parcelles plus petites
+- le couplage des deux jeux de données est une étape assez lourde en temps de calcul
+
+
+**À DISCUTER / DECIDER**:   
+
+Quelle source de données utiliser pour calculer la taille des parcelles autour des sites d’échantillonnage?
