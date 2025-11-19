@@ -6,7 +6,7 @@
 
 # load the needed package and functions
 devtools::load_all()
-library(terra)
+# library(sf)
 # make sure no one is logged in from Google Account
 googlesheets4::gs4_deauth()
 
@@ -48,13 +48,12 @@ proj <- ifelse(gis$longitude > 180, "LAMB93", "WGS84")
 # transform LAMB93 to WGS84
 lamb93 <- gis[proj %in% "LAMB93", c("longitude", "latitude")]
 shp_2154 <- st_as_sf(lamb93, coords = c("longitude", "latitude"), crs = 2154)
-shp_4326 <- st_transform(shp_5698, crs = 4326)
+shp_4326 <- st_transform(shp_2154, crs = 4326)
 coo_4326 <- st_coordinates(shp_4326)
 gis[proj %in% "LAMB93", c("longitude", "latitude")] <- coo_4326
 # plot(gis[, c("longitude", "latitude")])
 
 # B.3 Add lines per site and year
-
 # clean years
 gis$Year <- gsub(" à ", ",", gis$Year)
 gis$Year <- gsub("-", ",", gis$Year)
@@ -86,13 +85,22 @@ gis_year <- gis_year[order(gis_year$Study_ID, gis_year$Site, gis_year$Site), ]
 dim(gis_year) # 1560, 5
 # head(gis_year)
 shp <- st_as_sf(gis_year, coords = c("longitude", "latitude"), crs = 4326)
+
 # check visualization
 mapview::mapview(shp, zcol = "Study_ID")
 
 
-# B5. Export shapefile
+# B5. Export geopackage file
 st_write(
   shp,
   here::here("data", "raw-data", "fields_FR.gpkg"),
   append = FALSE
 )
+
+## Get classes of RPG and OSO
+rpg <- read.csv2("data/raw-data/RPG/REF_CULTURES_GROUPES_CULTURES_2023.csv", )
+
+rpg2 <- read.csv2("data/raw-data/RPG/REF_CULTURES_2023.csv")
+keep <- which(rpg2$CAMPAGNE_DEBUT > 2015 | rpg2$CAMPAGNE_FIN > 2015)
+rpg2$LIBELLE_CULTURE[keep][!rpg2$CODE[keep] %in% rpg$CODE_CULTURE]
+rpg$CODE_CULTURE %in% rpg2$CODE[keep]
