@@ -1,0 +1,422 @@
+﻿new_code,original_code,nom,grp_id,grp_label,source
+30000,0,Unknown,39,Autres,OSO
+30001,1,Bâtis denses,34,Surface imperméables,OSO
+30002,2,Bâtis diffus,34,Surface imperméables,OSO
+30003,3,Zones industrielles et commerciales,34,Surface imperméables,OSO
+30004,4,Surfaces routes,34,Surface imperméables,OSO
+30005,5,Colza,5,Colza,OSO
+30006,6,Céréales à pailles,4,Autres céréales,OSO
+30007,7,Protéagineux,8,Protéagineux,OSO
+30008,8,Soja,7,Autres oléagineux,OSO
+30009,9,Tournesol,6,Tournesol,OSO
+30010,10,Maïs,2,Maïs,OSO
+30011,11,Riz,4,Autres céréales,OSO
+30012,12,Tubercules/racines,28,Divers,OSO
+30013,13,Prairies,18,Prairies permanentes,OSO
+30014,14,Vergers,20,Vergers,OSO
+30015,15,Vignes,21,Vignes,OSO
+30016,16,Forêts de feuillus,31,Forêts de feuillus,OSO
+30017,17,Forêts de conifères,32,Forêts de conifères,OSO
+30018,18,Pelouses,33,Pelouses,OSO
+30019,19,Landes ligneuses,17,Estives et landes,OSO
+30020,20,Surfaces minérales,35,Surfaces minérales,OSO
+30021,21,Plages et dunes,36,Plages et dunes,OSO
+30022,22,Glaciers ou neiges,37,Glaciers ou neiges,OSO
+30023,23,Eau,38,Eau,OSO
+30255,255,Autres,39,Autres,OSO
+20000,0,Autres,39,Autres,OSO_old
+20010,10,Cultures,30,Cultures d’été,OSO_old
+20011,11,Cultures d’été,30,Cultures d’été,OSO_old
+20012,12,Cultures d’hiver,29,Cultures d’hiver,OSO_old
+20031,31,Forêts de feuillus,31,Forêts de feuillus,OSO_old
+20032,32,Forêts de conifères,32,Forêts de conifères,OSO_old
+20033,33,Unknown,39,Autres,OSO_old
+20034,34,Pelouses,33,Pelouses,OSO_old
+20035,35,Unknown,39,Autres,OSO_old
+20036,36,Landes ligneuses,17,Estives et landes,OSO_old
+20041,41,Bâtis denses,34,Surface imperméables,OSO_old
+20042,42,Bâtis diffus,34,Surface imperméables,OSO_old
+20043,43,Zones industrielles et commerciales,34,Surface imperméables,OSO_old
+20044,44,Surfaces routes,34,Surface imperméables,OSO_old
+20045,45,Surfaces minérales,35,Surfaces minérales,OSO_old
+20046,46,Plages et dunes,36,Plages et dunes,OSO_old
+20051,51,Eau,38,Eau,OSO_old
+20052,52,Unknown,39,Autres,OSO_old
+20053,53,Glaciers ou neiges,37,Glaciers ou neiges,OSO_old
+20211,211,Prairies,18,Prairies permanentes,OSO_old
+20221,221,Vergers,20,Vergers,OSO_old
+20222,222,Vignes,21,Vignes,OSO_old
+20223,223,Unknown,39,Autres,OSO_old
+20224,224,Unknown,39,Autres,OSO_old
+12405,AAR,Plantes aromatiques herbacées non pérennes (< 5 ans) autres que persil,24,Autres cultures industrielles,RPG
+12801,ACA,Autre culture non précisée dans la liste (admissible),28,Divers,RPG
+12835,ACP,Autre culture pérenne et jachère dans les bananeraies,28,Divers,RPG
+11601,AFG,"Autre plante fourragère annuelle (ni légumineuse, ni graminée, ni céréale, ni oléagineux)",16,Fourrage,RPG
+12001,AGR,Agrume,20,Vergers,RPG
+12502,AIL,Aïl,25,Légumes ou fleurs,RPG
+12401,AME,Plantes médicinales et à parfum non pérennes (< 5 ans),24,Autres cultures industrielles,RPG
+12002,ANA,Ananas,20,Vergers,RPG
+12402,ANE,Aneth,24,Autres cultures industrielles,RPG
+12403,ANG,Angélique,24,Autres cultures industrielles,RPG
+12404,ANI,Anis,24,Autres cultures industrielles,RPG
+10701,ARA,Arachide,7,Autres oléagineux,RPG
+12406,ARP,Plante aromatique pérenne non arbustive ou arborée autre que la vanille,24,Autres cultures industrielles,RPG
+12503,ART,Artichaut,25,Légumes ou fleurs,RPG
+12504,AUB,Aubergine,25,Légumes ou fleurs,RPG
+10401,AVH,Avoine d’hiver,4,Autres céréales,RPG
+12003,AVO,Avocat,20,Vergers,RPG
+10402,AVP,Avoine de printemps,4,Autres céréales,RPG
+12407,BAR,Bardane,24,Autres cultures industrielles,RPG
+12408,BAS,Basilic,24,Autres cultures industrielles,RPG
+12004,BCA,Banane (hors export),20,Vergers,RPG
+12005,BCF,Banane créole (fruit et légume) - fermage,20,Vergers,RPG
+12006,BCI,Banane créole (fruit et légume) - indivision,20,Vergers,RPG
+12007,BCP,Banane créole (fruit et légume) - propriété ou faire valoir direct,20,Vergers,RPG
+12008,BCR,Banane créole (fruit et légume) - réforme foncière,20,Vergers,RPG
+10403,BDH,Blé dur d’hiver,4,Autres céréales,RPG
+10404,BDP,Blé dur de printemps,4,Autres céréales,RPG
+10405,BDT,Blé dur de printemps semé tardivement (après le 31/05),4,Autres céréales,RPG
+12009,BEA,Banane export - autre,20,Vergers,RPG
+12010,BEF,Banane (export),20,Vergers,RPG
+12011,BEI,Banane export - indivision,20,Vergers,RPG
+12012,BEP,Banane export - propriété ou faire valoir direct,20,Vergers,RPG
+12013,BER,Banane export - réforme foncière,20,Vergers,RPG
+12802,BFP,Bande admissible le long d’une forêt avec production,28,Divers,RPG
+12803,BFS,Bordure le long d'une forêt sans production,28,Divers,RPG
+12505,BLT,Bleuet,25,Légumes ou fleurs,RPG
+11701,BOP,Bois pâturé,17,Estives et landes,RPG
+12804,BOR,Bordure de champ,28,Divers,RPG
+12409,BRH,Bourrache de 5 ans ou moins,24,Autres cultures industrielles,RPG
+12805,BRO,Brome de 5 ans ou moins,28,Divers,RPG
+12806,BTA,Bande tampon,28,Divers,RPG
+10101,BTH,Blé tendre d’hiver,1,Blé tendre,RPG
+12410,BTN,Betterave,24,Autres cultures industrielles,RPG
+10102,BTP,Blé tendre de printemps,1,Blé tendre,RPG
+12506,BUR,Bugle rampante,25,Légumes ou fleurs,RPG
+11602,BVF,Betterave fourragère,16,Fourrage,RPG
+12201,CAB,Caroube,22,Fruits à coque,RPG
+12014,CAC,Café et cacao,20,Vergers,RPG
+12807,CAE,Châtaigneraie entretenue par des porcins ou des petits ruminants,28,Divers,RPG
+11603,CAF,Carotte fourragère,16,Fourrage,RPG
+10406,CAG,"Autre céréale ou pseudo-céréale secondaire de printemps (alpiste, quinoa, chia, …)",4,Autres céréales,RPG
+10407,CAH,Autre céréale ou pseudo-céréale secondaire d'hiver,4,Autres céréales,RPG
+12507,CAR,Carotte,25,Légumes ou fleurs,RPG
+12411,CAV,Carvi,24,Autres cultures industrielles,RPG
+12015,CBT,Cerise,20,Vergers,RPG
+12508,CCN,"Concombre, cornichon et courgette",25,Légumes ou fleurs,RPG
+12509,CCT,Courgette / Citrouille,25,Légumes ou fleurs,RPG
+12808,CEE,Chênaie entretenue par des porcins ou des petits ruminants,28,Divers,RPG
+12510,CEL,Céleri,25,Légumes ou fleurs,RPG
+12511,CES,Chicorée / Endive / Scarole,25,Légumes ou fleurs,RPG
+10408,CGF,Autre céréale de genre Fagopyrum,4,Autres céréales,RPG
+10409,CGH,Autre céréale de genre Phalaris,4,Autres céréales,RPG
+10410,CGO,Autre céréale de genre Sorghum,4,Autres céréales,RPG
+10411,CGP,Autre céréale de genre Panicum,4,Autres céréales,RPG
+10412,CGS,Autre céréale de genre Setaria,4,Autres céréales,RPG
+10413,CHA,Autre céréale d’hiver de genre Avena,4,Autres céréales,RPG
+11604,CHF,Chou fourrager,16,Fourrage,RPG
+10414,CHH,Autre céréale d’hiver de genre Hordeum,4,Autres céréales,RPG
+12412,CHR,Chardon Marie,24,Autres cultures industrielles,RPG
+10415,CHS,Autre céréale d’hiver de genre Secale,4,Autres céréales,RPG
+10416,CHT,Autre céréale d’hiver de genre Triticum,4,Autres céréales,RPG
+12512,CHU,Chou,25,Légumes ou fleurs,RPG
+10901,CHV,Chanvre,9,Plantes à fibres,RPG
+12413,CIB,Ciboulette,24,Autres cultures industrielles,RPG
+12810,CID,Cultures conduites en inter-rangs (bandes de cultures différentes)  - 2 cultures représentant chacune plus de 25  %,28,Divers,RPG
+12811,CIT,Cultures conduites en inter-rangs (bandes de cultures différentes)  - 3 cultures représentant chacune plus de 25  %,28,Divers,RPG
+12513,CMB,Courge musquée / Butternut,25,Légumes ou fleurs,RPG
+12414,CML,Cameline,24,Autres cultures industrielles,RPG
+12415,CMM,Camomille,24,Autres cultures industrielles,RPG
+12809,CNE,Chênaie non entretenue par des porcins ou des petits ruminants,28,Divers,RPG
+10417,CPA,Autre céréale de printemps de genre Avena,4,Autres céréales,RPG
+10418,CPH,Autre céréale de printemps de genre Hordeum,4,Autres céréales,RPG
+11605,CPL,"Mélange multi-espèces (céréales, oléagineux, légumineuses, …) sans graminées prairiales et sans prédominance de légumineuses",16,Fourrage,RPG
+10419,CPS,Autre céréale de printemps de genre Secale,4,Autres céréales,RPG
+10420,CPT,Autre céréale de printemps de genre Triticum,4,Autres céréales,RPG
+10421,CPZ,Autre céréale de printemps de genre Zea,4,Autres céréales,RPG
+12514,CRA,Cresson alénois de 5 ans ou moins,25,Légumes ou fleurs,RPG
+12416,CRD,Coriandre,24,Autres cultures industrielles,RPG
+12417,CRF,Cerfeuil,24,Autres cultures industrielles,RPG
+12515,CRN,Cornille,25,Légumes ou fleurs,RPG
+12516,CRS,Cresson,25,Légumes ou fleurs,RPG
+12601,CSA,Canne à sucre,26,Canne à sucre,RPG
+10902,CSE,Chanvre sans étiquette conforme,9,Plantes à fibres,RPG
+12602,CSF,Canne à sucre - fermage,26,Canne à sucre,RPG
+12603,CSI,Canne à sucre - indivision,26,Canne à sucre,RPG
+12604,CSP,Canne à sucre - propriété ou faire valoir direct,26,Canne à sucre,RPG
+12605,CSR,Canne à sucre - réforme foncière,26,Canne à sucre,RPG
+12517,CSS,Culture sous serre hors sol,25,Légumes ou fleurs,RPG
+12202,CTG,Châtaigne,22,Fruits à coque,RPG
+12812,CUA,Culture sous abattis,28,Divers,RPG
+12418,CUM,Cumin,24,Autres cultures industrielles,RPG
+12419,CUR,Curcuma,24,Autres cultures industrielles,RPG
+10501,CZH,Colza d’hiver,5,Colza,RPG
+10502,CZP,Colza de printemps,5,Colza,RPG
+12518,DOL,Dolique,25,Légumes ou fleurs,RPG
+11606,DTY,Dactyle de 5 ans ou moins,16,Fourrage,RPG
+10422,EPE,Epeautre (petit épeautre ou engrain et grand épeautre),4,Autres céréales,RPG
+12519,EPI,"Epinard, oseille et bette",25,Légumes ou fleurs,RPG
+12420,EST,Estragon,24,Autres cultures industrielles,RPG
+11607,FAG,Autre fourrage annuel d’un autre genre,16,Fourrage,RPG
+11608,FET,Fétuque de 5 ans ou moins,16,Fourrage,RPG
+10801,FEV,Fève,8,Protéagineux,RPG
+11610,FF5,Féverole fourragère implantée pour la récolte 2015,16,Fourrage,RPG
+11610,FF6,Féverole fourragère implantée pour la récolte 2016,16,Fourrage,RPG
+11610,FF7,Féverole fourragère implantée pour la récolte 2017,16,Fourrage,RPG
+11610,FF8,Féverole fourragère implantée pour la récolte 2018,16,Fourrage,RPG
+11610,FFO,Autre féverole fourragère,16,Fourrage,RPG
+12520,FLA,Autre légume ou fruit annuel,25,Légumes ou fleurs,RPG
+11611,FLO,Fléole de 5 ans ou moins,16,Fourrage,RPG
+12521,FLP,Autre légume ou fruit pérenne (hors petit fruit à baie),25,Légumes ou fleurs,RPG
+12421,FNO,Fenouil,24,Autres cultures industrielles,RPG
+12422,FNU,Fenugrec,24,Autres cultures industrielles,RPG
+12522,FRA,Fraise (en pleine terre),25,Légumes ou fleurs,RPG
+11612,FSG,Autre plante fourragère sarclée d’un autre genre,16,Fourrage,RPG
+10802,FVL,Féverole d'hiver,8,Protéagineux,RPG
+10803,FVP,Féverole de printemps,8,Protéagineux,RPG
+10804,FVT,Féverole semée tardivement (après le 31/05),8,Protéagineux,RPG
+11613,GAI,Gaillet,16,Fourrage,RPG
+12523,GER,Géranium,25,Légumes ou fleurs,RPG
+11614,GES,"Cornille, dolique (y/c lablab), gesse",16,Fourrage,RPG
+11615,GFP,Autre graminée fourragère pure de 5 ans ou moins,16,Fourrage,RPG
+12813,GRA,Graminée pure exclusivement pour gazon ou pour production de semences certifiées,28,Divers,RPG
+12524,HAR,Haricot / Flageolet,25,Légumes ou fleurs,RPG
+12423,HBL,Houblon,24,Autres cultures industrielles,RPG
+12525,HPC,Horticulture ornementale,25,Légumes ou fleurs,RPG
+12526,HSA,Horticulture ornementale sous abri,25,Légumes ou fleurs,RPG
+11101,J5M,Jachère de 5 ans ou moins,11,Gel (surfaces gelées sans production),RPG
+11102,J6P,Jachère de 6 ans ou plus,11,Gel (surfaces gelées sans production),RPG
+11103,J6S,Jachère de 6 ans ou plus déclarée comme Surface d’intérêt écologique,11,Gel (surfaces gelées sans production),RPG
+11104,JAC,Jachère (terre arable),11,Gel (surfaces gelées sans production),RPG
+11105,JNO,Jachère sanitaire imposée par l'administration,11,Gel (surfaces gelées sans production),RPG
+11617,JO5,Jarosse implantée pour la récolte 2015,16,Fourrage,RPG
+11617,JO6,Jarosse implantée pour la récolte 2016,16,Fourrage,RPG
+11617,JO7,Jarosse implantée pour la récolte 2017,16,Fourrage,RPG
+11617,JO8,Jarosse implantée pour la récolte 2018,16,Fourrage,RPG
+11617,JOD,Jarosse déshydratée,16,Fourrage,RPG
+11618,JOS,Autre jarosse,16,Fourrage,RPG
+12424,LAV,Lavande et lavandin,24,Autres cultures industrielles,RPG
+12527,LBF,"Laitue, endive et autres salades",25,Légumes ou fleurs,RPG
+10805,LDH,Lupin doux d’hiver,8,Protéagineux,RPG
+10806,LDP,Lupin doux de printemps semé avant le 31/05,8,Protéagineux,RPG
+10807,LDT,Lupin doux de printemps semé tardivement (après le 31/05),8,Protéagineux,RPG
+11501,LEC,Lentille,15,Légumineuses à grains,RPG
+11619,LEF,Lentille fourragère,16,Fourrage,RPG
+11620,LFH,Autre lupin fourrager d’hiver,16,Fourrage,RPG
+11621,LFP,Autre lupin fourrager de printemps,16,Fourrage,RPG
+11623,LH5,Lupin fourrager d’hiver implanté pour la récolte 2015,16,Fourrage,RPG
+11623,LH6,Lupin fourrager d’hiver implanté pour la récolte 2016,16,Fourrage,RPG
+11623,LH7,Lupin fourrager d’hiver implanté pour la récolte 2017,16,Fourrage,RPG
+11623,LH8,Lupin fourrager d'hiver implanté pour la récolte 2018,16,Fourrage,RPG
+10903,LIF,Lin fibres,9,Plantes à fibres,RPG
+10702,LIH,Lin non textile d’hiver,7,Autres oléagineux,RPG
+10703,LIP,Lin non textile de printemps,7,Autres oléagineux,RPG
+11625,LO7,Lotier implanté pour la récolte 2017,16,Fourrage,RPG
+11628,LO8,Lotier implanté pour la récolte 2018,16,Fourrage,RPG
+11625,LOT,"Lotier, minette",16,Fourrage,RPG
+11628,LP5,Lupin fourrager de printemps implanté pour la récolte 2015,16,Fourrage,RPG
+11628,LP6,Lupin fourrager de printemps implanté pour la récolte 2016,16,Fourrage,RPG
+11628,LP7,Lupin fourrager de printemps implanté pour la récolte 2017,16,Fourrage,RPG
+11628,LP8,Lupin fourrager de printemps implanté pour la récolte 2018,16,Fourrage,RPG
+12528,LSA,Légume sous abri,25,Légumes ou fleurs,RPG
+11629,LU5,Luzerne implantée pour la récolte 2015,16,Fourrage,RPG
+11629,LU6,Luzerne implantée pour la récolte 2016,16,Fourrage,RPG
+11629,LU7,Luzerne implantée pour la récolte 2017,16,Fourrage,RPG
+11629,LU8,Luzerne implantée pour la récolte 2018,16,Fourrage,RPG
+11628,LUD,Luzerne déshydratée,16,Fourrage,RPG
+11629,LUZ,Autre luzerne,16,Fourrage,RPG
+12529,MAC,Mâche,25,Légumes ou fleurs,RPG
+12425,MAV,Mauve,24,Autres cultures industrielles,RPG
+11631,MC5,Mélange de légumineuses fourragères prépondérantes au semis implantées pour la récolte 2015 et de céréales,16,Fourrage,RPG
+11631,MC6,Mélange de légumineuses fourragères prépondérantes au semis implantées pour la récolte 2016 et de céréales,16,Fourrage,RPG
+11631,MC7,Mélange de légumineuses fourragères prépondérantes au semis implantées pour la récolte 2017 et de céréales,16,Fourrage,RPG
+11631,MC8,Mélange de légumineuses fourragères prépondérantes implantées pour la récolte 2018 et de céréales et d’oléagineux,16,Fourrage,RPG
+10423,MCR,Mélange de céréales ou pseudo-céréales d'hiver entre elles,4,Autres céréales,RPG
+10424,MCS,Mélange de céréales ou pseudo-céréales de printemps entre elles,4,Autres céréales,RPG
+12814,MCT,Miscanthus,28,Divers,RPG
+12530,MDI,Maraîchage diversifié (plusieurs espèces de fruits et légumes majoritairement non pérennes),25,Légumes ou fleurs,RPG
+11633,ME5,Mélilot implanté pour la récolte 2015,16,Fourrage,RPG
+11633,ME6,Mélilot implanté pour la récolte 2016,16,Fourrage,RPG
+11633,ME7,Mélilot implanté pour la récolte 2017,16,Fourrage,RPG
+11633,ME8,Mélilot implanté pour la récolte 2018,16,Fourrage,RPG
+11633,MED,Mélilot déshydraté,16,Fourrage,RPG
+11634,MEL,Autre mélilot,16,Fourrage,RPG
+11637,MH5,Mélange de légumineuses fourragères prépondérantes au semis implantées pour la récolte 2015 et d’herbacées ou de graminées fourragères,16,Fourrage,RPG
+11637,MH6,Mélange de légumineuses fourragères prépondérantes au semis implantées pour la récolte 2016 et d’herbacées ou de graminées fourragères,16,Fourrage,RPG
+11637,MH7,Mélange de légumineuses fourragères prépondérantes au semis implantées pour la récolte 2017 et d’herbacées ou de graminées fourragères,16,Fourrage,RPG
+11639,MI7,Minette implanté pour la récolte 2017,16,Fourrage,RPG
+11639,MI8,Minette implanté pour la récolte 2018,16,Fourrage,RPG
+10201,MID,Maïs doux,2,Maïs,RPG
+10202,MIE,Maïs ensilage,2,Maïs,RPG
+11637,MIN,Minette,16,Fourrage,RPG
+10203,MIS,Maïs (hors maïs doux),2,Maïs,RPG
+11640,ML5,Mélange de légumineuses fourragères implantées pour la récolte 2015 (entre elles),16,Fourrage,RPG
+11640,ML6,Mélange de légumineuses fourragères implantées pour la récolte 2016 (entre elles),16,Fourrage,RPG
+11640,ML7,Mélange de légumineuses fourragères implantées pour la récolte 2017 (entre elles),16,Fourrage,RPG
+11640,ML8,Mélange de légumineuses fourragères implantées pour la récolte 2018 (entre elles),16,Fourrage,RPG
+11639,MLC,Mélange multi-espèces avec légumineuses fourragères prépondérantes sans graminées prairiales,16,Fourrage,RPG
+11640,MLD,Mélange de légumineuses déshydratées (entre elles),16,Fourrage,RPG
+11641,MLF,Mélange de légumineuses à graines ou fourragères pures,16,Fourrage,RPG
+11642,MLG,Mélange de légumineuses prépondérantes et de graminées fourragères de 5 ans ou moins,16,Fourrage,RPG
+12426,MLI,Mélisse,24,Autres cultures industrielles,RPG
+12531,MLO,Melon et pastèque,25,Légumes ou fleurs,RPG
+12427,MLP,Millepertuis,24,Autres cultures industrielles,RPG
+10817,MLS,Mélange de légumineuses non fourragères prépondérantes et de céréales et/ou d'oléagineux,8,Protéagineux,RPG
+10425,MLT,Millet,4,Autres céréales,RPG
+11643,MOH,Moha,16,Fourrage,RPG
+10704,MOL,Mélange d’oléagineux,7,Autres oléagineux,RPG
+12428,MOT,Moutarde d'hiver,24,Autres cultures industrielles,RPG
+12815,MPA,Autre mélange de plantes fixant l’azote,28,Divers,RPG
+10808,MPC,Mélange de protéagineux (pois et/ou lupin et/ou féverole) prépondérants semés avant le 31/05 et de céréales,8,Protéagineux,RPG
+10809,MPP,Mélange de protéagineux (pois et/ou lupin et/ou féverole),8,Protéagineux,RPG
+10810,MPT,Mélange de protéagineux semés tardivement (après le 31/05),8,Protéagineux,RPG
+12532,MRG,Marguerite,25,Légumes ou fleurs,RPG
+12429,MRJ,Marjolaine / Origan,24,Autres cultures industrielles,RPG
+12816,MRS,Marais salants,28,Divers,RPG
+12817,MSW,"Culture pérenne à forte biomasse (miscanthus, switchgrass, silphie, canne fourragère, …)",28,Divers,RPG
+12430,MTH,Menthe,24,Autres cultures industrielles,RPG
+12203,NOS,Noisette,22,Fruits à coque,RPG
+12204,NOX,Noix (y compris noix de coco),22,Fruits à coque,RPG
+10705,NVE,Navette d’été,7,Autres oléagineux,RPG
+11644,NVF,Navet fourrager,16,Fourrage,RPG
+10706,NVH,Navette d’hiver,7,Autres oléagineux,RPG
+12533,NVT,"Navet, rutabaga et autres légumes racines (hors carotte, radis, betterave)",25,Légumes ou fleurs,RPG
+12818,NYG,Nyger,28,Divers,RPG
+10707,OAG,"Autres oléagineux ou mélange d'oléagineux de printemps et d'été (dont moutarde ou navette d'été, sésame et nyger)",7,Autres oléagineux,RPG
+10708,OEH,Autre oléagineux d’espèce Helianthus,7,Autres oléagineux,RPG
+10709,OEI,Oeillette (pavot),7,Autres oléagineux,RPG
+10710,OHN,Autre oléagineux d’hiver d’espèce Brassica napus,7,Autres oléagineux,RPG
+10711,OHR,Autres oléagineux ou mélange d'oléagineux d'hiver (dont navette d'hiver),7,Autres oléagineux,RPG
+12534,OIG,Oignon et échalote,25,Légumes ou fleurs,RPG
+12300,OLI,Olive,23,Oliviers,RPG
+10712,OPN,Autre oléagineux de printemps d’espèce Brassica napus,7,Autres oléagineux,RPG
+10713,OPR,Autre oléagineux de printemps d’espèce Brassica rapa,7,Autres oléagineux,RPG
+10301,ORH,Orge d'hiver,3,Orge,RPG
+10302,ORP,Orge de printemps,3,Orge,RPG
+12431,ORT,Ortie,24,Autres cultures industrielles,RPG
+12432,OSE,Oseille,24,Autres cultures industrielles,RPG
+10811,PAG,Autre légumineuse à graines ou fourragères,8,Protéagineux,RPG
+12535,PAN,Panais,25,Légumes ou fleurs,RPG
+12536,PAQ,Pâquerette,25,Légumes ou fleurs,RPG
+12433,PAR,Plante aromatique (autre que vanille),24,Autres cultures industrielles,RPG
+12537,PAS,Pastèque,25,Légumes ou fleurs,RPG
+11645,PAT,Pâturin commun de 5 ans ou moins,16,Fourrage,RPG
+11502,PCH,Pois chiche,15,Légumineuses à grains,RPG
+12819,PCL,Phacélie de 5 ans ou moins,28,Divers,RPG
+12820,PEP,Pépinière (plants laissés en terre plus d’un an),28,Divers,RPG
+12821,PEV,Pépinière (plants laissés en terre moins d’un an),28,Divers,RPG
+11646,PFH,Autre pois fourrager d’hiver,16,Fourrage,RPG
+11647,PFP,Autre pois fourrager de printemps,16,Fourrage,RPG
+12016,PFR,Petit fruit à baie (hors fraise),20,Vergers,RPG
+11650,PH5,Pois fourrager d’hiver implanté pour la récolte 2015,16,Fourrage,RPG
+11650,PH6,Pois fourrager d’hiver implanté pour la récolte 2016,16,Fourrage,RPG
+11650,PH7,Pois fourrager d’hiver implanté pour la récolte 2017,16,Fourrage,RPG
+11650,PH8,Pois fourrager d’hiver implanté pour la récolte 2018,16,Fourrage,RPG
+10812,PHF,Pois et haricot frais (alimentation humaine),8,Protéagineux,RPG
+10813,PHI,Pois protéagineux d'hiver (alimentation animale),8,Protéagineux,RPG
+10814,PHS,Pois et haricot secs (alimentation humaine),8,Protéagineux,RPG
+12205,PIS,Pistache,22,Fruits à coque,RPG
+12434,PMD,Plante médicinale,24,Autres cultures industrielles,RPG
+12501,PME,Plantes médicinales pérennes (autres que arbres),24,Autres cultures industrielles,RPG
+12538,PMV,Primevère,25,Légumes ou fleurs,RPG
+12539,POR,Poireau,25,Légumes ou fleurs,RPG
+12540,POT,"Potiron, citrouille et autres courges",25,Légumes ou fleurs,RPG
+11652,PP5,Pois fourrager de printemps implanté pour la récolte 2015,16,Fourrage,RPG
+11652,PP6,Pois fourrager de printemps implanté pour la récolte 2016,16,Fourrage,RPG
+11652,PP7,Pois fourrager de printemps implanté pour la récolte 2017,16,Fourrage,RPG
+11652,PP8,Pois fourrager de printemps implanté pour la récolte 2018,16,Fourrage,RPG
+12435,PPA,Autre plante à parfum,24,Autres cultures industrielles,RPG
+12436,PPF,Plante à parfum (autre que géranium et vétiver),24,Autres cultures industrielles,RPG
+11801,PPH,Prairie de 6 ans ou plus (couvert herbacé),18,Prairies permanentes,RPG
+12541,PPO,Petits pois,25,Légumes ou fleurs,RPG
+12437,PPP,Plantes médicinales pérennes (arbres ou arbustes) sauf cassis,24,Autres cultures industrielles,RPG
+10815,PPR,Pois protéagineux de printemps (alimentation animale),8,Protéagineux,RPG
+10816,PPT,Pois de printemps semé tardivement (après le 31/05),8,Protéagineux,RPG
+12438,PRF,Plantes à parfum pérennes autres que lavande et lavandin,24,Autres cultures industrielles,RPG
+11802,PRL,Prairie en rotation longue (6 ans ou plus),18,Prairies permanentes,RPG
+12017,PRU,"Prune (y compris mirabelle, quetsche, reine-claude, …)",20,Vergers,RPG
+12542,PSE,Pensée,25,Légumes ou fleurs,RPG
+12439,PSL,Persil,24,Autres cultures industrielles,RPG
+12440,PSN,Psyllium noir de Provence,24,Autres cultures industrielles,RPG
+12441,PSY,Plantain psyllium,24,Autres cultures industrielles,RPG
+12543,PTC,Pomme de terre,25,Légumes ou fleurs,RPG
+12544,PTF,Pomme de terre féculière,25,Légumes ou fleurs,RPG
+11901,PTR,Prairie temporaire de moins de 5 ans et autre mélange avec graminées,19,Prairies temporaires,RPG
+12545,PVP,"Poivron, piment et aubergine",25,Légumes ou fleurs,RPG
+12018,PVT,"Pêche (y compris nectarine, brugnon)",20,Vergers,RPG
+12019,PWT,Poire,20,Vergers,RPG
+11650,RDF,Radis fourrager,16,Fourrage,RPG
+12546,RDI,Radis,25,Légumes ou fleurs,RPG
+11902,RGA,Ray-grass de 5 ans ou moins,19,Prairies temporaires,RPG
+11400,RIZ,Riz,14,Riz,RPG
+12442,ROM,Romarin,24,Autres cultures industrielles,RPG
+12547,ROQ,Roquette,25,Légumes ou fleurs,RPG
+12822,ROS,Roselière,28,Divers,RPG
+12548,RUT,Rutabaga,25,Légumes ou fleurs,RPG
+12101,RVI,Restructuration du vignoble,21,Vignes,RPG
+11653,SA5,Sainfoin implanté pour la récolte 2015,16,Fourrage,RPG
+11653,SA6,Sainfoin implanté pour la récolte 2016,16,Fourrage,RPG
+11653,SA7,Sainfoin implanté pour la récolte 2017,16,Fourrage,RPG
+11653,SA8,Sainfoin implanté pour la récolte 2018,16,Fourrage,RPG
+11652,SAD,Sainfoin déshydraté,16,Fourrage,RPG
+12823,SAG,Roselière (récolte de sagnes),28,Divers,RPG
+11653,SAI,Sainfoin,16,Fourrage,RPG
+12824,SBO,Boisement aidé d'une surface agricole,28,Divers,RPG
+11655,SE5,Serradelle implantée pour la récolte 2015,16,Fourrage,RPG
+11655,SE6,Serradelle implantée pour la récolte 2016,16,Fourrage,RPG
+11655,SE7,Serradelle implantée pour la récolte 2017,16,Fourrage,RPG
+11655,SE8,Serradelle implantée pour la récolte 2018,16,Fourrage,RPG
+11655,SED,Serradelle déshydratée,16,Fourrage,RPG
+11656,SER,Autre serradelle,16,Fourrage,RPG
+12549,SFI,Salsifis,25,Légumes ou fleurs,RPG
+12443,SGE,Sauge,24,Autres cultures industrielles,RPG
+10426,SGH,Seigle d’hiver,4,Autres céréales,RPG
+10427,SGP,Seigle de printemps,4,Autres céréales,RPG
+12825,SHD,Surfaces hautement diversifiées (DOM),28,Divers,RPG
+12826,SIN,Surface pastorale ou parcours non utilisé l'année en cours,28,Divers,RPG
+12827,SNA,Surface non agricole non visible sur l’orthophotographie,28,Divers,RPG
+12828,SNE,"Surface agricole temporairement non admissible, autre que surface pâturable",28,Divers,RPG
+12829,SNU,"Parc d'élevage de monogastriques avec couvert dégradé, voire sol nu",28,Divers,RPG
+10428,SOG,Sorgho,4,Autres céréales,RPG
+10714,SOJ,Soja,7,Autres oléagineux,RPG
+11702,SPH,Prairie avec herbe prédominante et ressources fourragères ligneuses présentes,17,Estives et landes,RPG
+11703,SPL,Surface pastorale - Ressources fourragères ligneuses prédominantes,17,Estives et landes,RPG
+12444,SRI,Sarriette,24,Autres cultures industrielles,RPG
+10429,SRS,Sarrasin,4,Autres céréales,RPG
+12445,TAB,Tabac,24,Autres cultures industrielles,RPG
+12830,TBT,Tubercule tropical,28,Divers,RPG
+12831,TCR,Taillis à courte rotation,28,Divers,RPG
+12446,THY,Thym,24,Autres cultures industrielles,RPG
+12550,TOM,Tomate (en pleine terre),25,Légumes ou fleurs,RPG
+12551,TOP,Topinambour,25,Légumes ou fleurs,RPG
+12447,TOT,Tomate pour transformation,24,Autres cultures industrielles,RPG
+11658,TR5,Trèfle implanté pour la récolte 2015,16,Fourrage,RPG
+11658,TR6,Trèfle implanté pour la récolte 2016,16,Fourrage,RPG
+11658,TR7,Trèfle implanté pour la récolte 2017,16,Fourrage,RPG
+11658,TR8,Trèfle implanté pour la récolte 2018,16,Fourrage,RPG
+11658,TRD,Trèfle déshydraté,16,Fourrage,RPG
+11663,TRE,Autre trèfle,16,Fourrage,RPG
+10600,TRN,Tournesol,6,Tournesol,RPG
+12832,TRU,Truffière (chênaie de plants mycorhizés),28,Divers,RPG
+10430,TTH,Triticale d’hiver,4,Autres céréales,RPG
+10431,TTP,Triticale de printemps,4,Autres céréales,RPG
+12448,VAL,Valériane,24,Autres cultures industrielles,RPG
+11664,VE5,Vesce implantée pour la récolte 2015,16,Fourrage,RPG
+11664,VE6,Vesce implantée pour la récolte 2016,16,Fourrage,RPG
+11664,VE7,Vesce implantée pour la récolte 2017,16,Fourrage,RPG
+11664,VE8,Vesce implantée pour la récolte 2018,16,Fourrage,RPG
+11663,VED,Vesce déshydratée,16,Fourrage,RPG
+12552,VER,Véronique,25,Légumes ou fleurs,RPG
+11665,VES,"Vesce, mélilot, jarosse, serradelle",16,Fourrage,RPG
+12833,VET,Vétiver,28,Divers,RPG
+12020,VGD,Verger (DOM),20,Vergers,RPG
+12449,VNB,Vanille sous bois,24,Autres cultures industrielles,RPG
+12450,VNL,Vanille,24,Autres cultures industrielles,RPG
+12451,VNV,Vanille verte,24,Autres cultures industrielles,RPG
+12102,VRC,Vigne (sauf vigne rouge),21,Vignes,RPG
+12021,VRG,Autre verger (y compris verger DOM),20,Vergers,RPG
+12103,VRN,Vigne : raisins de cuve non en production,21,Vignes,RPG
+12104,VRT,Vigne : raisins de table,21,Vignes,RPG
+11663,XFE,X-Felium de 5 ans ou moins,16,Fourrage,RPG
+12452,YLA,Ylang-ylang,24,Autres cultures industrielles,RPG
+12834,ZZZ,Culture inconnue,28,Divers,RPG
