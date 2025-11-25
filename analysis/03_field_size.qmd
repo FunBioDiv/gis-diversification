@@ -138,8 +138,6 @@ knitr::kable(out, row.names = TRUE)
 
 # plot(rpg33_comp)
 # plot(pts33, add = TRUE, col = "red")
-ext_33 <- ext(c(443000, 446000, 6394000, 6398000))
-zoom_33 <- vect(ext_33, crs = crs(pts33))
 
 zori <- crop(rpg33_ori, zoom_33)
 zseq <- crop(rpg33_seq, zoom_33)
@@ -439,3 +437,7 @@ La distribution de la taille des parcelles autour des sites d’échantillonnage
 **À DISCUTER / DECIDER**:   
 
 Quelle source de données utiliser pour calculer la taille des parcelles autour des sites d’échantillonnage?
+
+The European Environment Agency[4] and the INSPIRE specification for coordinate systems [5] recommends using this projection (also named ETRS89-LCC) for conformal pan-European mapping at scales smaller or equal to 1:500,000. In Metropolitan France, the official projection is Lambert-93,[6] a Lambert conic projection using RGF93 geodetic system[7] and defined by references parallels that are 44°N and 49°N. 
+
+Polygons to be polished.

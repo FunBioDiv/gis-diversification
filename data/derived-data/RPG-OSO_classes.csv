@@ -1,5 +1,5 @@
 ﻿new_code,original_code,nom,grp_id,grp_label,source
-30000,0,Unknown,39,Autres,OSO
+NA,0,NA,NA,NA,OSO
 30001,1,Bâtis denses,34,Surface imperméables,OSO
 30002,2,Bâtis diffus,34,Surface imperméables,OSO
 30003,3,Zones industrielles et commerciales,34,Surface imperméables,OSO
@@ -23,8 +23,10 @@
 30021,21,Plages et dunes,36,Plages et dunes,OSO
 30022,22,Glaciers ou neiges,37,Glaciers ou neiges,OSO
 30023,23,Eau,38,Eau,OSO
+30024,24,Serres,25,Légumes ou fleurs,OSO
+30025,25,Unknown,39,Autres,OSO
 30255,255,Autres,39,Autres,OSO
-20000,0,Autres,39,Autres,OSO_old
+NA,0,NA,NA,NA,OSO_old
 20010,10,Cultures,30,Cultures d’été,OSO_old
 20011,11,Cultures d’été,30,Cultures d’été,OSO_old
 20012,12,Cultures d’hiver,29,Cultures d’hiver,OSO_old

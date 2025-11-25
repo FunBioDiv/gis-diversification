@@ -1,0 +1,725 @@
+---
+title: "Calculation of diversification indicators and other covariates"
+author: Romain Frelat
+date: today
+format: 
+  html:
+    toc: true
+execute:
+  echo: false
+  warning: false
+---
+
+
+## Résumé
+
+| **Indicateurs**                            | **Données**          | **Format**      |
+| ------------------------------------------ | -------------------- | --------------- |
+| périmètre et surface de la parcelle        | RPG                  | vectoriel       |
+| taille moyenne des parcelles sur un buffer | RPG                  | vectoriel       |
+| longueur des haies autour de la parcelle   | RPG + BD haies       | vectoriel       |
+| séquence de culture (N-5:N)                | RPG + OSO            | raster          |
+| % occupation du sol sur un buffer          | RPG + OSO            | raster          |
+| densité de bordures                        | RPG + OSO            | raster          | 
+
+- **Registre Parcellaire Graphique (RPG)**: disponible par année (2007-2023) et pour la France entière sur le portail IGN: <https://geoservices.ign.fr/rpg>. Les données au niveau de la parcelle sont cohérentes seulement sur la période 2015-2023. (50Gb en total)   
+- **Carte d’occupation des sols du CES OSO – THEIA (OSO)**: disponible par année (2016-2024), pour la France entière en format raster avec une résolution de 10m (<https://doi.org/10.57745/UZ2NJ7>) L'accès officiel se fait par le portail <https://geodes-portal.cnes.fr>, licence Ouverte v2.0 (Etalab).   
+- **BD Haies v2**: disponible pour la France entière sur le portail de l'IGN: <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb). La BD Haie v2 a été produite d'images satellites de 2020-2022 (ce qui correspond mieux à nos données que la v1, issue d'images de 2011-2014).  
+
+
+## Summary
+
+| **Indicator**                              | **Data**             | **Format**      |
+| ------------------------------------------ | -------------------- | --------------- |
+| perimeter and area of the field            | RPG                  | vectoriel       |
+| mean field size within buffer              | RPG                  | vectoriel       |
+| hedges length around field                 | RPG + BD haies       | vectoriel       |
+| crop rotation (N-5:N)                      | RPG + OSO            | raster          |
+| % land cover within buffer                 | RPG + OSO            | raster          |
+| density of bordures                        | RPG + OSO            | raster          | 
+
+- **Registre Parcellaire Graphique (RPG)**: disponible par année (2007-2023) et pour la France entière sur le portail IGN: <https://geoservices.ign.fr/rpg>. Les données au niveau de la parcelle sont cohérentes seulement sur la période 2015-2023. (50Gb en total)   
+- **Carte d’occupation des sols du CES OSO – THEIA (OSO)**: disponible par année (2016-2024), pour la France entière en format raster avec une résolution de 10m (<https://doi.org/10.57745/UZ2NJ7>) L'accès officiel se fait par le portail <https://geodes-portal.cnes.fr>, licence Ouverte v2.0 (Etalab).   
+- **BD Haies v2**: disponible pour la France entière sur le portail de l'IGN: <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb). La BD Haie v2 a été produite d'images satellites de 2020-2022 (ce qui correspond mieux à nos données que la v1, issue d'images de 2011-2014).  
+
+
+## Field observations
+
+```{r}
+#| label: tbl-1
+#| tbl-cap: "Number of observations per year and per project"
+suppressWarnings({
+  library(terra)
+  library(sf)
+  library(here)
+  library(mapview)
+  library(leaflet)
+  library(tmap)
+})
+
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data")
+
+pts <- vect(here(datafolder, "fields_FR.gpkg"), "fields_FR")
+
+# Create an ID per site
+pts$ID <- paste(pts$Study_ID, pts$Site, pts$Year, sep = "_")
+
+# crds(pts)[pts$ID %in% pts$ID[duplicated(pts$ID)],]
+# remove duplicates
+pts <- pts[!duplicated(pts$ID)]
+
+n_year <- as.data.frame.matrix(table(pts$Study_ID, pts$Year))
+n_year$TOTAL <- rowSums(n_year)
+n_year['TOTAL', ] <- colSums(n_year)
+
+knitr::kable(n_year)
+
+
+```
+
+```{r}
+# remove outside year range
+pts <- pts[pts$Year %in% 2016:2023]
+```
+
+Because of data availability (RPG is not released yet for 2024 and OSO is not available before 2016), we will only focus on the period 2016-2023. There were ```r nrow(pts)``` observations made between 2016 and 2023.
+
+```{r}
+#| label: fig-1
+#| fig-cap: "Map of field observations"
+tmap_mode("view")
+tm_basemap(c(StreetMap = "OpenStreetMap", TopoMap = "OpenTopoMap")) +
+  tm_shape(pts, is.main = TRUE) +
+  tm_symbols(fill = "Study_ID") +
+  tm_view(
+    set_zoom_limits = c(3, 8),
+    set_view = c(mean(ext(pts)[1:2]), mean(ext(pts)[3:4]), zoom = 5)
+  )
+
+# the easy solution
+# m0 <- mapview(pts, zcol = "Study_ID")
+# m0@map |>
+#   addTiles(
+#     options = providerTileOptions(minZoom = 3, maxZoom = 10)
+#   )
+# more complex solution
+# pal <- leaflet::colorFactor("viridis", domain = NULL)
+# keepPal <- pal(sort(unique(pts$Study_ID)))
+# names(keepPal) <- sort(unique(pts$Study_ID))
+# stablePal <- function(x) {
+#   return(as.character(keepPal[x]))
+# }
+# shp_popup <- paste0(pts$Study_ID, "<br>", pts$Site)
+# leaflet(pts) |>
+#   addTiles(
+#     options = providerTileOptions(minZoom = 3, maxZoom = 10)
+#   ) |>
+#   addCircleMarkers(
+#     data = pts,
+#     fillColor = ~ stablePal(Study_ID),
+#     fillOpacity = 0.8,
+#     color = ~ stablePal(Study_ID),
+#     weight = 0.1,
+#     popup = shp_popup
+#   ) |>
+#   addLegend(
+#     labels = sort(unique(pts$Study_ID)),
+#     position = "bottomleft",
+#     color = stablePal(sort(unique(pts$Study_ID)))
+#   ) |>
+#   setView(
+#     mean(ext(pts)[1:2]),
+#     mean(ext(pts)[3:4]),
+#     zoom = 5
+#   )
+```
+
+
+## Indicators from vector datasets
+
+### Identification of the field in RPG
+
+```{r}
+#| label: tbl-2
+#| tbl-cap: "Number of observations in fields from RPG"
+indv <- read.csv(here("data", "derived-data", "vector_indicators.csv"))
+# table(indv$Study_ID) == table(pts$Study_ID)
+
+in_rpg <- data.frame(
+  "Nobs" = as.numeric(table(indv$Study_ID)),
+  "in_RPG" = table(indv$Study_ID, is.na(indv$ID_PARCEL))[, 1]
+)
+in_rpg$Perc <- round(in_rpg$in_RPG / in_rpg$Nobs * 100, 2)
+
+knitr::kable(in_rpg)
+```
+
+In total, ```r round(sum(!is.na(indv$ID_PARCEL)) / nrow(indv) * 100)``` % of the fields observations are covered by RPG data. There are large disparities among projects with `SEBIOPAG_VcG`, `MUESLI` and `LepiBats` having a lower coverage than 60%. The project `DURUM_MIX_GM` has only one coordinates leading to the entrance of the Institut Agro-Montpellier.
+
+
+```{r}
+#| label: fig-2
+#| fig-cap: "Case of SEBIOPAG_VcG in 2023 with observations and RPG"
+pts_vcg <- pts[pts$Study_ID == "SEBIOPAG_VcG" & pts$Year == "2023"]
+pts_vcg$in_RPG <- !is.na(indv$ID_PARCEL[match(pts_vcg$ID, indv$ID)])
+
+#fmt:skip
+rpg_R73_2023 <- vect(
+  here("data", "raw-data", "RPG", "RPG_2-2_2023_PARCELLES_GRAPHIQUES.gpkg"),
+  filter = project(pts_vcg, "EPSG:2154")
+)
+
+mapview(pts_vcg, zcol = "in_RPG", layer.name = "in_RPG") +
+  mapview(rpg_R73_2023, alpha = 0.5, alpha.regions = 0.3)
+
+# pts_durum <- pts[pts$Study_ID == "LepiBats"]
+# pts_durum <- pts[pts$Study_ID == "DURUM_MIX_GM"]
+```
+
+**Issue:**    
+As seen in @fig-2, the coordinates were taken at the edge of the field, or on boundaries so it is not possible to clearly identify the field.   
+*In such case, should we consider the closest field within a distance threshold (e.g. 10m)?*
+
+### Size of the parcel
+
+```{r}
+#| label: tbl-3
+#| tbl-cap: "Summary statistics of the area (in ha) and perimeter (in m) of the fields"
+
+size <- cbind(
+  "Area_ha" = summary(indv$Area_ha),
+  "Perim_m" = summary(indv$Perim_m)
+)
+
+knitr::kable(round(size, 2))
+```
+
+```{r}
+#| label: tbl-X
+#| tbl-cap: "Summary statistics of the area (in ha) and perimeter (in m) of the fields"
+sum_area <- sapply(
+  tapply(indv$Area_ha, indv$Study_ID, summary),
+  function(x) x[1:6]
+)
+sum_area <- sum_area[, !is.na(sum_area[1, ])]
+
+knitr::kable(round(sum_area, 2))
+```
+
+```{r}
+#| label: fig-3
+#| fig-cap: "Relation between area and perimeter"
+plot(indv$Area_ha, indv$Perim_m, xlab = "Area (ha)", ylab = "Perimeter (m)")
+```
+
+There is a strong relation between area and perimeter (@fig-3). In median, field size is 2.7ha and field perimeter is 790m.  
+
+**Outliers**
+
+```{r}
+rpg_fields <- vect(here("data", "derived-data", "vector_parcels.gpkg"))
+
+# indv$ID_PARCELYEAR <- paste0(indv$ID_PARCEL, indv$Year)
+# rpg_fields$ID_PARCELYEAR <- paste0(rpg_fields$ID_PARCEL, rpg_fields$Year)
+# not needed
+
+# for matching image to satellite image
+ind23 <- indv[indv$Year == 2023, ]
+```
+
+::::{ .columns }
+:::{ .column width="50%"}
+
+```{r}
+#| label: fig-4
+#| fig-cap: "Abnormally large perimeter"
+#fmt: skip
+maxF <- rpg_fields[rpg_fields$ID_PARCEL == ind23$ID_PARCEL[which.max(ind23$Perim_m)]]
+maxP <- pts[pts$ID == ind23$ID[which.max(ind23$Perim_m)]]
+mapview(maxF) + mapview(maxP) # not up to date
+```
+
+:::
+
+:::{ .column width="50%"}
+```{r}
+#| label: fig-5
+#| fig-cap: "Abnormally small field"
+#fmt: skip
+minF <- rpg_fields[rpg_fields$ID_PARCEL == ind23$ID_PARCEL[which.min(ind23$Area_ha)]]
+minP <- pts[pts$ID == ind23$ID[which.min(ind23$Area_ha)]]
+mapview(minF) + mapview(minP) # not up to date
+
+# par(mfrow = c(10, 10), mar = c(0, 0, 0, 0))
+# for (i in sample(1:nrow(rpg_fields), size = 100)) {
+#   plot(rpg_fields[i, ], axes = FALSE)
+#   text(crds(centroids(rpg_fields[i, ])), rpg_fields$SURF_PARC[i])
+# }
+```
+
+:::
+
+::::
+
+### Hedge length
+
+Using the field as defined by RPG, we can calculate the length of hedges from BD Haies that intersect the field (+ a small buffer).
+
+```{r}
+#| label: tbl-4
+#| tbl-cap: "Summary statistics of the hedge length (in m) within different buffer size"
+buff_hedge <- cbind(
+  "B_0m" = summary(indv$Length_haie_0_m),
+  "B_5m" = summary(indv$Length_haie_5_m),
+  "B_10m" = summary(indv$Length_haie_10_m)
+)
+
+#fmt: skip
+PercWithHedges <- c(
+  sum(indv$Length_haie_0_m > 0, na.rm = TRUE),
+  sum(indv$Length_haie_5_m > 0, na.rm = TRUE),
+  sum(indv$Length_haie_10_m > 0, na.rm = TRUE)
+) / sum(!is.na(indv$Length_haie_0_m)) * 100
+
+buff_hedge <- rbind(buff_hedge, PercWithHedges)
+buff_hedge
+knitr::kable(round(buff_hedge, 2))
+```
+
+The 230 NA's correspond to the observations from which no corresponding fields were found. Without buffer, 42% of fields have hedges within the field. This percentage increases up to 70% if we consider a 10m buffer around the field.
+
+```{r}
+#| label: fig-6
+#| fig-cap: "Correlation among hedge lengths per buffer size"
+hedgelendth <- data.frame(
+  "B_0m" = indv$Length_haie_0_m,
+  "B_5m" = indv$Length_haie_5_m,
+  "B_10m" = indv$Length_haie_10_m
+)
+
+pairs(hedgelendth, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+**Outliers**
+
+::::{ .columns }
+:::{ .column width="50%"}
+
+```{r}
+#| label: fig-7
+#| fig-cap: "Field with hedges at 5m buffer"
+#fmt: skip
+ex1 <- which(indv$ID == indv$ID[indv$Length_haie_0_m == 0][which.max(indv$Length_haie_10_m[indv$Length_haie_0_m == 0])])
+pts_ex1 <- pts[pts$ID == indv$ID[ex1]]
+rpg_ex1 <- rpg_fields[rpg_fields$ID_PARCEL == indv$ID_PARCEL[ex1]]
+r5_ex1 <- buffer(rpg_ex1, 5)
+r10_ex1 <- buffer(rpg_ex1, 10)
+haie_ex1 <- vect(
+  here("data", "raw-data", "haie.gpkg"),
+  filter = vect(ext(r10_ex1))
+)
+
+plot(r10_ex1, col = NA, border = "red", lty = 3)
+plot(rpg_ex1, col = NA, border = "black", add = TRUE)
+plot(r5_ex1, col = NA, border = "blue", lty = 2, add = TRUE)
+plot(haie_ex1, col = "darkgreen", lwd = 3, add = TRUE)
+plot(project(pts_ex1, crs(haie_ex1)), add = TRUE)
+lab <- c(
+  paste("B_0m:", round(indv$Length_haie_0_m[ex1]), "m"),
+  paste("B_5m:", round(indv$Length_haie_5_m[ex1]), "m"),
+  paste("B_10m:", round(indv$Length_haie_10_m[ex1]), "m")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("black", "blue", "red"),
+  lty = 1:3,
+  xpd = NA
+)
+
+```
+
+:::
+
+:::{ .column width="50%"}
+```{r}
+#| label: fig-8
+#| fig-cap: "Field with hedges at 5-10m"
+#fmt: skip
+ex2 <- which(indv$ID == indv$ID[indv$Length_haie_5_m == 0][which.max(indv$Length_haie_10_m[indv$Length_haie_5_m == 0])])
+pts_ex2 <- pts[pts$ID == indv$ID[ex2]]
+rpg_ex2 <- rpg_fields[rpg_fields$ID_PARCEL == indv$ID_PARCEL[ex2]]
+r5_ex2 <- buffer(rpg_ex2, 5)
+r10_ex2 <- buffer(rpg_ex2, 10)
+haie_ex2 <- vect(
+  here("data", "raw-data", "haie.gpkg"),
+  filter = vect(ext(r10_ex2))
+)
+
+plot(r10_ex2, col = NA, border = "red", lty = 3)
+plot(rpg_ex2, col = NA, border = "black", add = TRUE)
+plot(r5_ex2, col = NA, border = "blue", lty = 2, add = TRUE)
+plot(haie_ex2, col = "darkgreen", lwd = 3, add = TRUE)
+plot(project(pts_ex2, crs(haie_ex2)), add = TRUE)
+lab <- c(
+  paste("B_0m:", round(indv$Length_haie_0_m[ex2]), "m"),
+  paste("B_5m:", round(indv$Length_haie_5_m[ex2]), "m"),
+  paste("B_10m:", round(indv$Length_haie_10_m[ex2]), "m")
+)
+legend(
+  "topright",
+  legend = lab,
+  col = c("black", "blue", "red"),
+  lty = 1:3,
+  xpd = NA
+)
+
+```
+
+:::
+
+::::
+
+**To be discussed:**
+- which buffer size to calculate the hedge lengths? Is 10m large enough, or more? whould we consider the position of the field sampling?
+
+
+
+### Field size within buffer
+    
+```{r}
+#| label: tbl-5
+#| tbl-cap: "Summary statistics of the field area (in ha) within different buffer size"
+buff_size <- cbind(
+  "B_500m" = summary(indv$Mean_fieldsize_500m_ha),
+  "B_1000m" = summary(indv$Mean_fieldsize_1000m_ha),
+  "B_1500m" = summary(indv$Mean_fieldsize_1500m_ha)
+)
+
+knitr::kable(round(buff_size, 2))
+```
+
+We see that some observation don't have field within 500m (N=13). To be checked whether those observations were really made close to an agricultural field.
+
+```{r}
+#| label: tbl-6
+#| tbl-cap: "Observations with no fields within a 500m buffer."
+# table(indv$Study_ID, is.na(indv$Mean_fieldsize_500m_ha))
+miss_b500 <- indv[is.na(indv$Mean_fieldsize_500m_ha), ]
+miss_b500[
+  order(miss_b500$Study_ID, miss_b500$Year),
+  c("Study_ID", "Site", "Year")
+] |>
+  knitr::kable()
+```
+
+```{r}
+#| label: fig-9
+#| fig-cap: "Correlation among field areas per buffer size"
+meansize <- data.frame(
+  "B_500m" = indv$Mean_fieldsize_500m_ha,
+  "B_1000m" = indv$Mean_fieldsize_1000m_ha,
+  "B_1500m" = indv$Mean_fieldsize_1500m_ha
+)
+
+pairs(meansize, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+**Outliers**
+
+::::{ .columns }
+:::{ .column width="50%"}
+
+```{r}
+#| label: fig-10
+#| fig-cap: "Highest average field size within 1500m buffer"
+#fmt: skip
+ex1 <-  which(indv$ID == indv$ID[indv$Year == 2023][which.max(indv$Mean_fieldsize_1500m_ha[indv$Year == 2023])])
+
+pts_ex1 <- project(pts[pts$ID == indv$ID[ex1]], crs(haie_ex1))
+b500_ex1 <- buffer(pts_ex1, 500)
+b1000_ex1 <- buffer(pts_ex1, 1000)
+b1500_ex1 <- buffer(pts_ex1, 1500)
+
+rpg_ex1 <- vect(
+  here("data", "raw-data", "RPG", "RPG_2-2_2023_PARCELLES_GRAPHIQUES.gpkg"),
+  filter = b1500_ex1
+)
+
+plot(rpg_ex1, col = NA, border = "black", main = indv$ID[ex1]))
+plot(b1500_ex1, col = NA, border = "red", add = TRUE)
+plot(b1000_ex1, col = NA, border = "blue", add = TRUE)
+plot(b500_ex1, col = NA, border = "green", add = TRUE)
+plot(pts_ex1, add = TRUE)
+lab <- c(
+  paste("B_500m:", round(indv$Mean_fieldsize_500m_ha[ex1], 2), "ha"),
+  paste("B_1000m:", round(indv$Mean_fieldsize_1000m_ha[ex1], 2), "ha"),
+  paste("B_1500m:", round(indv$Mean_fieldsize_1500m_ha[ex1], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue", "red"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+:::
+
+:::{ .column width="50%"}
+```{r}
+#| label: fig-11
+#| fig-cap: "Lowest average field size within 1500m buffer in 2023"
+#fmt: skip
+ex2 <-  which(indv$ID == indv$ID[indv$Year == 2023][which.min(indv$Mean_fieldsize_1500m_ha[indv$Year == 2023])])
+
+pts_ex2 <- project(pts[pts$ID == indv$ID[ex2]], crs(haie_ex2))
+b500_ex2 <- buffer(pts_ex2, 500)
+b1000_ex2 <- buffer(pts_ex2, 1000)
+b1500_ex2 <- buffer(pts_ex2, 1500)
+
+rpg_ex2 <- vect(
+  here("data", "raw-data", "RPG", "RPG_2-2_2023_PARCELLES_GRAPHIQUES.gpkg"),
+  filter = b1500_ex2
+)
+
+plot(rpg_ex2, col = NA, border = "black", main = indv$ID[ex2])
+plot(b1500_ex2, col = NA, border = "red", add = TRUE)
+plot(b1000_ex2, col = NA, border = "blue", add = TRUE)
+plot(b500_ex2, col = NA, border = "green", add = TRUE)
+plot(pts_ex2, add = TRUE)
+lab <- c(
+  paste("B_500m:", round(indv$Mean_fieldsize_500m_ha[ex2], 2), "ha"),
+  paste("B_1000m:", round(indv$Mean_fieldsize_1000m_ha[ex2], 2), "ha"),
+  paste("B_1500m:", round(indv$Mean_fieldsize_1500m_ha[ex2], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue", "red"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+:::
+
+::::
+
+
+::::{ .columns }
+:::{ .column width="50%"}
+
+```{r}
+#| label: fig-12
+#| fig-cap: "Large difference between 1000 and 1500m buffer"
+var1 <- abs(indv$Mean_fieldsize_1500m_ha - indv$Mean_fieldsize_1000m_ha) /
+  (indv$Mean_fieldsize_1500m_ha + indv$Mean_fieldsize_1000m_ha)
+
+whom <- indv$Year == 2023 & !is.na(indv$ID_PARCEL)
+ex3 <- which(indv$ID == indv$ID[whom][which.max(var1[whom])])
+
+pts_ex3 <- project(pts[pts$ID == indv$ID[ex3]], "EPSG:2154")
+b500_ex3 <- buffer(pts_ex3, 500)
+b1000_ex3 <- buffer(pts_ex3, 1000)
+b1500_ex3 <- buffer(pts_ex3, 1500)
+
+rpg_ex3 <- vect(
+  here("data", "raw-data", "RPG", "RPG_2-2_2023_PARCELLES_GRAPHIQUES.gpkg"),
+  filter = b1500_ex3
+)
+
+plot(rpg_ex3, col = NA, border = "black", main = indv$ID[ex3])
+plot(b1500_ex3, col = NA, border = "red", add = TRUE)
+plot(b1000_ex3, col = NA, border = "blue", add = TRUE)
+plot(b500_ex3, col = NA, border = "green", add = TRUE)
+plot(pts_ex3, add = TRUE)
+lab <- c(
+  paste("B_500m:", round(indv$Mean_fieldsize_500m_ha[ex3], 2), "ha"),
+  paste("B_1000m:", round(indv$Mean_fieldsize_1000m_ha[ex3], 2), "ha"),
+  paste("B_1500m:", round(indv$Mean_fieldsize_1500m_ha[ex3], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue", "red"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+:::
+
+:::{ .column width="50%"}
+```{r}
+#| label: fig-13
+#| fig-cap: "Large difference between 500 and 1000m buffer"
+var2 <- abs(indv$Mean_fieldsize_1500m_ha - indv$Mean_fieldsize_500m_ha) /
+  (indv$Mean_fieldsize_1500m_ha + indv$Mean_fieldsize_500m_ha)
+
+whom <- indv$Year == 2023 &
+  !is.na(indv$ID_PARCEL) &
+  indv$Study_ID != indv$Study_ID[ex3]
+ex4 <- which(indv$ID == indv$ID[whom][which.max(var2[whom])])
+
+pts_ex4 <- project(pts[pts$ID == indv$ID[ex4]], "EPSG:2154")
+b500_ex4 <- buffer(pts_ex4, 500)
+b1000_ex4 <- buffer(pts_ex4, 1000)
+b1500_ex4 <- buffer(pts_ex4, 1500)
+
+rpg_ex4 <- vect(
+  here("data", "raw-data", "RPG", "RPG_2-2_2023_PARCELLES_GRAPHIQUES.gpkg"),
+  filter = b1500_ex4
+)
+
+plot(rpg_ex4, col = NA, border = "black", main = indv$ID[ex4])
+plot(b1500_ex4, col = NA, border = "red", add = TRUE)
+plot(b1000_ex4, col = NA, border = "blue", add = TRUE)
+plot(b500_ex4, col = NA, border = "green", add = TRUE)
+plot(pts_ex4, add = TRUE)
+lab <- c(
+  paste("B_500m:", round(indv$Mean_fieldsize_500m_ha[ex4], 2), "ha"),
+  paste("B_1000m:", round(indv$Mean_fieldsize_1000m_ha[ex4], 2), "ha"),
+  paste("B_1500m:", round(indv$Mean_fieldsize_1500m_ha[ex4], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue", "red"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+:::
+
+::::
+
+**To be discussed**  
+
+- Inclusion of RPG complete is long, hard, and quality might differ.
+
+
+
+## Indicators from raster datasets (RPG+OSO)
+
+### crop rotation (N-5:N)
+
+```{r}
+indr <- read.csv(here("data", "derived-data", "raster_indicators.csv"))
+
+# rpg and oso classes
+ref <- read.csv(here("data", "derived-data", "RPG-OSO_classes.csv"))
+# make small correspondance table
+ref$fullname <- paste(ref$source, ref$nom, sep = "_")
+miniref <- ref[, c("new_code", "fullname")]
+miniref <- miniref[!duplicated(miniref$new_code), ]
+miniref <- miniref[!is.na(miniref$new_code), ]
+
+# transform with class names
+lulc_id <- indr[,grep("lulc_", names(indr))]
+lulc_class <- sapply(lulc_id, function(x) {
+  miniref$fullname[match(x, miniref$new_code)]
+})
+
+numYr <- as.data.frame(table(pts$Year))
+names(numYr) <- c("Year", "Nobs")
+knitr::kable(numYr)
+
+numNA <- apply(is.na(lulc_class),2,sum) 
+names(numNA)[-1] <- gsub("_N", "_N-", names(numNA)[-1])
+knitr::kable(data.frame("NAs"=numNA))
+```
+
+
+```{r}
+lulc_vec <- as.character(unlist(lulc_class[,1]))#[,1]
+sort(table(lulc_vec), decreasing = TRUE)[1:sum(table(lulc_vec)>=10)]
+```
+
+
+
+```{r}
+pasteNA <- function(x){
+  x <- x[!is.na(x)]
+  return(paste(x, collapse = ", "))
+}
+pasteUN <- function(x){
+  x <- x[!is.na(x)]
+  x <- sort(unique(x))
+  return(paste(x, collapse = ", "))
+}
+
+rotation <- apply(lulc_class,1,pasteNA)
+rotationU <- apply(lulc_class,1,pasteUN)
+sort(table(rotationU), decreasing = TRUE)[1:sum(table(rotationU)>=10)]
+```
+
+
+```{r}
+barplot(table(apply(lulc_id,1,function(x) length(unique(x)))))
+```
+
+### land cover within buffer 
+
+```{r}
+m500 <- grep("frac500", names(indr))
+m1000 <- grep("frac1000", names(indr))
+m1500 <- grep("frac1500", names(indr))
+n_classes <- data.frame(
+  "buffer_500" = length(m500),
+  "buffer_1000" = length(m1000),
+  "buffer_1500" = length(m1500)
+)
+top1 <- c(
+  gsub("frac500_", "", names(sort(apply(indr[,m500],2,mean, na.rm=TRUE), decreasing = TRUE)[1])),
+  gsub("frac1000_", "", names(sort(apply(indr[,m1000],2,mean, na.rm=TRUE), decreasing = TRUE))[1]),
+  gsub("frac1500_", "", names(sort(apply(indr[,m1500],2,mean, na.rm=TRUE), decreasing = TRUE))[1])
+)
+top2 <- c(
+  gsub("frac500_", "", names(sort(apply(indr[,m500],2,mean, na.rm=TRUE), decreasing = TRUE)[2])),
+  gsub("frac1000_", "", names(sort(apply(indr[,m1000],2,mean, na.rm=TRUE), decreasing = TRUE)[2])),
+  gsub("frac1500_", "", names(sort(apply(indr[,m1500],2,mean, na.rm=TRUE), decreasing = TRUE)[2]))
+)
+top3 <- c(
+  gsub("frac500_", "", names(sort(apply(indr[,m500],2,mean, na.rm=TRUE), decreasing = TRUE)[3])),
+  gsub("frac1000_", "", names(sort(apply(indr[,m1000],2,mean, na.rm=TRUE), decreasing = TRUE)[3])),
+  gsub("frac1500_", "", names(sort(apply(indr[,m1500],2,mean, na.rm=TRUE), decreasing = TRUE)[3]))
+)
+
+info <- rbind(n_classes, 
+miniref$fullname[match(top1, miniref$new_code)], 
+miniref$fullname[match(top2, miniref$new_code)],
+miniref$fullname[match(top3, miniref$new_code)])
+
+row.names(info) <- c("N_classes", "top 1", "top 2", "top 3")
+```
+
+
+```{r}
+mean_500 <- apply(indr[,m500],2,mean, na.rm=TRUE)
+names(mean_500) <- gsub("frac500_", "", names(mean_500))
+mean_1000 <- apply(indr[,m1000],2,mean, na.rm=TRUE)
+names(mean_1000) <- gsub("frac1000_", "", names(mean_1000))
+mean_1500 <- apply(indr[,m1500],2,mean, na.rm=TRUE)
+names(mean_1500) <- gsub("frac1500_", "", names(mean_1500))
+
+keepC <- unique(c(names(mean_500)[mean_500>0.02], names(mean_1000)[mean_1000>0.02], names(mean_1500)[mean_1500>0.02]))
+
+ref$nom[match(keepC, ref$new_code)]
+ref$nom[match(keepC, ref$new_code)]
+ref$nom[match(keepC, ref$new_code)]
+mean_500[keepC]
+
+mean_1000[keepC]
+mean_1500[keepC]
+```
+
+### density of bordures  
+
+
+<!-- https://rdrr.io/cran/terra/man/boundaries.html -->
