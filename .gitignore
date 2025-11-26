@@ -1,8 +1,13 @@
 # all data files (to be stored somewhere else)
 data/raw-data
 data/zip
+data/poc
+data/rpg
+data/rpgc
 *.tif*
 
 biblio/
 /.quarto/
 _freeze/
+
+notes/datasources.txt

@@ -40,3 +40,35 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...) {
   text(xtxt, ytxt, txt, cex = cex * abs(r))
   text(xstar, ystar, Signif, cex = cex, col = 2)
 }
+
+
+plotly_df <- function(df, xlab = "dataset") {
+  pal <- pals::glasbey(ncol(df)) #cols25
+  fig <- plot_ly(df, type = "bar", name = "Land cover")
+  for (i in 1:ncol(df)) {
+    fig <- fig %>%
+      add_bars(
+        x = 1:nrow(df),
+        y = df[, i],
+        marker = list(color = pal[i], line = list(color = 'black', width = 1)),
+        name = names(df)[i],
+        width = ~width,
+        hoverinfo = 'text',
+        hovertext = paste(names(df)[i], ":", round(df[, i] * 100), "%")
+      )
+  }
+  fig <- fig %>%
+    layout(
+      xaxis = list(
+        showline = TRUE,
+        linecolor = '#000',
+        tickvals = 1:nrow(df),
+        ticktext = row.names(df),
+        title = xlab
+      ),
+      barmode = 'stack'
+    )
+  fig <- fig %>%
+    config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
+  return(fig)
+}
