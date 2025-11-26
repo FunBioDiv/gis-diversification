@@ -10,7 +10,7 @@ execute:
   warning: false
 ---
 
-
+<!--
 ## Résumé
 
 | **Indicateurs**                            | **Données**          | **Format**      |
@@ -25,7 +25,7 @@ execute:
 - **Registre Parcellaire Graphique (RPG)**: disponible par année (2007-2023) et pour la France entière sur le portail IGN: <https://geoservices.ign.fr/rpg>. Les données au niveau de la parcelle sont cohérentes seulement sur la période 2015-2023. (50Gb en total)   
 - **Carte d’occupation des sols du CES OSO – THEIA (OSO)**: disponible par année (2016-2024), pour la France entière en format raster avec une résolution de 10m (<https://doi.org/10.57745/UZ2NJ7>) L'accès officiel se fait par le portail <https://geodes-portal.cnes.fr>, licence Ouverte v2.0 (Etalab).   
 - **BD Haies v2**: disponible pour la France entière sur le portail de l'IGN: <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb). La BD Haie v2 a été produite d'images satellites de 2020-2022 (ce qui correspond mieux à nos données que la v1, issue d'images de 2011-2014).  
-
+-->
 
 ## Summary
 
@@ -33,14 +33,14 @@ execute:
 | ------------------------------------------ | -------------------- | --------------- |
 | perimeter and area of the field            | RPG                  | vectoriel       |
 | mean field size within buffer              | RPG                  | vectoriel       |
-| hedges length around field                 | RPG + BD haies       | vectoriel       |
+| hedgerows length around field                 | RPG + BD haies       | vectoriel       |
 | crop rotation (N-5:N)                      | RPG + OSO            | raster          |
 | % land cover within buffer                 | RPG + OSO            | raster          |
 | density of bordures                        | RPG + OSO            | raster          | 
 
-- **Registre Parcellaire Graphique (RPG)**: disponible par année (2007-2023) et pour la France entière sur le portail IGN: <https://geoservices.ign.fr/rpg>. Les données au niveau de la parcelle sont cohérentes seulement sur la période 2015-2023. (50Gb en total)   
-- **Carte d’occupation des sols du CES OSO – THEIA (OSO)**: disponible par année (2016-2024), pour la France entière en format raster avec une résolution de 10m (<https://doi.org/10.57745/UZ2NJ7>) L'accès officiel se fait par le portail <https://geodes-portal.cnes.fr>, licence Ouverte v2.0 (Etalab).   
-- **BD Haies v2**: disponible pour la France entière sur le portail de l'IGN: <https://geoservices.ign.fr/bdhaie> (1.5Gb compressed, 6.8Gb). La BD Haie v2 a été produite d'images satellites de 2020-2022 (ce qui correspond mieux à nos données que la v1, issue d'images de 2011-2014).  
+- **Registre Parcellaire Graphique (RPG)**(45Gb): annual field crop data for the period 2007-2023 available at France scale on IGN website: <https://geoservices.ign.fr/rpg>. Definition of field (parcelles) are coherent only in the recent period 2015-2023.    
+- **Carte d’occupation des sols du CES OSO – THEIA (OSO)**(6.6Gb): annual land cover data for the period 2016-2024. Available for France in raster format and 10m resolution <https://doi.org/10.57745/UZ2NJ7>. Official access through the CNES website <https://geodes-portal.cnes.fr>.   
+- **BD Haies v2** (6.8Gb): hedgerows dataset for France available on the IGN website: <https://geoservices.ign.fr/bdhaie>. BD Haie v2 was produced from satellite images of 2020-2022 (which is a better fit to our data than v1 from images of 2011-2014).  
 
 
 ## Field observations
@@ -76,8 +76,6 @@ n_year$TOTAL <- rowSums(n_year)
 n_year['TOTAL', ] <- colSums(n_year)
 
 knitr::kable(n_year)
-
-
 ```
 
 ```{r}
@@ -91,9 +89,15 @@ Because of data availability (RPG is not released yet for 2024 and OSO is not av
 #| label: fig-1
 #| fig-cap: "Map of field observations"
 tmap_mode("view")
-tm_basemap(c(StreetMap = "OpenStreetMap", TopoMap = "OpenTopoMap")) +
+tm_basemap("OpenStreetMap") +
   tm_shape(pts, is.main = TRUE) +
-  tm_symbols(fill = "Study_ID") +
+  tm_symbols(
+    fill = "Study_ID",
+    fill.scale = tm_scale_categorical(
+      values = "cols4all.friendly13",
+      values.repeat = FALSE
+    )
+  ) +
   tm_view(
     set_zoom_limits = c(3, 8),
     set_view = c(mean(ext(pts)[1:2]), mean(ext(pts)[3:4]), zoom = 5)
@@ -140,7 +144,7 @@ tm_basemap(c(StreetMap = "OpenStreetMap", TopoMap = "OpenTopoMap")) +
 
 ## Indicators from vector datasets
 
-### Identification of the field in RPG
+### Identification of the crop field in RPG
 
 ```{r}
 #| label: tbl-2
@@ -162,7 +166,7 @@ In total, ```r round(sum(!is.na(indv$ID_PARCEL)) / nrow(indv) * 100)``` % of the
 
 ```{r}
 #| label: fig-2
-#| fig-cap: "Case of SEBIOPAG_VcG in 2023 with observations and RPG"
+#| fig-cap: "Case of SEBIOPAG_VcG observations in 2023 with overlaied RPG"
 pts_vcg <- pts[pts$Study_ID == "SEBIOPAG_VcG" & pts$Year == "2023"]
 pts_vcg$in_RPG <- !is.na(indv$ID_PARCEL[match(pts_vcg$ID, indv$ID)])
 
@@ -179,31 +183,40 @@ mapview(pts_vcg, zcol = "in_RPG", layer.name = "in_RPG") +
 # pts_durum <- pts[pts$Study_ID == "DURUM_MIX_GM"]
 ```
 
-**Issue:**    
-As seen in @fig-2, the coordinates were taken at the edge of the field, or on boundaries so it is not possible to clearly identify the field.   
-*In such case, should we consider the closest field within a distance threshold (e.g. 10m)?*
 
-### Size of the parcel
+
+### Field size
 
 ```{r}
 #| label: tbl-3
-#| tbl-cap: "Summary statistics of the area (in ha) and perimeter (in m) of the fields"
+#| tbl-cap: "Summary statistics per project of the area (in ha) of crop fields"
 
-size <- cbind(
-  "Area_ha" = summary(indv$Area_ha),
-  "Perim_m" = summary(indv$Perim_m)
-)
+# size <- cbind(
+#   "Area_ha" = summary(indv$Area_ha),
+#   "Perim_m" = summary(indv$Perim_m)
+# )
+# knitr::kable(round(size, 2))
 
-knitr::kable(round(size, 2))
-```
-
-```{r}
-#| label: tbl-X
-#| tbl-cap: "Summary statistics of the area (in ha) and perimeter (in m) of the fields"
 sum_area <- sapply(
   tapply(indv$Area_ha, indv$Study_ID, summary),
   function(x) x[1:6]
 )
+# remove DURUM_MIX_GM
+sum_area <- sum_area[, !is.na(sum_area[1, ])]
+
+knitr::kable(round(sum_area, 2))
+
+
+```
+
+```{r}
+#| label: tbl-4
+#| tbl-cap: "Summary statistics per project of the perimeter (in m) of crop fields"
+sum_area <- sapply(
+  tapply(indv$Area_ha, indv$Study_ID, summary),
+  function(x) x[1:6]
+)
+# remove DURUM_MIX_GM
 sum_area <- sum_area[, !is.na(sum_area[1, ])]
 
 knitr::kable(round(sum_area, 2))
@@ -215,17 +228,13 @@ knitr::kable(round(sum_area, 2))
 plot(indv$Area_ha, indv$Perim_m, xlab = "Area (ha)", ylab = "Perimeter (m)")
 ```
 
-There is a strong relation between area and perimeter (@fig-3). In median, field size is 2.7ha and field perimeter is 790m.  
+There is a strong relation between area and perimeter (@fig-3). In median, field size is ```r round(median(indv$Area_ha, na.rm=TRUE),1)``` ha and field perimeter is ```r round(median(indv$Perim_m, na.rm=TRUE),0)```.  
 
 **Outliers**
 
 ```{r}
+# load matching rpg data
 rpg_fields <- vect(here("data", "derived-data", "vector_parcels.gpkg"))
-
-# indv$ID_PARCELYEAR <- paste0(indv$ID_PARCEL, indv$Year)
-# rpg_fields$ID_PARCELYEAR <- paste0(rpg_fields$ID_PARCEL, rpg_fields$Year)
-# not needed
-
 # for matching image to satellite image
 ind23 <- indv[indv$Year == 2023, ]
 ```
@@ -264,13 +273,13 @@ mapview(minF) + mapview(minP) # not up to date
 
 ::::
 
-### Hedge length
+### Hedgerows length
 
-Using the field as defined by RPG, we can calculate the length of hedges from BD Haies that intersect the field (+ a small buffer).
+Using the field as defined by RPG, we can calculate the length of hedgerows from BD Haies that intersect the field (+ a small buffer).
 
 ```{r}
-#| label: tbl-4
-#| tbl-cap: "Summary statistics of the hedge length (in m) within different buffer size"
+#| label: tbl-5
+#| tbl-cap: "Summary statistics of the hedgerows length (in m) within different buffer size"
 buff_hedge <- cbind(
   "B_0m" = summary(indv$Length_haie_0_m),
   "B_5m" = summary(indv$Length_haie_5_m),
@@ -285,15 +294,15 @@ PercWithHedges <- c(
 ) / sum(!is.na(indv$Length_haie_0_m)) * 100
 
 buff_hedge <- rbind(buff_hedge, PercWithHedges)
-buff_hedge
+
 knitr::kable(round(buff_hedge, 2))
 ```
 
-The 230 NA's correspond to the observations from which no corresponding fields were found. Without buffer, 42% of fields have hedges within the field. This percentage increases up to 70% if we consider a 10m buffer around the field.
+The 230 NA's correspond to the observations from which no corresponding fields were found. Without buffer, 42% of fields have hedgerows within the field. This percentage increases up to 70% if we consider a 10m buffer around the field.
 
 ```{r}
 #| label: fig-6
-#| fig-cap: "Correlation among hedge lengths per buffer size"
+#| fig-cap: "Correlation among hedgerows lengths per buffer size"
 hedgelendth <- data.frame(
   "B_0m" = indv$Length_haie_0_m,
   "B_5m" = indv$Length_haie_5_m,
@@ -310,7 +319,7 @@ pairs(hedgelendth, lower.panel = panel.smooth, upper.panel = panel.cor)
 
 ```{r}
 #| label: fig-7
-#| fig-cap: "Field with hedges at 5m buffer"
+#| fig-cap: "Field with hedgerows at 5m buffer"
 #fmt: skip
 ex1 <- which(indv$ID == indv$ID[indv$Length_haie_0_m == 0][which.max(indv$Length_haie_10_m[indv$Length_haie_0_m == 0])])
 pts_ex1 <- pts[pts$ID == indv$ID[ex1]]
@@ -318,7 +327,7 @@ rpg_ex1 <- rpg_fields[rpg_fields$ID_PARCEL == indv$ID_PARCEL[ex1]]
 r5_ex1 <- buffer(rpg_ex1, 5)
 r10_ex1 <- buffer(rpg_ex1, 10)
 haie_ex1 <- vect(
-  here("data", "raw-data", "haie.gpkg"),
+  here("data", "raw-data", "haie_2-0.gpkg"),
   filter = vect(ext(r10_ex1))
 )
 
@@ -347,7 +356,7 @@ legend(
 :::{ .column width="50%"}
 ```{r}
 #| label: fig-8
-#| fig-cap: "Field with hedges at 5-10m"
+#| fig-cap: "Field with hedgerows at 5-10m"
 #fmt: skip
 ex2 <- which(indv$ID == indv$ID[indv$Length_haie_5_m == 0][which.max(indv$Length_haie_10_m[indv$Length_haie_5_m == 0])])
 pts_ex2 <- pts[pts$ID == indv$ID[ex2]]
@@ -355,7 +364,7 @@ rpg_ex2 <- rpg_fields[rpg_fields$ID_PARCEL == indv$ID_PARCEL[ex2]]
 r5_ex2 <- buffer(rpg_ex2, 5)
 r10_ex2 <- buffer(rpg_ex2, 10)
 haie_ex2 <- vect(
-  here("data", "raw-data", "haie.gpkg"),
+  here("data", "raw-data", "haie_2-0.gpkg"),
   filter = vect(ext(r10_ex2))
 )
 
@@ -384,14 +393,14 @@ legend(
 ::::
 
 **To be discussed:**
-- which buffer size to calculate the hedge lengths? Is 10m large enough, or more? whould we consider the position of the field sampling?
-
+- which buffer size to calculate the hedgerows lengths? Is 10m large enough, or more? 
+- should we consider the position of the field sampling ?
 
 
 ### Field size within buffer
     
 ```{r}
-#| label: tbl-5
+#| label: tbl-6
 #| tbl-cap: "Summary statistics of the field area (in ha) within different buffer size"
 buff_size <- cbind(
   "B_500m" = summary(indv$Mean_fieldsize_500m_ha),
@@ -402,10 +411,10 @@ buff_size <- cbind(
 knitr::kable(round(buff_size, 2))
 ```
 
-We see that some observation don't have field within 500m (N=13). To be checked whether those observations were really made close to an agricultural field.
+We see that some observations don't have crop field within 500m (N=13). To be checked (@tbl-7) whether those observations were really made close to an agricultural field.
 
 ```{r}
-#| label: tbl-6
+#| label: tbl-7
 #| tbl-cap: "Observations with no fields within a 500m buffer."
 # table(indv$Study_ID, is.na(indv$Mean_fieldsize_500m_ha))
 miss_b500 <- indv[is.na(indv$Mean_fieldsize_500m_ha), ]
@@ -449,7 +458,7 @@ rpg_ex1 <- vect(
   filter = b1500_ex1
 )
 
-plot(rpg_ex1, col = NA, border = "black", main = indv$ID[ex1]))
+plot(rpg_ex1, col = NA, border = "black", main = indv$ID[ex1])
 plot(b1500_ex1, col = NA, border = "red", add = TRUE)
 plot(b1000_ex1, col = NA, border = "blue", add = TRUE)
 plot(b500_ex1, col = NA, border = "green", add = TRUE)
@@ -600,6 +609,11 @@ legend(
 ::::
 
 **To be discussed**  
+- RPG complété: need more data processing, and might not add much in term of crop cover (but in some wineyards)
+
+- As seen in @fig-2, some coordinates were taken at the edge or on the boundary of the field, so it is not possible to clearly identify the field. In such case, should we consider the closest field within a distance threshold (e.g. 10m)?
+
+- add indicators about position on the field? were the samples taken from the edges or close to center?
 
 - Inclusion of RPG complete is long, hard, and quality might differ.
 
@@ -621,102 +635,138 @@ miniref <- miniref[!duplicated(miniref$new_code), ]
 miniref <- miniref[!is.na(miniref$new_code), ]
 
 # transform with class names
-lulc_id <- indr[,grep("lulc_", names(indr))]
+lulc_id <- indr[, grep("lulc_", names(indr))]
 lulc_class <- sapply(lulc_id, function(x) {
   miniref$fullname[match(x, miniref$new_code)]
 })
 
-numYr <- as.data.frame(table(pts$Year))
-names(numYr) <- c("Year", "Nobs")
-knitr::kable(numYr)
+# numYr <- as.data.frame(table(pts$Year))
+# names(numYr) <- c("Year", "Nobs")
+# knitr::kable(numYr)
 
-numNA <- apply(is.na(lulc_class),2,sum) 
-names(numNA)[-1] <- gsub("_N", "_N-", names(numNA)[-1])
-knitr::kable(data.frame("NAs"=numNA))
+```
+
+```{r}
+#| label: tbl-8
+#| tbl-cap: "Land cover data sources for the observations at year N to N-5"
+
+info <- data.frame(
+  "inRPG" = apply(lulc_id < 20000, 2, sum, na.rm = TRUE),
+  "inOSO" = apply(lulc_id >= 20000, 2, sum, na.rm = TRUE),
+  "NAs" = apply(is.na(lulc_id), 2, sum)
+)
+row.names(info)[-1] <- gsub("_N", "_N-", row.names(info)[-1])
+knitr::kable(info)
+
+# barplot(as.matrix(t(info)))
 ```
 
 
+List of the most commun land cover at year N:  
 ```{r}
-lulc_vec <- as.character(unlist(lulc_class[,1]))#[,1]
-sort(table(lulc_vec), decreasing = TRUE)[1:sum(table(lulc_vec)>=10)]
+lulc_vec <- as.character(unlist(lulc_class[, 1])) #[,1]
+sort(table(lulc_vec), decreasing = TRUE)[1:sum(table(lulc_vec) >= 10)]
 ```
 
 
 
 ```{r}
-pasteNA <- function(x){
+pasteNA <- function(x) {
   x <- x[!is.na(x)]
   return(paste(x, collapse = ", "))
 }
-pasteUN <- function(x){
+pasteUN <- function(x) {
   x <- x[!is.na(x)]
   x <- sort(unique(x))
   return(paste(x, collapse = ", "))
 }
 
-rotation <- apply(lulc_class,1,pasteNA)
-rotationU <- apply(lulc_class,1,pasteUN)
-sort(table(rotationU), decreasing = TRUE)[1:sum(table(rotationU)>=10)]
+rotation <- apply(lulc_class, 1, pasteNA)
+rotationU <- apply(lulc_class, 1, pasteUN)
+sort(table(rotationU), decreasing = TRUE)[1:sum(table(rotationU) >= 10)]
 ```
 
 
 ```{r}
-barplot(table(apply(lulc_id,1,function(x) length(unique(x)))))
+barplot(table(apply(lulc_id, 1, function(x) length(unique(x)))))
 ```
+
+
 
 ### land cover within buffer 
 
 ```{r}
+
+paste_name <- function(x) {
+  return(paste0(names(x), " (", round(x * 100, 1), "%)"))
+}
+
 m500 <- grep("frac500", names(indr))
 m1000 <- grep("frac1000", names(indr))
 m1500 <- grep("frac1500", names(indr))
+
+mean_500 <- apply(indr[, m500], 2, mean, na.rm = TRUE)
+names(mean_500) <- gsub("frac500_", "", names(mean_500))
+#fmt:skip
+mean_500_gr <- tapply(mean_500, ref$grp_label[match(names(mean_500), ref$new_code)], sum)
+
+mean_1000 <- apply(indr[, m1000], 2, mean, na.rm = TRUE)
+names(mean_1000) <- gsub("frac1000_", "", names(mean_1000))
+#fmt:skip
+mean_1000_gr <- tapply(mean_1000, ref$grp_label[match(names(mean_1000), ref$new_code)], sum)
+
+mean_1500 <- apply(indr[, m1500], 2, mean, na.rm = TRUE)
+names(mean_1500) <- gsub("frac1500_", "", names(mean_1500))
+#fmt:skip
+mean_1500_gr <- tapply(mean_1500, ref$grp_label[match(names(mean_1500), ref$new_code)], sum)
+
 n_classes <- data.frame(
   "buffer_500" = length(m500),
   "buffer_1000" = length(m1000),
   "buffer_1500" = length(m1500)
 )
 top1 <- c(
-  gsub("frac500_", "", names(sort(apply(indr[,m500],2,mean, na.rm=TRUE), decreasing = TRUE)[1])),
-  gsub("frac1000_", "", names(sort(apply(indr[,m1000],2,mean, na.rm=TRUE), decreasing = TRUE))[1]),
-  gsub("frac1500_", "", names(sort(apply(indr[,m1500],2,mean, na.rm=TRUE), decreasing = TRUE))[1])
+  paste_name(sort(mean_500_gr)[length(mean_500_gr)]),
+  paste_name(sort(mean_1000_gr)[length(mean_1000_gr)]),
+  paste_name(sort(mean_1500_gr)[length(mean_1500_gr)])
 )
 top2 <- c(
-  gsub("frac500_", "", names(sort(apply(indr[,m500],2,mean, na.rm=TRUE), decreasing = TRUE)[2])),
-  gsub("frac1000_", "", names(sort(apply(indr[,m1000],2,mean, na.rm=TRUE), decreasing = TRUE)[2])),
-  gsub("frac1500_", "", names(sort(apply(indr[,m1500],2,mean, na.rm=TRUE), decreasing = TRUE)[2]))
+  paste_name(sort(mean_500_gr)[length(mean_500_gr) - 1]),
+  paste_name(sort(mean_1000_gr)[length(mean_1000_gr) - 1]),
+  paste_name(sort(mean_1500_gr)[length(mean_1500_gr) - 1])
 )
 top3 <- c(
-  gsub("frac500_", "", names(sort(apply(indr[,m500],2,mean, na.rm=TRUE), decreasing = TRUE)[3])),
-  gsub("frac1000_", "", names(sort(apply(indr[,m1000],2,mean, na.rm=TRUE), decreasing = TRUE)[3])),
-  gsub("frac1500_", "", names(sort(apply(indr[,m1500],2,mean, na.rm=TRUE), decreasing = TRUE)[3]))
+  paste_name(sort(mean_500_gr)[length(mean_500_gr) - 2]),
+  paste_name(sort(mean_1000_gr)[length(mean_1000_gr) - 2]),
+  paste_name(sort(mean_1500_gr)[length(mean_1500_gr) - 2])
 )
 
-info <- rbind(n_classes, 
-miniref$fullname[match(top1, miniref$new_code)], 
-miniref$fullname[match(top2, miniref$new_code)],
-miniref$fullname[match(top3, miniref$new_code)])
+
+info <- rbind(n_classes, top1, top2, top3)
 
 row.names(info) <- c("N_classes", "top 1", "top 2", "top 3")
+
+knitr::kable(info)
 ```
 
 
 ```{r}
-mean_500 <- apply(indr[,m500],2,mean, na.rm=TRUE)
+mean_500 <- apply(indr[, m500], 2, mean, na.rm = TRUE)
 names(mean_500) <- gsub("frac500_", "", names(mean_500))
-mean_1000 <- apply(indr[,m1000],2,mean, na.rm=TRUE)
+mean_1000 <- apply(indr[, m1000], 2, mean, na.rm = TRUE)
 names(mean_1000) <- gsub("frac1000_", "", names(mean_1000))
-mean_1500 <- apply(indr[,m1500],2,mean, na.rm=TRUE)
+mean_1500 <- apply(indr[, m1500], 2, mean, na.rm = TRUE)
 names(mean_1500) <- gsub("frac1500_", "", names(mean_1500))
 
-keepC <- unique(c(names(mean_500)[mean_500>0.02], names(mean_1000)[mean_1000>0.02], names(mean_1500)[mean_1500>0.02]))
+keepC <- unique(c(
+  names(mean_500_gr)[mean_500_gr > 0.02],
+  names(mean_1000_gr)[mean_1000_gr > 0.02],
+  names(mean_1500_gr)[mean_1500_gr > 0.02]
+))
 
 ref$nom[match(keepC, ref$new_code)]
 ref$nom[match(keepC, ref$new_code)]
 ref$nom[match(keepC, ref$new_code)]
-mean_500[keepC]
-
-mean_1000[keepC]
-mean_1500[keepC]
 ```
 
 ### density of bordures  

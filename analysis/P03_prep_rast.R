@@ -86,7 +86,7 @@ for (i in period) {
     print("   Combine RPG+OSO")
     all_i <- merge(rpg_r, oso_r, first = TRUE)
     # set factor values
-    set.cats(all_i, value = miniref)
+    # set.cats(all_i, value = miniref)
 
     # export
     writeRaster(all_i, filename = here(outfolder, outi))
