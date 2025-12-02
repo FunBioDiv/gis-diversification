@@ -13,8 +13,10 @@ execute:
 
 ## Summary
 
+### Indicators 
+
 | **Indicator**                              | **Data**             | **Format**      |
-| ------------------------------------------ | -------------------- | --------------- |
+|:-------------------------------------------|:---------------------|:----------------|
 | perimeter and area of the field            | RPG                  | vectoriel       |
 | mean field size within buffer              | RPG                  | vectoriel       |
 | hedgerows length around field              | RPG + BD haies       | vectoriel       |
@@ -22,11 +24,14 @@ execute:
 | % land cover within buffer                 | RPG + OSO            | raster          |
 | *density of bordures*                      | RPG + OSO            | raster          | 
 
-Data description:  
+
+### Datasets 
 
 - **Registre Parcellaire Graphique (RPG)**(45Gb): annual field crop data for the period 2007-2023 available at France scale on IGN website: <https://geoservices.ign.fr/rpg>. Definition of field (parcelles) are coherent only in the recent period 2015-2023.    
 - **Carte d’occupation des sols du CES OSO – THEIA (OSO)**(6.6Gb): annual land cover data for the period 2016-2024. Available for France in raster format and 10m resolution <https://doi.org/10.57745/UZ2NJ7>. Official access through the CNES website <https://geodes-portal.cnes.fr>.   
 - **BD Haies v2** (6.8Gb): hedgerows dataset for France available on the IGN website: <https://geoservices.ign.fr/bdhaie>. BD Haie v2 was produced from satellite images of 2020-2022 (which is a better fit to our data than v1 from images of 2011-2014).  
+
+- *RPG complété*: add missing crop field data that was not officially reported in the Common Agricultural Policy (CAP) so absent from the RPG dataset. It uses a combination of datasets from cadastre, IGN BD TOPO and OSO. Data is publicly available since 2018-2023 and could be retrieve for the year 2016-2017. It is spread in multiple files per regions or department <https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022>. The main issue is that the definition of parcelle is different from cadastre, so if may bring biases in the vectorial calculation (based on the field definition). It is heavy to process and bring little information on land cover. Can be  
 
 
 ## Field observations
@@ -66,6 +71,8 @@ ref <- read.csv(here("data", "derived-data", "RPG-OSO_classes.csv"))
 
 # vector indicators
 indv <- read.csv(here("data", "derived-data", "vector_indicators.csv"))
+# for plotting Study_ID
+indv$Study_Lab <- gsub("_", "\n", indv$Study_ID)
 # table(indv$Study_ID) == table(pts$Study_ID)
 
 n_year <- as.data.frame.matrix(table(pts$Study_ID, pts$Year))
@@ -143,6 +150,8 @@ tm_basemap("OpenStreetMap") +
 
 ### Identification of the crop field in RPG
 
+We identified the crop field from RPG dataset corresponding to the observations based on the coordinates and the year of the samplings.
+
 ```{r}
 #| label: tbl-2
 #| tbl-cap: "Number of observations in fields from RPG"
@@ -181,10 +190,33 @@ mapview(pts_vcg, zcol = "in_RPG", layer.name = "in_RPG") +
 
 **To be discussed:**   
 
-Some coordinates were taken at the edge or on the boundary of the field, so it is not possible to clearly identify the field. In such case, should we consider the closest field within a distance threshold (e.g. 10m)?
+- Some coordinates were taken at the edge or on the boundary of the field, so it is not possible to clearly identify the field. In such case, should we consider the closest field within a distance threshold (e.g. 10m)?
 
 
 ### Field size
+
+We calculated the area and the perimeter of the crop fields corresponding to the samplings.
+
+::: {.panel-tabset}
+
+## boxplot 
+
+```{r}
+#| label: fig-17
+#| fig-cap: "Field area in ha per project"
+
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  indv$Area_ha ~ indv$Study_Lab,
+  las = 2,
+  ylab = "ha",
+  xlab = "",
+  main = "Crop field area"
+)
+abline(h = median(indv$Mean_fieldsize_500m_ha, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## table
 
 ```{r}
 #| label: tbl-3
@@ -203,26 +235,48 @@ sum_area <- sapply(
 # remove DURUM_MIX_GM
 sum_area <- sum_area[, !is.na(sum_area[1, ])]
 
+colnames(sum_area) <- gsub("_", "<br>", colnames(sum_area))
+
 knitr::kable(round(sum_area, 2))
 ```
+
+:::
+
 
 ```{r}
 #| label: tbl-4
 #| tbl-cap: "Summary statistics per project of the perimeter (in m) of crop fields"
 sum_area <- sapply(
-  tapply(indv$Area_ha, indv$Study_ID, summary),
+  tapply(indv$Perim_m, indv$Study_ID, summary),
   function(x) x[1:6]
 )
 # remove DURUM_MIX_GM
 sum_area <- sum_area[, !is.na(sum_area[1, ])]
 
+colnames(sum_area) <- gsub("_", "<br>", colnames(sum_area))
+
 knitr::kable(round(sum_area, 2))
 ```
 
+
+
+
 ```{r}
 #| label: fig-3
-#| fig-cap: "Relation between area and perimeter"
-plot(indv$Area_ha, indv$Perim_m, xlab = "Area (ha)", ylab = "Perimeter (m)")
+#| fig-cap: "Relation between area and perimeter (in log scale)"
+# sunflowerplot(
+#   indv$Area_ha,
+#   indv$Perim_m,
+#   xlab = "Area (ha)",
+#   ylab = "Perimeter (m)"
+# )
+plot(
+  indv$Area_ha,
+  indv$Perim_m,
+  xlab = "Area (ha)",
+  ylab = "Perimeter (m)",
+  log = "xy"
+)
 ```
 
 There is a strong relation between area and perimeter (@fig-3). In median, field size is ```r round(median(indv$Area_ha, na.rm=TRUE),1)``` ha and field perimeter is ```r round(median(indv$Perim_m, na.rm=TRUE),0)```m.  
@@ -271,12 +325,13 @@ mapview(minF) + mapview(minP) # not up to date
 ::::
 
 **To be discussed:**  
-Some fields are defined as ```r ref$nom[ref$original_code == "BOR"]``` which are not field but borders (as in @fig-5). Should we remove fields from RPG that are not agricultural before running the calculations?
+
+- Some fields are defined as ```r ref$nom[ref$original_code == "BOR"]``` which are not field but borders (as in @fig-5). Should we remove non crop fields from RPG before running the calculations?
 
 
 ### Hedgerows length
 
-Using the field as defined by RPG, we can calculate the length of hedgerows from BD Haies that intersect the field (+ a small buffer).
+Using the field as defined by RPG, we calculated the length of hedgerows from BD Haies that intersect the field (+ a small buffer).
 
 ```{r}
 #| label: tbl-5
@@ -357,7 +412,7 @@ legend(
 :::{ .column width="50%"}
 ```{r}
 #| label: fig-8
-#| fig-cap: "Field with hedgerows at 5-10m"
+#| fig-cap: "Field with hedgerows at 10m buffer"
 #fmt: skip
 ex2 <- which(indv$ID == indv$ID[indv$Length_haie_5_m == 0][which.max(indv$Length_haie_10_m[indv$Length_haie_5_m == 0])])
 pts_ex2 <- pts[pts$ID == indv$ID[ex2]]
@@ -401,6 +456,8 @@ legend(
 
 ### Field size within buffer
     
+Using the coordinated of the sampling sites, we calculated the average area of all crop fields within a buffer (500m, 1000m, and 1500m).
+
 ```{r}
 #| label: tbl-6
 #| tbl-cap: "Summary statistics of the field area (in ha) within different buffer size"
@@ -413,7 +470,71 @@ buff_size <- cbind(
 knitr::kable(round(buff_size, 2))
 ```
 
-We see that some observations don't have crop field within 500m (N=13). To be checked whether those observations (listed in @tbl-7) were really made close to an agricultural field.
+We see that some observations don't have crop field within 500m (N=13). These observations (listed in @tbl-7) would need to be checked and ensure that they are close to an agricultural field.  
+
+```{r}
+
+```
+
+
+::: {.panel-tabset}
+
+## 500m 
+
+```{r}
+#| label: fig-17
+#| fig-cap: "Average field size with buffer of 500m"
+
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  indv$Mean_fieldsize_500m_ha ~ indv$Study_Lab,
+  las = 2,
+  ylab = "ha",
+  xlab = "",
+  main = "Average field size within 500m buffer"
+)
+abline(h = median(indv$Mean_fieldsize_500m_ha, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## 1000m 
+
+```{r}
+#| label: fig-17
+#| fig-cap: "Average field size with buffer of 1000m"
+
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  indv$Mean_fieldsize_1000m_ha ~ indv$Study_Lab,
+  las = 2,
+  ylab = "ha",
+  xlab = "",
+  main = "Average field size within 1000m buffer"
+)
+abline(h = median(indv$Mean_fieldsize_1500m_ha, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## 1500m 
+
+```{r}
+#| label: fig-19
+#| fig-cap: "Average field size with buffer of 1500m"
+
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  indv$Mean_fieldsize_1500m_ha ~ indv$Study_Lab,
+  las = 2,
+  ylab = "ha",
+  xlab = "",
+  main = "Average field size within 1500m buffer"
+)
+abline(h = median(indv$Mean_fieldsize_1500m_ha, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+:::
+
+
+
+
 
 ```{r}
 #| label: tbl-7
@@ -878,7 +999,7 @@ plotly_df(pc1500)
 
 ### Density of bordures  
 
-To be defined.
+*To be defined.*
 <!-- https://rdrr.io/cran/terra/man/boundaries.html -->
 
 

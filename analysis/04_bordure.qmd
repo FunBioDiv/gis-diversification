@@ -1,0 +1,439 @@
+---
+title: "Exploration de la densité de bordures"
+author: Romain Frelat
+date: today
+format: 
+  html:
+    toc: true
+execute:
+  echo: false
+  warning: false
+---
+
+```{r setup}
+suppressWarnings({
+  library(terra)
+  library(sf)
+  library(here)
+  library(mapview)
+  library(leafsync)
+})
+
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data")
+outfolder <- here("data", "derived-data")
+
+pts35 <- vect(here(datafolder, "pts_35.gpkg"))
+pts35$ID <- paste(pts35$Study_ID, pts35$Site, pts35$Year, sep = "_")
+buff35 <- buffer(pts35, 1500)
+
+# pts33 <- vect(here(datafolder, "pts_33.gpkg"))
+# pts33$ID <- paste(pts33$Study_ID, pts33$Site, pts33$Year, sep = "_")
+# buff33 <- buffer(pts33, 1500)
+
+# rpg and oso classes
+ref <- read.csv(here(outfolder, "RPG-OSO_classes.csv"))
+newclass <- ref[, c("new_code", "class_id")]
+newclass <- newclass[!duplicated(newclass) & complete.cases(newclass), ]
+labclass <- ref[, c("class_id", "class_label")]
+labclass <- labclass[!duplicated(labclass) & complete.cases(labclass), ]
+
+newgrp <- ref[, c("new_code", "grp_id")]
+newgrp <- newgrp[!duplicated(newgrp) & complete.cases(newgrp), ]
+labgrp <- ref[, c("grp_id", "grp_label")]
+labgrp <- labgrp[!duplicated(labgrp) & complete.cases(labgrp), ]
+
+
+allgrp <- ref[, c("new_code", "nom")]
+newgrp <- newgrp[!duplicated(newgrp) & complete.cases(newgrp), ]
+labgrp <- ref[, c("grp_id", "grp_label")]
+labgrp <- labgrp[!duplicated(labgrp) & complete.cases(labgrp), ]
+
+# rpg oso in 2019
+rast_files <- list.files(
+  outfolder,
+  pattern = "^RPG-OSO_.*\\.tif$",
+  full.names = TRUE
+)
+rast_year <- substr(rast_files, nchar(rast_files) - 7, nchar(rast_files) - 4)
+r2023 <- rast(rast_files[8])
+rpg_oso <- rast(rast_files)
+names(rpg_oso) <- rast_year
+```
+
+
+## Objectif
+
+L'objectif de ce document est d'explorer comment évaluer la densité des bordures à partir des données rasters  `RPG original` + `OSO` avec une résolution spatiale de 10m. 
+
+Ces tests sont réalisées sur les sites d’échantillonnage d'Ille-et-Vilaine (d35 N=227) en utilisant une taille de buffer de 1500m.  
+
+Pour calculer les densités de bordures, il faut définir quelles interfaces à considérer. Ici, on a testé deux approches:   
+
+- longueur d'interfaces entre les cultures et les habitats semi-naturels
+- longueur d'interfaces entre les cultures répertoriées dans le RPG
+
+La densités de bordures depend aussi de la résolution spatiale. Ici on va tester 3 résolutions: 10m (résolution originale), 20m, 50m.
+
+## Example d'un buffer
+
+### Interfaces cultures vs semi-naturels
+
+```{r}
+#| label: fig-1
+#| fig-cap: "Calcul des interfaces entre les cultures et les habitats semi-naturels sur un buffer de 1500m"
+
+bi <- buff35[1]
+
+cropi <- crop(r2023, bi, mask = TRUE)
+
+# 3 classes
+classi <- classify(cropi, newclass)
+set.cats(classi, value = labclass)
+
+par(mfrow = c(2, 2))
+plot(classi, main = "Edges Crop vs Semi-natural", legend = FALSE)
+
+polyi <- as.polygons(classi)
+edgei <- edges(polyi, rm = "Impermeable")
+plot(
+  classi,
+  legend = FALSE,
+  main = paste0("10m, edges=", round(perim(edgei) / 1000), "km")
+)
+plot(edgei, col = "red", lwd = 2, add = TRUE)
+
+resi2 <- resample(classi, 2)
+edg2i <- edges(as.polygons(resi2), rm = "Impermeable")
+plot(
+  resi2,
+  legend = FALSE,
+  main = paste0("20m, edges=", round(perim(edg2i) / 1000), "km")
+)
+plot(edg2i, col = "red", lwd = 2, add = TRUE)
+
+resi5 <- resample(classi, 5)
+edg5i <- edges(as.polygons(resi5), rm = "Impermeable")
+plot(
+  resi5,
+  legend = FALSE,
+  main = paste0("50m, edges=", round(perim(edg5i) / 1000), "km")
+)
+plot(edg5i, col = "red", lwd = 2, add = TRUE)
+
+```
+
+
+### Interfaces entre cultures
+
+```{r}
+#| label: fig-2
+#| fig-cap: "Calcul des interfaces entre cultures sur un buffer de 1500m"
+
+# group :35 classes
+cropi <- crop(r2023, bi, mask = TRUE)
+labref <- ref[, c("new_code", "nom")]
+labref <- labref[!duplicated(labref$new_code) & complete.cases(labref), ]
+labrm <- ref$nom[ref$class_label != "agriculture"]
+set.cats(cropi, value = labref)
+
+polyi <- as.polygons(cropi)
+
+par(mfrow = c(2, 2))
+# many classes
+
+plot(
+  polyi[!polyi$nom %in% labrm],
+  "nom",
+  main = "Edges among crops",
+  border = NA,
+  type = "classes",
+  legend = FALSE
+)
+edgei <- edges(polyi, rm = labrm)
+plot(
+  polyi[!polyi$nom %in% labrm],
+  "nom",
+  border = NA,
+  type = "classes",
+  legend = FALSE,
+  main = paste0("10m, edges=", round(perim(edgei) / 1000), "km")
+)
+plot(edgei, col = "red", lwd = 2, add = TRUE)
+
+resi2 <- resample(cropi, 2) |> as.polygons()
+edg2i <- edges(resi2, rm = labrm)
+plot(
+  resi2[!resi2$nom %in% labrm],
+  "nom",
+  border = NA,
+  type = "classes",
+  legend = FALSE,
+  main = paste0("20m, edges=", round(perim(edg2i) / 1000), "km")
+)
+plot(edg2i, col = "red", lwd = 2, add = TRUE)
+
+resi5 <- resample(cropi, 5) |> as.polygons()
+edg5i <- edges(resi5, rm = labrm)
+plot(
+  resi5[!resi5$nom %in% labrm],
+  "nom",
+  border = NA,
+  type = "classes",
+  legend = FALSE,
+  main = paste0("50m, edges=", round(perim(edg5i) / 1000), "km")
+)
+plot(edg5i, col = "red", lwd = 2, add = TRUE)
+```
+
+**Summary**:  
+
+- Il est possible de calculer les longueurs d'interfaces entre différentes catégories directement sous R en faisant l'opération par buffer.
+- La résolution à 10m permet de capturer toutes les interfaces, mais est sensible aux imprécisions de la numérisation des parcelles (incohérences RPG-OSO).  
+- La résolution à 50m est peut-etre trop grossière mais permet d'éliminer les incohérences ou les artefacts liés à la numérisation des parcelles.  
+
+
+## Comparaison
+
+```{r}
+#| eval: false
+out <- c()
+# loop over the buffers
+for (i in 1:length(buff35)) {
+  if (i %% 10 == 0) {
+    print(i)
+  }
+  bi <- buff35[i]
+  yri <- bi$Year
+  if (yri %in% names(rpg_oso)) {
+    ri <- crop(rpg_oso[yri], bi, mask = TRUE)
+    # crop - SNH
+    ci <- classify(ri, newclass)
+    set.cats(ci, value = labclass)
+    e_SNC_10m <- edges(as.polygons(ci), rm = "Impermeable", out = "perim")
+    c2 <- resample(ci, 2)
+    e_SNC_20m <- edges(as.polygons(c2), rm = "Impermeable", out = "perim")
+    c5 <- resample(ci, 5)
+    e_SNC_50m <- edges(as.polygons(c5), rm = "Impermeable", out = "perim")
+
+    # crops RPG
+    set.cats(ri, value = labref)
+    e_RPG_10m <- edges(as.polygons(ri), rm = labrm, out = "perim")
+    c2 <- resample(ri, 2)
+    e_RPG_20m <- edges(as.polygons(c2), rm = labrm, out = "perim")
+    c5 <- resample(ri, 5)
+    e_RPG_50m <- edges(as.polygons(c5), rm = labrm, out = "perim")
+
+    #fmt: skip
+    outi <- c(unlist(values(bi)), 
+              e_SNC_10m, e_SNC_20m, e_SNC_50m, e_RPG_10m, e_RPG_20m, e_RPG_50m)
+    out <- rbind(out, outi)
+  }
+}
+colnames(out)[5:10] <- c(
+  "e_SNC_10m",
+  "e_SNC_20m",
+  "e_SNC_50m",
+  "e_RPG_10m",
+  "e_RPG_20m",
+  "e_RPG_50m"
+)
+write.csv(out, here(outfolder, "Edges_d35.csv"), row.names = FALSE)
+```
+
+
+```{r}
+out <- read.csv(here(outfolder, "Edges_d35.csv"))
+```
+
+```{r}
+#| label: fig-3
+#| fig-cap: "Correlation entre les longueurs d'interfaces calculées sur les 187 buffers d'Ille-et-Vilaine "
+
+edges <- data.frame(out[, 5:10])
+edges <- sapply(edges, as.numeric)
+pairs(edges, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+Les longueurs d'interfaces entre les cultures et les habitats semi-naturels ne sont pas corrélés avec les longueurs d'interfaces entre cultures. La résolution de 20m semble un bon compromis entre les résolutions à 10m et à 50m.
+
+## Zoom in
+
+### Min-max outliers
+
+```{r}
+#| label: fig-4
+#| fig-cap: "Exemple de buffers avec des longueurs d'interfaces extrèmes"
+
+minmax <- unique(c(
+  which.min(edges[, "e_SNC_20m"]),
+  which.max(edges[, "e_SNC_20m"]),
+  which.min(edges[, "e_RPG_20m"]),
+  which.max(edges[, "e_RPG_20m"])
+))
+layout(matrix(1:6, ncol = 3, byrow = FALSE))
+for (i in out$ID[minmax]) {
+  bi <- buff35[buff35$ID == i]
+  yri <- bi$Year
+  ri <- crop(rpg_oso[yri], bi, mask = TRUE)
+  # crop - SNH
+  ci <- classify(ri, newclass)
+  set.cats(ci, value = labclass)
+  c2 <- resample(ci, 2) |> as.polygons()
+  e_20m <- edges(c2, rm = "Impermeable")
+  plot(
+    c2[c2$class_label != "Impermeable"],
+    "class_label",
+    main = paste(i, "-", round(perim(e_20m) / 1000), "km"),
+    legend = FALSE,
+    border = NA,
+    type = "classes"
+  )
+  plot(e_20m, add = TRUE, lwd = 2, col = "red")
+  # crops RPG
+  set.cats(ri, value = labref)
+  c2 <- resample(ri, 2) |> as.polygons()
+  e_20m <- edges(c2, rm = labrm)
+  plot(
+    c2[!c2$nom %in% labrm],
+    "nom",
+    main = paste(i, "-", round(perim(e_20m) / 1000), "km"),
+    legend = FALSE,
+    border = NA
+  )
+  plot(e_20m, add = TRUE, lwd = 2, col = "red")
+}
+```
+
+
+### Grande influence de la résolution spatiale
+
+```{r}
+#| label: fig-5
+#| fig-cap: "Exemple de buffers avec des longueurs d'interfaces qui varient selon l'echelle spatiale"
+
+par(mfrow = c(2, 3))
+
+# SNC
+i <- out$ID[which.max(abs(edges[, "e_SNC_10m"] - edges[, "e_SNC_50m"]))]
+
+bi <- buff35[buff35$ID == i]
+yri <- bi$Year
+ri <- crop(rpg_oso[yri], bi, mask = TRUE)
+# crop - SNH
+ci <- classify(ri, newclass)
+set.cats(ci, value = labclass)
+c1 <- as.polygons(ci)
+e_SNC_10m <- edges(c1, rm = "Impermeable")
+c2 <- resample(ci, 2) |> as.polygons()
+e_SNC_20m <- edges(c2, rm = "Impermeable")
+c5 <- resample(ci, 5) |> as.polygons()
+e_SNC_50m <- edges(c5, rm = "Impermeable")
+
+plot(
+  c1[c1$class_label != "Impermeable"],
+  "class_label",
+  main = paste(i, "\n 10m: ", round(perim(e_SNC_10m) / 1000), "km"),
+  legend = FALSE,
+  border = NA,
+)
+plot(e_SNC_10m, add = TRUE, lwd = 2, col = "red")
+
+plot(
+  c2[c2$class_label != "Impermeable"],
+  "class_label",
+  main = paste(i, "\n  20m: ", round(perim(e_SNC_20m) / 1000), "km"),
+  legend = FALSE,
+  border = NA,
+)
+plot(e_SNC_20m, add = TRUE, lwd = 2, col = "red")
+
+plot(
+  c1[c1$class_label != "Impermeable"],
+  "class_label",
+  main = paste(i, "\n 50m: ", round(perim(e_SNC_50m) / 1000), "km"),
+  legend = FALSE,
+  border = NA,
+)
+plot(e_SNC_50m, add = TRUE, lwd = 2, col = "red")
+
+# RPG
+j <- out$ID[which.max(abs(edges[, "e_RPG_10m"] - edges[, "e_RPG_50m"]))]
+bj <- buff35[buff35$ID == j]
+yri <- bj$Year
+ri <- crop(rpg_oso[yri], bj, mask = TRUE)
+# crop - SNH
+set.cats(ri, value = labref)
+r1 <- as.polygons(ri)
+e_RPG_10m <- edges(r1, rm = labrm)
+r2 <- resample(ri, 2) |> as.polygons()
+e_RPG_20m <- edges(r2, rm = labrm)
+r5 <- resample(ri, 5) |> as.polygons()
+e_RPG_50m <- edges(r5, rm = labrm)
+
+plot(
+  r1[!r1$nom %in% labrm],
+  "nom",
+  main = paste(j, "\n 10m: ", round(perim(e_RPG_10m) / 1000), "km"),
+  legend = FALSE,
+  border = NA,
+)
+plot(e_RPG_10m, add = TRUE, lwd = 2, col = "red")
+
+plot(
+  r2[!r2$nom %in% labrm],
+  "nom",
+  main = paste(j, "\n  20m: ", round(perim(e_RPG_20m) / 1000), "km"),
+  legend = FALSE,
+  border = NA,
+)
+plot(e_RPG_20m, add = TRUE, lwd = 2, col = "red")
+
+plot(
+  r5[!r5$nom %in% labrm],
+  "nom",
+  main = paste(j, "\n 50m: ", round(perim(e_RPG_50m) / 1000), "km"),
+  legend = FALSE,
+  border = NA,
+)
+plot(e_RPG_50m, add = TRUE, lwd = 2, col = "red")
+```
+
+
+```{r}
+#| label: fig-6
+#| fig-cap: "Vue dynamique des buffers avec une grande différence selon l'echelle spatiale"
+
+m1 <- mapview(bi, alpha.regions = 0, lwd = 3) +
+  mapview(c1, alpha.regions = 0.2, legend = FALSE) +
+  mapview(e_SNC_10m, color = "red")
+
+m2 <- mapview(bi, alpha.regions = 0, lwd = 3) +
+  mapview(c2, alpha.regions = 0.2, legend = FALSE) +
+  mapview(e_SNC_20m, color = "red")
+
+m3 <- mapview(bi, alpha.regions = 0, lwd = 3) +
+  mapview(c5, alpha.regions = 0.2, legend = FALSE) +
+  mapview(e_SNC_50m, color = "red")
+
+m4 <- mapview(bj, alpha.regions = 0, lwd = 3) +
+  mapview(r1, alpha.regions = 0.2, legend = FALSE) +
+  mapview(e_RPG_10m, color = "red")
+
+m5 <- mapview(bj, alpha.regions = 0, lwd = 3) +
+  mapview(r2, alpha.regions = 0.2, legend = FALSE) +
+  mapview(e_RPG_20m, color = "red")
+
+m6 <- mapview(bj, alpha.regions = 0, lwd = 3) +
+  mapview(r5, alpha.regions = 0.2, legend = FALSE) +
+  mapview(e_RPG_50m, color = "red")
+
+sync(
+  list(m1, m2, m3, m4, m5, m6),
+  sync = list(c(1, 2, 3), c(4, 5, 6)),
+  no.initial.sync = TRUE,
+  ncol = 3
+)
+```

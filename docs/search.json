@@ -95,7 +95,7 @@
     "href": "index.html",
     "title": "Overview",
     "section": "",
-    "text": "Overview\nExplorations des jeux de données en cours:\n\nDonnées RPG, RPG complété et BD haies\n\nCroisement RPG+OSO\nComparaison taille des parcelles RPG"
+    "text": "Overview\nExplorations des jeux de données en cours:\n\nDonnées RPG, RPG complété et BD haies\n\nCroisement RPG+OSO\nComparaison taille des parcelles RPG\nLongueurs d’interfaces\nSummary"
   },
   {
     "objectID": "analysis/03_field_size.html",
@@ -201,5 +201,61 @@
     "title": "Calculation of diversification indicators and other covariates",
     "section": "Indicators from raster datasets (RPG+OSO)",
     "text": "Indicators from raster datasets (RPG+OSO)\n\nCrop rotation (N-5:N)\n\n\n\n\nTable 8: Land cover data sources for the observations at year N to N-5\n\n\n\n\n\n\n\ninRPG\ninOSO\nNAs\n\n\n\n\nlulc_N\n1042\n233\n283\n\n\nlulc_N-1\n1100\n214\n244\n\n\nlulc_N-2\n1028\n221\n309\n\n\nlulc_N-3\n923\n213\n422\n\n\nlulc_N-4\n779\n209\n570\n\n\nlulc_N-5\n632\n181\n745\n\n\n\n\n\n\n\n\n\n\n\n\nTable 9: Most commun land cover classes\n\n\n\n\n\n\nlandcover class\nN\n\n\n\n\nRPG_Vigne (sauf vigne rouge)\n484\n\n\nRPG_Blé tendre d’hiver\n165\n\n\nRPG_Autre verger (y compris verger DOM)\n79\n\n\nOSO_Vignes\n64\n\n\nOSO_Forêts de feuillus\n41\n\n\nOSO_Prairies\n41\n\n\nRPG_Maïs (hors maïs doux)\n34\n\n\nRPG_Orge d’hiver\n29\n\n\nRPG_Maïs ensilage\n26\n\n\nRPG_Mélange de céréales ou pseudo-céréales d’hiver entre elles\n25\n\n\nRPG_Vigne : raisins de cuve non en production\n24\n\n\nRPG_Colza d’hiver\n21\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 14: Land cover at year N\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 15: Crop rotation in the period N:N-5\n\n\n\n\n\nThere are 648 observations with complete time series from year N to N-5. From these observations with complete rotation information, 342 have the same crop group for the whole time period, while 74 fields have four different crop groups in the past 6 years.\n\n\n\n\nTable 10: Number of crop groups in the period N:N-5 for observations with complete data\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBACCHUS\nFRAMEworkBVD\nLepiBats\nOSCAR\nSEBIOPAGBVD\nSEBIOPAGPlaine de Dijon\nSEBIOPAGVcG\nSEBIOPAGZAAr\n\n\n\n\n1\n116\n28\n39\n119\n35\n3\n2\n0\n\n\n2\n0\n7\n8\n71\n4\n6\n9\n19\n\n\n3\n0\n1\n3\n46\n1\n16\n17\n12\n\n\n4\n0\n0\n0\n18\n0\n29\n19\n8\n\n\n5\n0\n0\n0\n1\n0\n6\n4\n1\n\n\n\n\n\n\n\n\n\n\n\nFALSE  TRUE  &lt;NA&gt; \n   33  1012   513 \n\n\n\n\nLand cover within buffer\n\n\n\n\nTable 11: Summary of the land cover buffer composition\n\n\n\n\n\n\n\nbuffer_500\nbuffer_1000\nbuffer_1500\n\n\n\n\nn_classes\n186\n220\n237\n\n\nav_perc_rpg\n50\n47\n45\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 16: Average land cover per buffer size\n\n\n\n\n\n500m1000m1500m\n\n\n\n\n\n\n\n\n\n\nFigure 17: Average land cover per dataset with buffer of 500m\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 18: Average land cover per dataset with buffer of 1000m\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 19: Average land cover per dataset with buffer of 1500m\n\n\n\n\n\n\n\n\n\nDensity of bordures\nTo be defined. \nSummary and questions about vector indicators:\n\nThere are up to 237 land cover in the RPG+OSO dataset. Here we simplified it using the Référentiel des cultures as an illustration. Before the extracted information can be usefull in the project, it requires further work on land cover class homogeneization.\nThe edge density needs further thinking."
+  },
+  {
+    "objectID": "analysis/test_left.html",
+    "href": "analysis/test_left.html",
+    "title": "Test",
+    "section": "",
+    "text": "Figure 1: Map of field observations\n\n\n\n\n\n\n\n\n\n\n\nNo label but ?@fig-2 reference?"
+  },
+  {
+    "objectID": "analysis/04_bordure.html",
+    "href": "analysis/04_bordure.html",
+    "title": "Exploration de la densité de bordures",
+    "section": "",
+    "text": "L’objectif de ce document est d’explorer comment évaluer la densité des bordures à partir des données rasters RPG original + OSO avec une résolution spatiale de 10m.\nCes tests sont réalisées sur les sites d’échantillonnage d’Ille-et-Vilaine (d35 N=227) en utilisant une taille de buffer de 1500m.\nPour calculer les densités de bordures, il faut définir quelles interfaces à considérer. Ici, on a testé deux approches:\n\nlongueur d’interfaces entre les cultures et les habitats semi-naturels\nlongueur d’interfaces entre les cultures répertoriées dans le RPG\n\nLa densités de bordures depend aussi de la résolution spatiale. Ici on va tester 3 résolutions: 10m (résolution originale), 20m, 50m."
+  },
+  {
+    "objectID": "analysis/04_bordure.html#objectif",
+    "href": "analysis/04_bordure.html#objectif",
+    "title": "Exploration de la densité de bordures",
+    "section": "",
+    "text": "L’objectif de ce document est d’explorer comment évaluer la densité des bordures à partir des données rasters RPG original + OSO avec une résolution spatiale de 10m.\nCes tests sont réalisées sur les sites d’échantillonnage d’Ille-et-Vilaine (d35 N=227) en utilisant une taille de buffer de 1500m.\nPour calculer les densités de bordures, il faut définir quelles interfaces à considérer. Ici, on a testé deux approches:\n\nlongueur d’interfaces entre les cultures et les habitats semi-naturels\nlongueur d’interfaces entre les cultures répertoriées dans le RPG\n\nLa densités de bordures depend aussi de la résolution spatiale. Ici on va tester 3 résolutions: 10m (résolution originale), 20m, 50m."
+  },
+  {
+    "objectID": "analysis/04_bordure.html#interfaces-cultivé-vs-semi-naturel",
+    "href": "analysis/04_bordure.html#interfaces-cultivé-vs-semi-naturel",
+    "title": "Exploration de la densité de bordures",
+    "section": "Interfaces cultivé vs semi-naturel",
+    "text": "Interfaces cultivé vs semi-naturel"
+  },
+  {
+    "objectID": "analysis/04_bordure.html#interfaces-entre-cultures",
+    "href": "analysis/04_bordure.html#interfaces-entre-cultures",
+    "title": "Exploration de la densité de bordures",
+    "section": "Interfaces entre cultures",
+    "text": "Interfaces entre cultures"
+  },
+  {
+    "objectID": "analysis/04_bordure.html#example-dun-buffer",
+    "href": "analysis/04_bordure.html#example-dun-buffer",
+    "title": "Exploration de la densité de bordures",
+    "section": "Example d’un buffer",
+    "text": "Example d’un buffer\n\nInterfaces cultures vs semi-naturels\n\n\n\n\n\n\n\n\nFigure 1: Calcul des interfaces entre les cultures et les habitats semi-naturels sur un buffer de 1500m\n\n\n\n\n\n\n\nInterfaces entre cultures\n\n\n\n\n\n\n\n\nFigure 2: Calcul des interfaces entre cultures sur un buffer de 1500m\n\n\n\n\n\nSummary:\n\nIl est possible de calculer les longueurs d’interfaces entre différentes catégories directement sous R en faisant l’opération par buffer.\nLa résolution à 10m permet de capturer toutes les interfaces, mais est sensible aux imprécisions de la numérisation des parcelles (incohérences RPG-OSO).\n\nLa résolution à 50m est peut-etre trop grossière mais permet d’éliminer les incohérences ou les artefacts liés à la numérisation des parcelles."
+  },
+  {
+    "objectID": "analysis/04_bordure.html#comparaison",
+    "href": "analysis/04_bordure.html#comparaison",
+    "title": "Exploration de la densité de bordures",
+    "section": "Comparaison",
+    "text": "Comparaison\n\n\n\n\n\n\n\n\nFigure 3: Correlation entre les longueurs d’interfaces calculées sur les 187 buffers d’Ille-et-Vilaine\n\n\n\n\n\nLes longueurs d’interfaces entre les cultures et les habitats semi-naturels ne sont pas corrélés avec les longueurs d’interfaces entre cultures. La résolution de 20m semble un bon compromis entre les résolutions à 10m et à 50m."
+  },
+  {
+    "objectID": "analysis/04_bordure.html#zoom-in",
+    "href": "analysis/04_bordure.html#zoom-in",
+    "title": "Exploration de la densité de bordures",
+    "section": "Zoom in",
+    "text": "Zoom in\n\nMin-max outliers\n\n\n\n\n\n\n\n\nFigure 4: Exemple de buffers avec des longueurs d’interfaces extrèmes\n\n\n\n\n\n\n\nGrande influence de la résolution spatiale\n\n\n\n\n\n\n\n\nFigure 5: Exemple de buffers avec des longueurs d’interfaces qui varient selon l’echelle spatiale\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 6: Vue dynamique des buffers avec une grande différence selon l’echelle spatiale"
   }
 ]

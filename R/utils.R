@@ -72,3 +72,38 @@ plotly_df <- function(df, xlab = "dataset") {
     config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
   return(fig)
 }
+
+
+edges <- function(x, id = NULL, rm = c(), out = c("lines", "perim")) {
+  # transform as SpatVect if needed
+  if ("sf" %in% class(x)) {
+    x <- vect(x)
+  }
+  if (!"SpatVector" %in% class(x)) {
+    stop("Need a SpatVector")
+  }
+  if (is.null(id)) {
+    id <- names(x)[1]
+  }
+  # define the output format
+  out <- match.arg(out, c("lines", "perim"))
+  # transform as line
+  li_all <- as.lines(x)
+  # get the lines of the out border
+  li_outer <- as.lines(aggregate(x))
+  # get the lines of the out border
+  li_rm <- li_all[values(x)[, id] %in% rm]
+
+  # erase the outer border
+  li_edge <- erase(li_all, li_outer)
+  # erase the lines to remove
+  li_edge <- erase(li_edge, li_rm)
+  # remove duplicated lines
+  li_edge <- aggregate(li_edge)
+  # output the edges
+  if (out == "lines") {
+    return(li_edge)
+  } else {
+    return(perim(li_edge))
+  }
+}
