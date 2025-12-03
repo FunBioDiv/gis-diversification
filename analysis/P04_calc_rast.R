@@ -1,9 +1,11 @@
 # Get indicators from rasters RPG+OSO 10m
+# run rouglhy in 1h
 # input:
 #   data/derived-data/Landcover_RPG-OSO_2016_2023.tif (29Gb)
 #   data/data/raw-data/fields_FR.gpkg
 # output:
 #   data/derived-data/raster_indicators.csv
+#   data/derived-data/raster_edges.csv
 
 suppressWarnings({
   library(terra)
@@ -58,17 +60,22 @@ pt_lulc <- extract(rpgoso, pts, ID = FALSE)
 
 # get land cover at year N to N-5
 # identify the matching layer corresponding to the time of observation
-t_obs <- match(pts$Year, names(pt_lulc))
+t0_obs <- match(pts$Year, names(pt_lulc))
+t1_obs <- match(as.character(as.numeric(pts$Year) - 1), names(pt_lulc))
+t2_obs <- match(as.character(as.numeric(pts$Year) - 2), names(pt_lulc))
+t3_obs <- match(as.character(as.numeric(pts$Year) - 3), names(pt_lulc))
+t4_obs <- match(as.character(as.numeric(pts$Year) - 4), names(pt_lulc))
+t5_obs <- match(as.character(as.numeric(pts$Year) - 5), names(pt_lulc))
 # unique(pts$Year[is.na(t_obs)]) # 2014, 2015, 2024
 
 # get the values at time N
 lulc_id <- data.frame(
-  "lulc_N" = pt_lulc[cbind(1:nrow(pts), t_obs)],
-  "lulc_N1" = pt_lulc[cbind(1:nrow(pts), ifelse(t_obs > 1, t_obs - 1, NA))],
-  "lulc_N2" = pt_lulc[cbind(1:nrow(pts), ifelse(t_obs > 2, t_obs - 2, NA))],
-  "lulc_N3" = pt_lulc[cbind(1:nrow(pts), ifelse(t_obs > 3, t_obs - 3, NA))],
-  "lulc_N4" = pt_lulc[cbind(1:nrow(pts), ifelse(t_obs > 4, t_obs - 4, NA))],
-  "lulc_N5" = pt_lulc[cbind(1:nrow(pts), ifelse(t_obs > 5, t_obs - 5, NA))]
+  "lulc_N" = pt_lulc[cbind(1:nrow(pts), t0_obs)],
+  "lulc_N1" = pt_lulc[cbind(1:nrow(pts), t1_obs)],
+  "lulc_N2" = pt_lulc[cbind(1:nrow(pts), t2_obs)],
+  "lulc_N3" = pt_lulc[cbind(1:nrow(pts), t3_obs)],
+  "lulc_N4" = pt_lulc[cbind(1:nrow(pts), t4_obs)],
+  "lulc_N5" = pt_lulc[cbind(1:nrow(pts), t5_obs)]
 )
 
 # transform with class names
@@ -111,6 +118,8 @@ dim(all[match(pts$ID, all$ID), ])
 
 out <- data.frame(
   "ID" = pts$ID,
+  "Study_ID" = pts$Study_ID,
+  "Year" = pts$Year,
   lulc_id,
   all[match(pts$ID, all$ID), -1]
 )
@@ -126,3 +135,64 @@ write.csv(
 
 # all$ID[which(all$frac1500_24 > 0)]
 # all$ID[which(all$frac1500_30000 > 0)]
+
+## 4. Get edge density -----------------------------
+buff <- buffer(pts, 1500)
+
+# SNC
+newclass <- ref[, c("new_code", "class_id")]
+newclass <- newclass[!duplicated(newclass) & complete.cases(newclass), ]
+labclass <- ref[, c("class_id", "class_label")]
+labclass <- labclass[!duplicated(labclass) & complete.cases(labclass), ]
+
+#RPG
+labref <- ref[, c("new_code", "nom")]
+labref <- labref[!duplicated(labref$new_code) & complete.cases(labref), ]
+labrm <- ref$nom[ref$class_label != "agriculture"]
+
+density <- c()
+# loop over the buffers
+for (i in 1:length(buff)) {
+  if (i %% 100 == 0) {
+    print(i)
+  }
+  bi <- buff[i]
+  yri <- bi$Year
+  if (yri %in% names(rpgoso)) {
+    ri <- crop(rpgoso[yri], bi, mask = TRUE)
+    # crop - SNH
+    ci <- classify(ri, newclass)
+    set.cats(ci, value = labclass)
+    e_SNC_10m <- edges(as.polygons(ci), rm = "Impermeable", out = "perim")
+    c2 <- aggregate(ci, 2)
+    e_SNC_20m <- edges(as.polygons(c2), rm = "Impermeable", out = "perim")
+    c5 <- aggregate(ci, 5)
+    e_SNC_50m <- edges(as.polygons(c5), rm = "Impermeable", out = "perim")
+
+    # crops RPG
+    set.cats(ri, value = labref)
+    e_RPG_10m <- edges(as.polygons(ri), rm = labrm, out = "perim")
+    r2 <- aggregate(ri, 2)
+    e_RPG_20m <- edges(as.polygons(r2), rm = labrm, out = "perim")
+    r5 <- aggregate(ri, 5)
+    e_RPG_50m <- edges(as.polygons(r5), rm = labrm, out = "perim")
+
+    #fmt: skip
+    outi <- c(unlist(values(bi)), 
+              e_SNC_10m, e_SNC_20m, e_SNC_50m, e_RPG_10m, e_RPG_20m, e_RPG_50m)
+    density <- rbind(density, outi)
+  }
+}
+colnames(density)[5:10] <- c(
+  "e_SNC_10m",
+  "e_SNC_20m",
+  "e_SNC_50m",
+  "e_RPG_10m",
+  "e_RPG_20m",
+  "e_RPG_50m"
+)
+write.csv(
+  density,
+  here("data", "derived-data", "raster_edges.csv"),
+  row.names = FALSE
+)
