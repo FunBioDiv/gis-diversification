@@ -2,7 +2,7 @@
 
 Extraction des métriques de diversification depuis les coordonnées des sites de prélèvements.
 
-Les données sont sauvegardées dans le répertoire Nextcloud WP2/gis-diversification/data
+Les données sont sauvegardées dans le répertoire Nextcloud WP2/gis-diversification/data/
 
 Pour le moment, ce sont seulement des documents exploratoires: 
 
@@ -22,12 +22,13 @@ quarto::quarto_render("analysis/02_land_cover.qmd")
 quarto::quarto_render("analysis/03_field_size.qmd")
 ```
 
-#### 4. Exploration de la densité de bordures
+#### 4. exploration de la densité de bordures
 ```r
 quarto::quarto_render("analysis/04_bordure.qmd")
 ```
 
-#### 5. Summary
+#### 5. summary 
+(~5 min to render)
 ```r
 quarto::quarto_render("analysis/05_summary.qmd")
 ```
