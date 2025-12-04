@@ -42,7 +42,7 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...) {
 }
 
 
-plotly_df <- function(df, xlab = "dataset") {
+plotly_df <- function(df, xlab = "project") {
   pal <- pals::glasbey(ncol(df)) #cols25
   fig <- plot_ly(df, type = "bar", name = "Land cover")
   for (i in 1:ncol(df)) {

@@ -27,11 +27,11 @@ execute:
 
 ### Datasets 
 
-- **Registre Parcellaire Graphique (RPG)**(45Gb): annual field crop data for the period 2007-2023 available at France scale on IGN website: <https://geoservices.ign.fr/rpg>. Definition of field (parcelles) are coherent only in the recent period 2015-2023.    
+- **Registre Parcellaire Graphique (RPG)**(45Gb): annual field crop data for the period 2007-2024 available at France scale on IGN website: <https://geoservices.ign.fr/rpg>. Definition of field (parcelles) are coherent only in the recent period 2015-2023.    
 - **Carte d’occupation des sols du CES OSO – THEIA (OSO)**(6.6Gb): annual land cover data for the period 2016-2024. Available for France in raster format and 10m resolution <https://doi.org/10.57745/UZ2NJ7>. Official access through the CNES website <https://geodes-portal.cnes.fr>.   
 - **BD Haies v2** (6.8Gb): hedgerows dataset for France available on the IGN website: <https://geoservices.ign.fr/bdhaie>. BD Haie v2 was produced from satellite images of 2020-2022 (which is a better fit to our data than v1 from images of 2011-2014).  
 
-- *RPG complété*: add missing crop field data that was not officially reported in the Common Agricultural Policy (PAC in French acronym) so absent from the `RPG` dataset. It uses a combination of datasets from cadastre, IGN BD TOPO and OSO. Data is publicly available for the period 2018-2023 and it could be retrieve for the year 2016-2017 directly from Pierre Cantelaube (INRAE - ODR). The year 2024 will not be available in time for our project. The dataset is stored in multiple files per year and per regions or department <https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022>. The main issue is that the definition of parcelle in `RPG` is different from cadastre in `RPG complété`, so if may bring biases in the vectorial calculations (based on the field definition). Additionally, it is heavy to process (download hundreds of files, merge them per year, ensure consistent classes with RPG) and it might bring only little information on land cover. For this first exploration, **RPG complété was not included but the discussion is open**.
+- *RPG complété*: add missing crop field data that was not officially reported in the Common Agricultural Policy (PAC in French acronym) so absent from the `RPG` dataset. It uses a combination of datasets from cadastre, IGN BD TOPO and OSO. Data is publicly available for the period 2018-2023 and it could be retrieve for the year 2016-2017 directly from Pierre Cantelaube (INRAE - ODR). The year 2024 will not be available in time for our project. The dataset is stored in multiple files per year and per regions or department <https://entrepot.recherche.data.gouv.fr/dataverse/rpg_complete_2022>. The main issue is that the definition of parcelle in `RPG` is different from cadastre in `RPG complété`, so it may bring biases in the vectorial calculations (based on the field definition). Additionally, it is heavy to process (download hundreds of files, merge them per year, ensure consistent classes with RPG) and it might bring only limited information on land cover. For this first exploration, **RPG complété was not included but the discussion is open**.
 
 - [Land cover class harmonization](https://github.com/FunBioDiv/gis-diversification/raw/refs/heads/main/data/derived-data/RPG-OSO_classes.csv): list all classes from RPG and OSO and categorize them. This file must be double checked by expert and customized for the project objectives.
 
@@ -198,7 +198,7 @@ mapview(pts_vcg, zcol = "in_RPG", layer.name = "in_RPG") +
 
 **To be discussed:**   
 
-- Some coordinates were taken at the edge or on the boundary of the field (@fig-outsebiopagvcg), so it is not possible to clearly identify the field. In such case, using RPG complété will probably not help. Should we consider the closest field within a distance threshold (e.g. 10m)?
+- Some coordinates were taken at the edge or on the boundary of the field (@fig-outsebiopagvcg), so it is not possible to clearly identify in which field they belong. In such case, using RPG complété will probably not help. Should we consider the closest field within a distance threshold (e.g. 10m)?
 
 
 ### Field size
@@ -345,7 +345,7 @@ mapview(minF) + mapview(minP) # not up to date
 
 **To be discussed:**  
 
-- Some fields are defined as ```r ref$nom[ref$original_code == "BOR"]``` which are not field but borders (as in @fig-smallarea). Should we remove non crop fields from RPG before running the calculations?
+- Some fields are defined as ```r ref$nom[ref$original_code == "BOR"]``` which are not proper fields but borders (as in @fig-smallarea). Should we remove non crop fields from RPG before running the calculations (e.g. `Bordure`, `Bande tampon`, `Surface non agricole`, `Truffière`, `Bois paturés`)?
 
 
 ### Hedgerows length
@@ -469,8 +469,8 @@ legend(
 
 **To be discussed:**    
 
-- Which buffer size should we use to calculate the hedgerows lengths? Without buffer, it might be too restrictive, but is 10m to large, or not enough?  
-- Should we consider the position of the field sampling when calculating the hedgerows length?  
+- Which buffer size should we use to calculate the hedgerows lengths? Without buffer, it might be too restrictive, but is 10m too large, or not enough?  
+- Should we consider the location of the sampling when calculating the hedgerows length?  
 
 
 ### Field size within buffer
@@ -751,10 +751,10 @@ legend(
 ### Summary and questions about vector indicators   
 
 - Most observations have a corresponding crop field in RPG dataset (@tbl-inrpg).    
-- But some coordinates were taken at the very edges of field (@fig-outsebiopagvcg), so we might need to identify the closest field instead (and add a distance threshold, e.g. 10m).  
-- Adding the `RPG complété` require more data processing, and in any case it won't cover all observations (but it will complete some wineyards that are not registered in PAC). The `RPG complété` classes might also be less consistent within our timeframe (e.g. issue of 2016-2017) and it would require to be further checks.
-- We might need to exclude some fields from RPG (e.g. Bordure, Bande tampon, Culture sous serre, Bois paturés, Surface non agricole, Truffière) to only includes crop fields that are relevant for us. This information should be added in the file [RPG-OSO_classes.csv](https://github.com/FunBioDiv/gis-diversification/raw/refs/heads/main/data/derived-data/RPG-OSO_classes.csv).
-- The position of the observations within the field might influence the results (influence of hedgerows, or of agricultural practices). We might want to add an indicator reflecting the distance to the center of the field and/or the distance to the closest field boundary?  
+- But some coordinates were taken at the outside edge of the field (@fig-outsebiopagvcg), so we might need to identify the closest field instead (and add a distance threshold, e.g. 10m).  
+- Adding the `RPG complété` requires more data processing and it won't cover all observations (but it will help characterizing some wineyards that are not registered in the PAC). The `RPG complété` classes might be less consistent within our timeframe (e.g. issue with data from 2016-2017) so it would require further checks.
+- We might need to exclude some fields from RPG (e.g. `Bordure`, `Bande tampon`, `Surface non agricole`, `Truffière`, `Bois paturés`) to includes only crop fields that are relevant for us. This information should be added in the file [RPG-OSO_classes.csv](https://github.com/FunBioDiv/gis-diversification/raw/refs/heads/main/data/derived-data/RPG-OSO_classes.csv).
+- The sampling location within the field might influence the results (different impact of hedgerows, or of agricultural practices). We might want to add an indicator reflecting the distance to the center of the field and/or the distance to the closest field boundary?  
 
 
 ## Indicators from raster datasets (RPG+OSO)
@@ -821,13 +821,13 @@ knitr::kable(info)
 
 ```{r}
 #| label: fig-coverstudy
-#| fig-cap: "Land cover of the observations (at year N) per dataset"
+#| fig-cap: "Land cover of the observations (at year N) per project"
 
 nlulc <- data.frame(table(lulc_group[, 1], indr$Study_ID))
-names(nlulc) <- c("Cover", "Dataset", "Nobs")
+names(nlulc) <- c("Cover", "Project", "Nobs")
 plot_ly(
   nlulc,
-  x = ~Dataset,
+  x = ~Project,
   y = ~Nobs,
   color = ~Cover,
   text = ~Cover,
@@ -840,14 +840,14 @@ plot_ly(
   config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
 ```
 
-Vigne is the most common land cover (@tbl-coverclass), but the information might come from `RPG` (two classes: `Vigne (sauf vigne rouge)` and `Vigne : raisins de cuve non en production`) or `OSO`. The land cover depends greatly on dataset (@fig-coverstudy) with `OSCAR` and `BACCHUS` studying wineyards, `FRAMEwork` and `SBIOPAG` studying orchard, and the other datasets focusing on annual crops.  
+Vigne is the most common land cover (@tbl-coverclass), but the information might come from `RPG` (two classes: `Vigne (sauf vigne rouge)` and `Vigne : raisins de cuve non en production`) or `OSO`. The land cover depends greatly on the project (@fig-coverstudy) with `OSCAR` and `BACCHUS` studying wineyards, `FRAMEwork` and `SBIOPAG` studying orchard, and the other projects focusing on annual crops.  
 
 Let's have a look at the crop rotations over the 6-year period (N:N-5).  
 
 
 ```{r}
 #| label: fig-nyearstudy
-#| fig-cap: "Length of the land cover time series per dataset."
+#| fig-cap: "Length of the land cover time series per project."
 
 # barplot(
 #   table(nyear),
@@ -1033,15 +1033,14 @@ plotly_df(data.frame(t(mean_buffer)), xlab = "Buffer size")
 ## year
 ```{r}
 #| label: fig-coveryear
-#| fig-cap: "Average land cover grouped in 36 categories per buffer size"
-# number of classes per buffer
+#| fig-cap: "Average land cover grouped in 36 categories per year"
 
 py1500 <- data.frame(
   rowsum(gr1500, indr$Year, na.rm = TRUE) /
     as.numeric(tapply(rowSums(gr1500) > 0, indr$Year, sum))
 )
 
-plotly_df(py1500)
+plotly_df(py1500, xlab = "Year")
 
 ```
 
@@ -1060,7 +1059,7 @@ The average land cover within buffers among all observations is not really influ
 
 ```{r}
 #| label: fig-bcoverstudy500
-#| fig-cap: "Average land cover per dataset with buffer of 500m"
+#| fig-cap: "Average land cover per project with buffer of 500m"
 
 pc500 <- data.frame(
   rowsum(gr500, indr$Study_ID, na.rm = TRUE) /
@@ -1074,7 +1073,7 @@ plotly_df(pc500)
 
 ```{r}
 #| label: fig-bcoverstudy1000
-#| fig-cap: "Average land cover per dataset with buffer of 1000m"
+#| fig-cap: "Average land cover per project with buffer of 1000m"
 
 pc1000 <- data.frame(
   rowsum(gr1000, indr$Study_ID, na.rm = TRUE) /
@@ -1088,7 +1087,7 @@ plotly_df(pc1000)
 
 ```{r}
 #| label: fig-bcoverstudy1500
-#| fig-cap: "Average land cover per dataset with buffer of 1500m"
+#| fig-cap: "Average land cover per project with buffer of 1500m"
 
 pc1500 <- data.frame(
   rowsum(gr1500, indr$Study_ID, na.rm = TRUE) /
@@ -1366,13 +1365,13 @@ boxplot(
 
 ### Summary and questions about raster indicators:   
 
-- Annual raster combining RPG and OSO for the whole France simplify the extraction of information on crop rotations, proportion of land cover within buffers and edge length density. 
+- Annual rasters combining RPG and OSO for the whole France simplify the extraction of indicators on crop rotations, proportion of land cover within buffers and edge length density. 
 
-- There are up to ```r info$n_classes[3]``` land cover in the RPG+OSO dataset. Here we simplified it using the *Référentiel des cultures* as an illustration. Before the extracted information can be usefull in the project, it requires further work on land cover class homogeneization. This will be done independantly from the GIS data extraction.   
+- There are up to ```r info$n_classes[3]``` land cover classes in the RPG+OSO dataset. Here we simplified it using the *Référentiel des cultures* (36 categories) as an illustration. Further work on land cover class homogeneization is needed to make use of the extracted information. This will be done independantly from the GIS data extraction.   
 
 - The edge density needs further thinking to decide which kind of edges should be quantified, and at what scale. At 10m, the indicators might be more influenced by artefacts. At 50m, the indicators might ignore important small patches.
 
-- The OSO data for year 2016-2017 use different classes and crops are grouped into only two classes: `cultures d'été` and `culture d'hiver`. This might artificially inflate the crop rotations (changes in land cover due to changes in GIS methodology instead of changes in crop practices) and it could potentially impact all indicators. Yet it is quite important to get *older* historical land cover. 
+- The OSO data for year 2016-2017 use different classes, e.g. crops are grouped into only two classes: `cultures d'été` and `culture d'hiver`. This might artificially inflate crop rotations (changes in land cover due to changes in GIS methodology instead of changes in crop practices) and it could potentially impact all indicators. Yet it is important to use *older* land cover if we want to characterize crop rotations on multiple years. 
 
-- We could add `RPG complété` in the land cover rasters, but that might create discrepancies among classes and it would require more care in the class homogeneization step.
+- We could add `RPG complété` in the land cover rasters, but that might create discrepancies among classes and it would require additional care in the class homogeneization step.
 
