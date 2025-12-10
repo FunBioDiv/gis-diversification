@@ -1146,9 +1146,9 @@ ci <- classify(ri, newclass)
 set.cats(ci, value = labclass)
 c1 <- as.polygons(ci)
 e_SNC_10m <- edges(c1, rm = "Impermeable")
-c2 <- resample(ci, 2) |> as.polygons()
+c2 <- aggregate(ci, 2, fun = "modal") |> as.polygons()
 e_SNC_20m <- edges(c2, rm = "Impermeable")
-c5 <- resample(ci, 5) |> as.polygons()
+c5 <- aggregate(ci, 5, fun = "modal") |> as.polygons()
 e_SNC_50m <- edges(c5, rm = "Impermeable")
 
 plot(
@@ -1182,9 +1182,9 @@ plot(e_SNC_50m, add = TRUE, lwd = 2, col = "red")
 set.cats(ri, value = labref)
 r1 <- as.polygons(ri)
 e_RPG_10m <- edges(r1, rm = labrm)
-r2 <- resample(ri, 2) |> as.polygons()
+r2 <- aggregate(ri, 2, fun = "modal") |> as.polygons()
 e_RPG_20m <- edges(r2, rm = labrm)
-r5 <- resample(ri, 5) |> as.polygons()
+r5 <- aggregate(ri, 5, fun = "modal") |> as.polygons()
 e_RPG_50m <- edges(r5, rm = labrm)
 
 plot(
@@ -1333,9 +1333,6 @@ edges <- sapply(edges, as.numeric)
 pairs(edges, lower.panel = panel.smooth, upper.panel = panel.cor)
 ```
 
-It is surprising that edge density calculated at 10m resolution are not highly correlated with edge density calculated at 20m or 50m (@fig-coredge). That might indicate the strong influence of artefacts in the 10m calculation. 
-
-The length of semi-natural vs crop (SNC) edge is correlated to the length of the crop (RPG) edge suggesting that more patchy landscapes also have more patchy crop fields.  
 
 
 ```{r}
@@ -1369,9 +1366,11 @@ boxplot(
 
 - There are up to ```r info$n_classes[3]``` land cover classes in the RPG+OSO dataset. Here we simplified it using the *Référentiel des cultures* (36 categories) as an illustration. Further work on land cover class homogeneization is needed to make use of the extracted information. This will be done independantly from the GIS data extraction.   
 
-- The edge density needs further thinking to decide which kind of edges should be quantified, and at what scale. At 10m, the indicators might be more influenced by artefacts. At 50m, the indicators might ignore important small patches.
+- The edge density needs further thinking to decide which kind of edges should be quantified, and at what scale. The spatial resolution depends on the minimum size of the patches that we want to consider.
 
 - The OSO data for year 2016-2017 use different classes, e.g. crops are grouped into only two classes: `cultures d'été` and `culture d'hiver`. This might artificially inflate crop rotations (changes in land cover due to changes in GIS methodology instead of changes in crop practices) and it could potentially impact all indicators. Yet it is important to use *older* land cover if we want to characterize crop rotations on multiple years. 
 
 - We could add `RPG complété` in the land cover rasters, but that might create discrepancies among classes and it would require additional care in the class homogeneization step.
+
+- The resolution of 10m might be to rough for the caracterization of the crop fields. We might want to consider 5m or 2m spatial resolution (but we are also constrained by OSO).
 

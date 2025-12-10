@@ -104,6 +104,10 @@ edges <- function(x, id = NULL, rm = c(), out = c("lines", "perim")) {
   if (out == "lines") {
     return(li_edge)
   } else {
-    return(perim(li_edge))
+    if (length(li_edge) == 0) {
+      return(0)
+    } else {
+      return(perim(li_edge))
+    }
   }
 }

@@ -1,5 +1,5 @@
 # Get indicators from rasters RPG+OSO 10m
-# run rouglhy in 1h
+# run roughly in 1h
 # input:
 #   data/derived-data/Landcover_RPG-OSO_2016_2023.tif (29Gb)
 #   data/data/raw-data/fields_FR.gpkg
@@ -130,11 +130,8 @@ write.csv(
   row.names = FALSE
 )
 
-# lab <- sort(unique(sapply(strsplit(names(all)[-1], "_"), function(x) x[[2]])))
-# lab_class <- miniref$fullname[match(lab, miniref$new_code)]
-
-# all$ID[which(all$frac1500_24 > 0)]
-# all$ID[which(all$frac1500_30000 > 0)]
+lab <- sort(unique(sapply(strsplit(names(all)[-1], "_"), function(x) x[[2]])))
+lab_class <- miniref$fullname[match(lab, miniref$new_code)]
 
 ## 4. Get edge density -----------------------------
 buff <- buffer(pts, 1500)
@@ -145,7 +142,7 @@ newclass <- newclass[!duplicated(newclass) & complete.cases(newclass), ]
 labclass <- ref[, c("class_id", "class_label")]
 labclass <- labclass[!duplicated(labclass) & complete.cases(labclass), ]
 
-#RPG
+# RPG
 labref <- ref[, c("new_code", "nom")]
 labref <- labref[!duplicated(labref$new_code) & complete.cases(labref), ]
 labrm <- ref$nom[ref$class_label != "agriculture"]
@@ -164,17 +161,17 @@ for (i in 1:length(buff)) {
     ci <- classify(ri, newclass)
     set.cats(ci, value = labclass)
     e_SNC_10m <- edges(as.polygons(ci), rm = "Impermeable", out = "perim")
-    c2 <- aggregate(ci, 2)
+    c2 <- aggregate(ci, 2, fun = "modal")
     e_SNC_20m <- edges(as.polygons(c2), rm = "Impermeable", out = "perim")
-    c5 <- aggregate(ci, 5)
+    c5 <- aggregate(ci, 5, fun = "modal")
     e_SNC_50m <- edges(as.polygons(c5), rm = "Impermeable", out = "perim")
 
     # crops RPG
     set.cats(ri, value = labref)
     e_RPG_10m <- edges(as.polygons(ri), rm = labrm, out = "perim")
-    r2 <- aggregate(ri, 2)
+    r2 <- aggregate(ri, 2, fun = "modal")
     e_RPG_20m <- edges(as.polygons(r2), rm = labrm, out = "perim")
-    r5 <- aggregate(ri, 5)
+    r5 <- aggregate(ri, 5, fun = "modal")
     e_RPG_50m <- edges(as.polygons(r5), rm = labrm, out = "perim")
 
     #fmt: skip
