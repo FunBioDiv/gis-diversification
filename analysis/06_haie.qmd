@@ -1,0 +1,346 @@
+---
+title: "Exploration des haies"
+author: Romain Frelat
+date: today
+format: 
+  html:
+    toc: true
+execute:
+  echo: false
+  warning: false
+---
+
+```{r setup}
+suppressWarnings({
+  library(terra)
+  library(sf)
+  library(here)
+  library(mapview)
+  library(leafsync)
+})
+
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data")
+outfolder <- here("data", "derived-data")
+
+
+# load matching rpg data
+pts <- vect(here(datafolder, "fields_FR.gpkg"), "fields_FR")
+pts$ID <- paste(pts$Study_ID, pts$Site, pts$Year, sep = "_")
+rpg_fields <- vect(here("data", "derived-data", "vector_parcels.gpkg"))
+indv <- read.csv(here("data", "derived-data", "vector_indicators.csv"))
+
+departments <- vect(here(datafolder, "departement.gpkg"))
+pts$Dep <- extract(departments, pts)$code_insee
+indv$Dep <- pts$Dep[match(indv$ID, pts$ID)]
+
+rpg33 <- rpg_fields[
+  rpg_fields$ID_PARCEL %in% indv$ID_PARCEL[indv$Dep == "33"],
+]
+
+rpg33_buff10 <- buffer(rpg33, 10)
+rpg33_buff10 <- rpg33_buff10[!duplicated(rpg33_buff10$ID_PARCEL)]
+
+bdhaie_33 <- vect(
+  here("data", "raw-data", "haie_2-0.gpkg"),
+  filter = vect(ext(rpg33_buff10))
+)
+```
+
+
+## Objectif
+
+L'objectif de ce document est de comparer les informations sur les haies entre:
+
+- BD Haie v2 de mars 2024 <https://geoservices.ign.fr/bdhaie> (France entière, vectoriel, 6.8Gb) issues d'images satellite de 2020-2022
+- Grain Bocager <https://geoservices.ign.fr/grain-bocager> (par département, raster 5m, ~2.5Gb) issues des données de Modèle Numérique de Hauteur de Canopée 2020-2022
+- CoSIA <https://geoservices.ign.fr/cosia> (par departement, vectoriel, 1.4Gb), couverture du sol par IA avec 15 classes définies à partir de données à très haute résolution (20cm). Deux millésimes, tous les 3 ans (2017-2020, 2021-2023), 1/3 des départements de France par an.
+- Liu *et al.* (2023) <https://zenodo.org/records/8154445> (monde, raster 30m, 14Gb). Couverture et biomass des éléments ligneux en dehors des forets.
+
+Ces tests sont réalisées sur les sites d’échantillonnage de Gironde (d33, N=338) et d'Ille-et-Vilaine (d35 N=227), en utilisant une taille de buffer de 10m autour des parcelles identifié par le RPG.  
+
+
+## Comparaison visuelle sur une parcelle
+
+### Grain Bocager
+
+```{r load33}
+sub <- rpg33_buff10[39]
+zoom <- vect(ext(sub) + 100, crs(sub))
+
+gb33 <- here("data", "poc", "grain_bocager_33_2021", "2021")
+type <- rast(here(gb33, "33_2021_type_boisement.tif"))
+influence <- rast(here(gb33, "33_2021_distance_influence.tif"))
+grainb <- rast(here(gb33, "33_2021_grain_bocager_5m.tif"))
+grainb50 <- rast(here(gb33, "33_2021_grain_bocager_50m.tif"))
+```
+
+
+```{r}
+#| label: fig-mapgrain
+#| fig-cap: "Carte du Grain Bocager, zoom sur une parcelle"
+par(mfrow = c(2, 2))
+plot(crop(type, zoom), main = "Type de boisement")
+plot(crop(influence, zoom), main = "Distance influence")
+plot(crop(grainb, zoom), main = "Grain Bocager 5m")
+plot(crop(grainb50, zoom), main = "Grain Bocager 50m")
+```
+
+
+
+```{r}
+#| label: fig-mapzoom
+#| fig-cap: "Carte Interactive, zoom sur une parcelle"
+mapview(
+  crop(type, zoom),
+  alpha.regions = 0.5,
+  layer.name = "Grain Bocager"
+) +
+  mapview(sub, color = "red", alpha.regions = 0, layer.name = "RPG") +
+  mapview(
+    crop(bdhaie_33, zoom),
+    color = "blue",
+    lwd = 3,
+    layer.name = "BDHaie"
+  )
+```
+
+
+
+### CoSIA
+
+```{r}
+#| label: fig-mapcosia
+#| fig-cap: "Carte de CoSIA, zoom sur une parcelle"
+cos33 <- here("data", "poc", "COSIA_1-0__GPKG_LAMB93_D033_2021-01-01")
+cosia <- vect(here(cos33, "D033_2021_440_6440_vecto.gpkg"))
+
+plot(crop(cosia, zoom), main = "CoSIA", y = "classe")
+```
+
+```{r}
+#| label: fig-mapintcosia
+#| fig-cap: "Interactive carte de CoSIA, zoom sur une parcelle"
+mapview(crop(cosia, zoom), zcol = "classe", layer.name = "CoSIA") +
+  mapview(
+    sub,
+    color = "black",
+    lwd = 2,
+    alpha.regions = 0,
+    layer.name = "RPG"
+  ) +
+  mapview(
+    crop(bdhaie_33, zoom),
+    color = "red",
+    lwd = 3,
+    layer.name = "BDHaie"
+  )
+```
+
+
+### Liu Canopy over
+
+```{r}
+#| label: fig-mapliu
+#| fig-cap: "Carte de Liu 2023, zoom sur une parcelle"
+liucov <- rast(here("data", "raw-data", "planet_canopy_cover_30m_v0.1.tif"))
+
+liucov_33 <- crop(liucov, project(rpg33_buff10, crs(liucov)))
+
+liubio <- rast(here("data", "raw-data", "planet_agb_30m_v0.1.tif"))
+liubio_33 <- crop(liubio, project(rpg33_buff10, crs(liubio)))
+
+par(mfrow = c(1, 2))
+plot(
+  crop(liucov_33, project(zoom, crs(liucov_33))),
+  main = "Liu_2023 Forest cover"
+)
+
+plot(
+  crop(liubio_33, project(zoom, crs(liubio_33))),
+  main = "Liu_2023 Forest biomass"
+)
+```
+
+
+```{r}
+#| label: fig-mapintliu
+#| fig-cap: "Carte interactive de Liu 2023 Couverture (%), zoom sur une parcelle"
+mapview(
+  crop(liucov_33, project(zoom, crs(liucov_33))),
+  alpha.regions = 0.7,
+  layer.name = "Liu_2023_cover"
+) +
+  mapview(
+    sub,
+    color = "black",
+    lwd = 2,
+    alpha.regions = 0,
+    layer.name = "RPG"
+  ) +
+  mapview(
+    crop(bdhaie_33, zoom),
+    color = "red",
+    lwd = 3,
+    layer.name = "BDHaie"
+  )
+```
+
+
+
+
+
+## Comparaison des indicateurs
+
+On peut comparer les indicateurs calculés à partir des différentes sources d'information sur les parcelles RPG (+10m buffer):
+
+- BDHaie: densité des haies dans BD Haie (distance linéaire divisé par la surface) en m/ha 
+- Liu2023_cover: pourcentage moyen d'éléments ligneux par parcelle
+- Liu2023_kg_pha: densité de biomass (=cover*height) d'élements ligneux par parcelle en kg/ha
+- GrBoc: pourcentage de la parcelle avec des elements répertoriés dans Grain Bocager
+- GrBoc_1: pourcentage de la parcelle avec des arbres isolés (class 1)
+- GrBoc_5: pourcentage de la parcelle avec des haies (class 5)
+- GrBoc_10: pourcentage de la parcelle avec des massifs (class 10)
+- CoSIA_Feuillu: pourcentage de la parcelle classé comme *Feuillu* 
+
+### Gironde (33)
+```{r}
+#| label: fig-cor33
+#| fig-cap: "Correlation Gironde"
+
+# Grain bocager
+type_33 <- exactextractr::exact_extract(
+  type,
+  st_as_sf(rpg33_buff10),
+  fun = "frac",
+  progress = FALSE
+)
+
+# Liu 2023
+ext_liucov_33 <- exactextractr::exact_extract(
+  liucov_33,
+  st_as_sf(project(rpg33_buff10, crs(liucov_33))),
+  fun = "mean",
+  progress = FALSE
+)
+
+ext_liubio_33 <- exactextractr::exact_extract(
+  liubio_33,
+  st_as_sf(project(rpg33_buff10, crs(liubio_33))),
+  fun = "sum",
+  progress = FALSE
+)
+
+# BD Haie
+haie_rpg <- intersect(bdhaie_33, rpg33_buff10)
+length_bdhaie_33 <- tapply(perim(haie_rpg), haie_rpg$ID_PARCEL, sum)
+
+ext_bdhaie33 <- length_bdhaie_33[match(
+  rpg33_buff10$ID_PARCEL,
+  names(length_bdhaie_33)
+)]
+
+# COSIA
+cosia_out <- read.csv(here("data", "derived-data", "Cosia_d33.csv"))
+ext_cosia <- cosia_out$Cosia_Feuillu_Area_ha[match(
+  rpg33_buff10$ID_PARCEL,
+  cosia_out$ID_PARCEL
+)]
+
+
+rpg33_buff10$Area_buffer <- expanse(rpg33_buff10) * 0.0001
+out_33 <- data.frame(
+  "BD_Haie_m_pha" = ext_bdhaie33 / rpg33_buff10$Area_buffer,
+  "Liu_2023_cover" = ext_liucov_33,
+  "Liu_2023_kg_pha" = ext_liubio_33 / rpg33_buff10$Area_buffer,
+  "GrBoc" = 1 - type_33$frac_0,
+  "GrBoc_1" = type_33$frac_1,
+  "GrBoc_5" = type_33$frac_5,
+  "GrBoc_10" = type_33$frac_10,
+  "CoSIA_Feuillu" = ext_cosia / rpg33_buff10$Area_buffer
+)
+pairs(out_33, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+
+
+### Ille-et-Vilaine (35)
+
+```{r}
+#| label: fig-cor35
+#| fig-cap: "Correlation Ille et Vilaine"
+
+rpg35 <- rpg_fields[
+  rpg_fields$ID_PARCEL %in% indv$ID_PARCEL[indv$Dep == "35"],
+]
+rpg35_buff10 <- buffer(rpg35, 10)
+
+# Grain bocager
+gb35 <- here("data", "poc", "grain_bocager_35_2020", "2020")
+type <- rast(here(gb35, "35_2020_type_boisement.tif"))
+type_35 <- exactextractr::exact_extract(
+  type,
+  st_as_sf(rpg35_buff10),
+  fun = "frac",
+  progress = FALSE
+)
+
+# Liu 2023
+liucov_35 <- crop(liucov, project(rpg35_buff10, crs(liucov)))
+ext_liucov_35 <- exactextractr::exact_extract(
+  liucov_35,
+  st_as_sf(project(rpg35_buff10, crs(liucov_35))),
+  fun = "mean",
+  progress = FALSE
+)
+liubio_35 <- crop(liubio, project(rpg35_buff10, crs(liubio)))
+ext_liubio_35 <- exactextractr::exact_extract(
+  liubio_35,
+  st_as_sf(project(rpg35_buff10, crs(liubio_35))),
+  fun = "sum",
+  progress = FALSE
+)
+
+# BD Haie
+bdhaie_35 <- vect(
+  here("data", "raw-data", "haie_2-0.gpkg"),
+  filter = vect(ext(rpg35_buff10))
+)
+haie_rpg <- intersect(bdhaie_35, rpg35_buff10)
+length_bdhaie_35 <- tapply(perim(haie_rpg), haie_rpg$ID_PARCEL, sum)
+
+ext_bdhaie35 <- length_bdhaie_35[match(
+  rpg35_buff10$ID_PARCEL,
+  names(length_bdhaie_35)
+)]
+
+# COSIA
+cosia_out <- read.csv(here("data", "derived-data", "Cosia_d35.csv"))
+ext_cosia <- cosia_out$Cosia_Feuillu_Area_ha[match(
+  rpg35_buff10$ID_PARCEL,
+  cosia_out$ID_PARCEL
+)]
+
+rpg35_buff10$Area_buffer <- expanse(rpg35_buff10) * 0.0001
+out_35 <- data.frame(
+  "BD_Haie_m_pha" = ext_bdhaie35 / rpg35_buff10$Area_buffer,
+  "Liu_2023_cover" = ext_liucov_35,
+  "Liu_2023_kg_pha" = ext_liubio_35 / rpg35_buff10$Area_buffer,
+  "GrBoc" = 1 - type_35$frac_0,
+  "GrBoc_1" = type_35$frac_1,
+  "GrBoc_5" = type_35$frac_5,
+  "GrBoc_10" = type_35$frac_10,
+  "CoSIA_Feuillu" = ext_cosia / rpg35_buff10$Area_buffer
+)
+pairs(out_35, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+
+## Résumé
+
+- Les données de `CoSIA` sont très précises mais très lourde à utiliser
+- Les donnees brutes de `Grain Bocager` à 5m sont intéressantes et corrélées aux données `CoSIA` (meme donnée source)
+- Les données de Liu 2023 ont une echelle trop grossiere pour le projet
+- La densité de haies calculée avec `Grain Bocager`, `CoSIA` et `Liu_2023` sont fortement corrélés mais pas avec les données de `BD Haie` ce qui est surprenant.
