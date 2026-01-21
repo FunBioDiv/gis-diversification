@@ -33,6 +33,18 @@ quarto::quarto_render("analysis/04_bordure.qmd")
 quarto::quarto_render("analysis/05_summary.qmd")
 ```
 
+#### 6. comparaison des données sur les haies
+
+```r
+quarto::quarto_render("analysis/06_haie.qmd")
+```
+
+#### 7. identification des parcelles vers Toulouse 
+
+```r
+quarto::quarto_render("analysis/07_fields_Toulouse.qmd")
+```
+
 
 #### Mise à jour de l'index:
 ```r

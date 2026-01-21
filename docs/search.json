@@ -95,7 +95,7 @@
     "href": "index.html",
     "title": "Overview",
     "section": "",
-    "text": "Overview\nExplorations des jeux de données en cours:\n\nDonnées RPG, RPG complété et BD haies\n\nCroisement RPG+OSO\nComparaison taille des parcelles RPG\nLongueurs d’interfaces\nSummary"
+    "text": "Overview\nExplorations des jeux de données en cours:\n\nDonnées RPG, RPG complété et BD haies\n\nCroisement RPG+OSO\nComparaison taille des parcelles RPG\nLongueurs d’interfaces\nSummary\n\nFurther exploration:\n\nComparaison des données sur les haies\nIdentification des parcelles vers Toulouse"
   },
   {
     "objectID": "analysis/03_field_size.html",
@@ -348,5 +348,26 @@
     "title": "Exploration des haies",
     "section": "Comparaison des indicateurs",
     "text": "Comparaison des indicateurs\nOn peut comparer les indicateurs calculés à partir des différentes sources d’information sur les parcelles RPG (+10m buffer):\n\nBDHaie: densité des haies dans BD Haie (distance linéaire divisé par la surface) en m/ha\nLiu2023_cover: pourcentage moyen d’éléments ligneux par parcelle\nLiu2023_kg_pha: densité de biomass (=cover*height) d’élements ligneux par parcelle en kg/ha\nGrBoc: pourcentage de la parcelle avec des elements répertoriés dans Grain Bocager\nGrBoc_1: pourcentage de la parcelle avec des arbres isolés (class 1)\nGrBoc_5: pourcentage de la parcelle avec des haies (class 5)\nGrBoc_10: pourcentage de la parcelle avec des massifs (class 10)\nCoSIA_Feuillu: pourcentage de la parcelle classé comme Feuillu\n\n\nGironde (33)\n\n\n\n\n\n\n\n\nFigure 7: Correlation Gironde\n\n\n\n\n\n\n\nIlle-et-Vilaine (35)\n\n\n\n\n\n\n\n\nFigure 8: Correlation Ille et Vilaine"
+  },
+  {
+    "objectID": "analysis/07_fields_Toulouse.html",
+    "href": "analysis/07_fields_Toulouse.html",
+    "title": "Identification des parcelles RPG",
+    "section": "",
+    "text": "L’objectif est de tester des solutions au problème d’identification des parcelles pour les coordonnées qui sont entre deux champs, e.g. (Sebiopag_VcG). L’idée est de prendre la parcelle du RPG la plus proche, si elle est à moins de 10m des observations.\nNous allons tester deux jeux de données, Sebiopag_VcG et MUESLI qui sont des études suivies par Sylvie et avec de nombreuses parcelles manquantes"
+  },
+  {
+    "objectID": "analysis/07_fields_Toulouse.html#sebiopag-vcg",
+    "href": "analysis/07_fields_Toulouse.html#sebiopag-vcg",
+    "title": "Identification des parcelles RPG",
+    "section": "Sebiopag VcG",
+    "text": "Sebiopag VcG\n\n\n\n\n\n\nObservations:\n\nT05: Enlever les zones de bordures du RPG pour ne pas les identifier comme champs\nT06, T12, T14 et T17: mauvaise identification de la parcelle la plus proche. Pas de solution identifiée, à part incorporer les données de terrain, plus précises.\n\n\nT06T12T14T17"
+  },
+  {
+    "objectID": "analysis/07_fields_Toulouse.html#muesli",
+    "href": "analysis/07_fields_Toulouse.html#muesli",
+    "title": "Identification des parcelles RPG",
+    "section": "MUESLI",
+    "text": "MUESLI\n\n\n\n\n\n\nObservations:\n\nT03_1: mauvaise parcelle, ou mauvaises coordonnées?\nT01_1, T01_5, T02, T12, 2_1, 6_2, 7_1: beaucoup de parcelles sont plus petites avec le RPG que ce qu’elles devraient être (ou l’inverse pour T05).\nPlusieurs parcelles (117, 398, 890, 1154, 1552, 1684, 1762, 2011) ne sont pas dans le jeu de données de Sylvie: les prélèvements ont été réalisés dans des forets et les parcelles RPG sont à plus de 10m. Sauf pour l’observation 568.\nIdentifier la parcelle la plus proche ne change rien pour les coordonnées MUESLI, la plupart sont dans des parcelles, ou à plus de 10m de parcelles RPG (foret)."
   }
 ]

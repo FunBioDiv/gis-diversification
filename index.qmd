@@ -6,4 +6,9 @@ Explorations des jeux de données en cours:
 2. [Croisement RPG+OSO](https://funbiodiv.github.io/gis-diversification/analysis/02_land_cover.html)
 3. [Comparaison taille des parcelles RPG](https://funbiodiv.github.io/gis-diversification/analysis/03_field_size.html)
 4. [Longueurs d'interfaces](https://funbiodiv.github.io/gis-diversification/analysis/04_bordure.html)
-4. [Summary](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html)
+5. [Summary](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html)
+
+Further exploration:  
+
+6. [Comparaison des données sur les haies](https://funbiodiv.github.io/gis-diversification/analysis/06_haie.html)
+7. [Identification des parcelles vers Toulouse](https://funbiodiv.github.io/gis-diversification/analysis/07_fields_Toulouse.html)

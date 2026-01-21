@@ -4,6 +4,7 @@ data/zip
 data/poc
 data/rpg
 data/rpgc
+data/toulouse
 *.tif*
 
 biblio/
@@ -11,3 +12,6 @@ biblio/
 _freeze/
 
 notes/datasources.txt
+**/*.quarto_ipynb
+
+analysis/explo_data.R

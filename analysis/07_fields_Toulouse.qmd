@@ -1,0 +1,253 @@
+---
+title: "Identification des parcelles RPG "
+author: Romain Frelat
+date: today
+format: 
+  html:
+    toc: true
+execute:
+  echo: false
+  warning: false
+---
+
+
+```{r setup}
+library(terra) |> suppressWarnings()
+library(sf) |> suppressWarnings()
+library(here) |> suppressWarnings()
+library(mapview)
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data")
+
+coo <- read.csv2(here("data", "raw-data", "dataset_coordinates.csv"))
+pts <- vect(here("data", "raw-data", "fields_FR.gpkg"))
+pts_2154 <- project(pts, "EPSG:2154")
+
+
+sebiopagF <- vect(here(
+  "data",
+  "toulouse",
+  "17parcelles_Sebiopag_Toulouse_L93_Dynafor.shp"
+))
+muesliF <- vect(here(
+  "data",
+  "toulouse",
+  "30parcellesAgricoles_MUESLI_Toulouse_L93_Dynafor.shp"
+))
+
+```
+
+
+L'objectif est de tester des solutions au problème d'identification des parcelles pour les coordonnées qui sont entre deux champs, e.g. ([Sebiopag_VcG](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html#fig-outsebiopagvcg)). L'idée est de prendre la parcelle du RPG la plus proche, si elle est à moins de 10m des observations.
+
+Nous allons tester deux jeux de données, `Sebiopag_VcG` et `MUESLI` qui sont des études suivies par Sylvie et avec de [nombreuses parcelles manquantes](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html#tbl-inrpg) 
+
+## Sebiopag VcG
+
+```{r}
+pts_SEB <- pts[pts$Study_ID == "SEBIOPAG_VcG" & pts$Year == "2023"]
+coo_SEB <- coo[coo$Study_ID == "SEBIOPAG_VcG", ]
+u_SEB <- coo_SEB[!duplicated(coo_SEB[, c("Plot_ID", "Long", "Lat")]), ]
+u_SEB <- cbind(u_SEB, crds(pts_SEB)[match(u_SEB$Plot_ID, pts_SEB$Site), ])
+# table(u_SEB$x == u_SEB$Long)
+# table(u_SEB$y == u_SEB$Lat)
+pts_SEB_2154 <- project(pts_SEB, "EPSG:2154")
+pts_SEB_2154$intersect <- !is.na(extract(sebiopagF, pts_SEB_2154)$Site)
+
+# load RPG
+#fmt:skip
+rpg_R73_2023 <- vect(
+  here("data", "raw-data", "RPG", "RPG_2-2_2023_PARCELLES_GRAPHIQUES.gpkg"),
+  filter = vect(ext(pts_SEB_2154) + 1000)
+)
+
+pts_SEB_2154$inRPG <- !is.na(extract(rpg_R73_2023, pts_SEB_2154)$ID_PARCEL)
+# table(pts_SEB_2154$inRPG, pts_SEB_2154$intersect)
+
+# find neareast field
+distance_matrix <- distance(pts_SEB_2154, rpg_R73_2023)
+# get which river is the closest
+nearest_field <- apply(distance_matrix, 1, which.min)
+# get the nearest distance
+nearest_distance <- apply(distance_matrix, 1, min)
+
+rpg_SEB <- rpg_R73_2023[nearest_field, ]
+rpg_SEB$distance <- nearest_distance
+
+mapview(
+  sebiopagF,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_SEB, zcol = "distance", layer.name = "RPG 2023 distance") +
+  mapview(pts_SEB_2154, layer.name = "coordonnées")
+```
+
+
+**Observations:**   
+
+- T05: Enlever les zones de bordures du RPG pour ne pas les identifier comme champs
+- T06, T12, T14 et T17: mauvaise identification de la parcelle la plus proche. Pas de solution identifiée, à part incorporer les données de terrain, plus précises.
+
+::: {.panel-tabset}
+
+## T06
+```{r}
+# T06
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T06"]
+vi <- buffer(pi, 1000)
+rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
+seb_i <- crop(sebiopagF, vi, ext = TRUE)
+
+distance_matrix <- distance(pi, rpg_i)
+nearest_field <- apply(distance_matrix, 1, which.min)
+
+rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
+
+mapview(
+  seb_i,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
+  mapview(pi, layer.name = "coordonnées")
+```
+
+## T12
+```{r}
+# T17
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T12"]
+vi <- buffer(pi, 1000)
+rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
+seb_i <- sebiopagF[sebiopagF$CodeSebiop == "T12", ]
+
+distance_matrix <- distance(pi, rpg_i)
+nearest_field <- apply(distance_matrix, 1, which.min)
+
+rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
+
+mapview(
+  seb_i,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
+  mapview(pi, layer.name = "coordonnées")
+```
+
+## T14
+```{r}
+# T14
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T14"]
+vi <- buffer(pi, 1000)
+rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
+seb_i <- crop(sebiopagF, vi, ext = TRUE)
+
+distance_matrix <- distance(pi, rpg_i)
+nearest_field <- apply(distance_matrix, 1, which.min)
+
+rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
+
+mapview(
+  seb_i,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
+  mapview(pi, layer.name = "coordonnées")
+```
+
+## T17
+```{r}
+# T17
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T17"]
+vi <- buffer(pi, 1000)
+rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
+seb_i <- sebiopagF[sebiopagF$CodeSebiop == "T17", ]
+
+distance_matrix <- distance(pi, rpg_i)
+nearest_field <- apply(distance_matrix, 1, which.min)
+
+rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
+
+mapview(
+  seb_i,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
+  mapview(pi, layer.name = "coordonnées")
+```
+
+:::
+
+
+
+## MUESLI
+
+
+```{r}
+pts_MUESLI <- pts[pts$Study_ID == "MUESLI"]
+coo_MUESLI <- coo[coo$Study_ID == "muesli", ]
+u_MUESLI <- coo_MUESLI[!duplicated(coo_MUESLI[, c("Plot_ID", "Long", "Lat")]), ]
+u_MUESLI <- cbind(
+  u_MUESLI,
+  crds(pts_MUESLI)[match(u_MUESLI$Plot_ID, pts_MUESLI$Site), ]
+)
+# all.equal(u_MUESLI$x, u_MUESLI$Long)
+# all.equal(u_MUESLI$y, u_MUESLI$Lat)
+
+pts_MUESLI_2154 <- project(pts_MUESLI, "EPSG:2154")
+pts_MUESLI_2154$intersect <- !is.na(extract(muesliF, pts_MUESLI_2154)$NumParcel)
+# table(pts_MUESLI_2154$intersect)
+
+# load RPG
+#fmt:skip
+rpg_2016 <- vect(
+  here("data", "raw-data", "RPG", "RPG_2-0_2016_PARCELLES_GRAPHIQUES.shp"),
+  filter = vect(ext(pts_MUESLI_2154) + 1000)
+)
+
+pts_MUESLI_2154$inRPG <- !is.na(extract(rpg_2016, pts_MUESLI_2154)$ID_PARCEL)
+# table(pts_SEB_2154$inRPG)
+
+# find neareast field
+distance_matrix <- distance(pts_MUESLI_2154, rpg_2016)
+# get which river is the closest
+nearest_field <- apply(distance_matrix, 1, which.min)
+# get the nearest distance
+nearest_distance <- apply(distance_matrix, 1, min)
+
+
+rpg_MUESLI <- rpg_2016[nearest_field[nearest_distance <= 10], ]
+rpg_MUESLI$distance <- nearest_distance[nearest_distance <= 10]
+
+mapview(
+  muesliF,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_MUESLI, zcol = "distance", layer.name = "RPG 2016 distance") +
+  mapview(pts_MUESLI_2154, layer.name = "coordonnées")
+```
+
+**Observations:**
+
+- T03_1: mauvaise parcelle, ou mauvaises coordonnées?
+- T01_1, T01_5, T02, T12, 2_1, 6_2, 7_1: beaucoup de parcelles sont plus petites avec le RPG que ce qu'elles devraient être (ou l'inverse pour T05).
+- Plusieurs parcelles (117, 398, 890, 1154, 1552, 1684, 1762, 2011) ne sont pas dans le jeu de données de Sylvie: les prélèvements ont été réalisés dans des forets et les parcelles RPG sont à plus de 10m. Sauf pour l'observation 568.
+- Identifier la parcelle la plus proche ne change rien pour les coordonnées MUESLI, la plupart sont dans des parcelles, ou à plus de 10m de parcelles RPG (foret).
