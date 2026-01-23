@@ -42,18 +42,35 @@ muesliF <- vect(here(
 
 L'objectif est de tester des solutions au problème d'identification des parcelles pour les coordonnées qui sont entre deux champs, e.g. ([Sebiopag_VcG](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html#fig-outsebiopagvcg)). L'idée est de prendre la parcelle du RPG la plus proche, si elle est à moins de 10m des observations.
 
-Nous allons tester deux jeux de données, `Sebiopag_VcG` et `MUESLI` qui sont des études suivies par Sylvie et avec de [nombreuses parcelles manquantes](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html#tbl-inrpg) 
+Nous allons tester deux jeux de données, `Sebiopag_VcG` et `MUESLI` qui sont des études suivies par Sylvie et avec de [nombreuses parcelles manquantes](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html#tbl-inrpg).
+
+**Conclusion:** Le problème avec les données Sebiopag VcG est reglé avec les nouvelles coordonnées (sans avoir besoin de calculer de distances). Calculer les distances pour les données MUESLI n'aide pas nonplus à trouver la parcelle correspondante aux mesures (foret).
 
 ## Sebiopag VcG
 
 ```{r}
+pts2 <- vect(here(
+  "data",
+  "toulouse",
+  "XYpoint1_transect1_17parcelles_Sebiopag_Toulouse_L93.shp"
+))
+
 pts_SEB <- pts[pts$Study_ID == "SEBIOPAG_VcG" & pts$Year == "2023"]
 coo_SEB <- coo[coo$Study_ID == "SEBIOPAG_VcG", ]
 u_SEB <- coo_SEB[!duplicated(coo_SEB[, c("Plot_ID", "Long", "Lat")]), ]
 u_SEB <- cbind(u_SEB, crds(pts_SEB)[match(u_SEB$Plot_ID, pts_SEB$Site), ])
+
 # table(u_SEB$x == u_SEB$Long)
 # table(u_SEB$y == u_SEB$Lat)
 pts_SEB_2154 <- project(pts_SEB, "EPSG:2154")
+
+
+pts2 <- pts2[match(pts_SEB_2154$Site, substr(pts2$NOMPLOT, 1, 3))]
+# cbind(crds(pts2), crds(pts_SEB_2154))
+
+pts_SEB_2154 <- pts2
+pts_SEB_2154$Site <- substr(pts2$NOMPLOT, 1, 3)
+
 pts_SEB_2154$intersect <- !is.na(extract(sebiopagF, pts_SEB_2154)$Site)
 
 # load RPG
@@ -90,63 +107,17 @@ mapview(
 
 **Observations:**   
 
-- T05: Enlever les zones de bordures du RPG pour ne pas les identifier comme champs
-- T06, T12, T14 et T17: mauvaise identification de la parcelle la plus proche. Pas de solution identifiée, à part incorporer les données de terrain, plus précises.
+- Les nouvelles coordonnées dans les champs facilite l'identification de la parcelle RPG correspondante.
+- T16 et T17: mauvaise parcelle car elle est absente du RPG
+- T02, T20: la parcelle RPG est **beaucoup** plus petite que celle fournie par Sylvie.
 
 ::: {.panel-tabset}
 
-## T06
+
+## T16
 ```{r}
-# T06
-pi <- pts_SEB_2154[pts_SEB_2154$Site == "T06"]
-vi <- buffer(pi, 1000)
-rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
-seb_i <- crop(sebiopagF, vi, ext = TRUE)
-
-distance_matrix <- distance(pi, rpg_i)
-nearest_field <- apply(distance_matrix, 1, which.min)
-
-rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
-
-mapview(
-  seb_i,
-  layer.name = "données Sylvie",
-  color = "darkgreen",
-  col.regions = "darkgreen",
-  alpha.regions = 0.3
-) +
-  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
-  mapview(pi, layer.name = "coordonnées")
-```
-
-## T12
-```{r}
-# T17
-pi <- pts_SEB_2154[pts_SEB_2154$Site == "T12"]
-vi <- buffer(pi, 1000)
-rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
-seb_i <- sebiopagF[sebiopagF$CodeSebiop == "T12", ]
-
-distance_matrix <- distance(pi, rpg_i)
-nearest_field <- apply(distance_matrix, 1, which.min)
-
-rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
-
-mapview(
-  seb_i,
-  layer.name = "données Sylvie",
-  color = "darkgreen",
-  col.regions = "darkgreen",
-  alpha.regions = 0.3
-) +
-  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
-  mapview(pi, layer.name = "coordonnées")
-```
-
-## T14
-```{r}
-# T14
-pi <- pts_SEB_2154[pts_SEB_2154$Site == "T14"]
+# T16
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T16"]
 vi <- buffer(pi, 1000)
 rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
 seb_i <- crop(sebiopagF, vi, ext = TRUE)
@@ -174,6 +145,79 @@ pi <- pts_SEB_2154[pts_SEB_2154$Site == "T17"]
 vi <- buffer(pi, 1000)
 rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
 seb_i <- sebiopagF[sebiopagF$CodeSebiop == "T17", ]
+
+distance_matrix <- distance(pi, rpg_i)
+nearest_field <- apply(distance_matrix, 1, which.min)
+
+rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
+
+mapview(
+  seb_i,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
+  mapview(pi, layer.name = "coordonnées")
+```
+
+## T02
+```{r}
+# T02
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T02"]
+vi <- buffer(pi, 1000)
+rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
+seb_i <- sebiopagF[sebiopagF$CodeSebiop == "T02", ]
+
+distance_matrix <- distance(pi, rpg_i)
+nearest_field <- apply(distance_matrix, 1, which.min)
+
+rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
+
+mapview(
+  seb_i,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
+  mapview(pi, layer.name = "coordonnées")
+```
+
+## T20
+```{r}
+# T02
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T20"]
+vi <- buffer(pi, 1000)
+rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
+seb_i <- sebiopagF[sebiopagF$CodeSebiop == "T02", ]
+
+distance_matrix <- distance(pi, rpg_i)
+nearest_field <- apply(distance_matrix, 1, which.min)
+
+rpg_i$nearest <- distance_matrix[1, ] == min(distance_matrix)
+
+mapview(
+  seb_i,
+  layer.name = "données Sylvie",
+  color = "darkgreen",
+  col.regions = "darkgreen",
+  alpha.regions = 0.3
+) +
+  mapview(rpg_i, zcol = "nearest", layer.name = "RPG 2023 nearest") +
+  mapview(pi, layer.name = "coordonnées")
+```
+
+## T06
+```{r}
+# T06
+pi <- pts_SEB_2154[pts_SEB_2154$Site == "T06"]
+pi <- pts2[substr(pts2$NOMPLOT, 1, 3) == "T06"]
+vi <- buffer(pi, 1000)
+rpg_i <- crop(rpg_R73_2023, vi, ext = TRUE)
+seb_i <- crop(sebiopagF, vi, ext = TRUE)
 
 distance_matrix <- distance(pi, rpg_i)
 nearest_field <- apply(distance_matrix, 1, which.min)

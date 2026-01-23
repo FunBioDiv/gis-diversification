@@ -354,14 +354,14 @@
     "href": "analysis/07_fields_Toulouse.html",
     "title": "Identification des parcelles RPG",
     "section": "",
-    "text": "L’objectif est de tester des solutions au problème d’identification des parcelles pour les coordonnées qui sont entre deux champs, e.g. (Sebiopag_VcG). L’idée est de prendre la parcelle du RPG la plus proche, si elle est à moins de 10m des observations.\nNous allons tester deux jeux de données, Sebiopag_VcG et MUESLI qui sont des études suivies par Sylvie et avec de nombreuses parcelles manquantes"
+    "text": "L’objectif est de tester des solutions au problème d’identification des parcelles pour les coordonnées qui sont entre deux champs, e.g. (Sebiopag_VcG). L’idée est de prendre la parcelle du RPG la plus proche, si elle est à moins de 10m des observations.\nNous allons tester deux jeux de données, Sebiopag_VcG et MUESLI qui sont des études suivies par Sylvie et avec de nombreuses parcelles manquantes.\nConclusion: Le problème avec les données Sebiopag VcG est reglé avec les nouvelles coordonnées (sans avoir besoin de calculer de distances). Calculer les distances pour les données MUESLI n’aide pas nonplus à trouver la parcelle correspondante aux mesures (foret)."
   },
   {
     "objectID": "analysis/07_fields_Toulouse.html#sebiopag-vcg",
     "href": "analysis/07_fields_Toulouse.html#sebiopag-vcg",
     "title": "Identification des parcelles RPG",
     "section": "Sebiopag VcG",
-    "text": "Sebiopag VcG\n\n\n\n\n\n\nObservations:\n\nT05: Enlever les zones de bordures du RPG pour ne pas les identifier comme champs\nT06, T12, T14 et T17: mauvaise identification de la parcelle la plus proche. Pas de solution identifiée, à part incorporer les données de terrain, plus précises.\n\n\nT06T12T14T17"
+    "text": "Sebiopag VcG\n\n\n\n\n\n\nObservations:\n\nLes nouvelles coordonnées dans les champs facilite l’identification de la parcelle RPG correspondante.\nT16 et T17: mauvaise parcelle car elle est absente du RPG\nT02, T20: la parcelle RPG est beaucoup plus petite que celle fournie par Sylvie.\n\n\nT16T17T02T20T06"
   },
   {
     "objectID": "analysis/07_fields_Toulouse.html#muesli",
