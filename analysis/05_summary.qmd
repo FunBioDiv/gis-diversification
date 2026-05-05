@@ -67,6 +67,8 @@ indr <- read.csv(here("data", "derived-data", "raster_indicators.csv"))
 
 # rpg and oso classes
 ref <- read.csv(here("data", "derived-data", "RPG-OSO_classes.csv"))
+ref_rpg <- read.csv(here("data", "raw-data", "RPG", "RPG_Explorer_Annexe2.csv"))
+
 
 # vector indicators
 indv <- read.csv(here("data", "derived-data", "vector_indicators.csv"))

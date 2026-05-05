@@ -98,9 +98,9 @@ st_write(
 )
 
 ## Get classes of RPG and OSO
-rpg <- read.csv2("data/raw-data/RPG/REF_CULTURES_GROUPES_CULTURES_2023.csv", )
+# rpg <- read.csv2("data/raw-data/RPG/REF_CULTURES_GROUPES_CULTURES_2023.csv", )
 
-rpg2 <- read.csv2("data/raw-data/RPG/REF_CULTURES_2023.csv")
-keep <- which(rpg2$CAMPAGNE_DEBUT > 2015 | rpg2$CAMPAGNE_FIN > 2015)
-rpg2$LIBELLE_CULTURE[keep][!rpg2$CODE[keep] %in% rpg$CODE_CULTURE]
-rpg$CODE_CULTURE %in% rpg2$CODE[keep]
+# rpg2 <- read.csv2("data/raw-data/RPG/REF_CULTURES_2023.csv")
+# keep <- which(rpg2$CAMPAGNE_DEBUT > 2015 | rpg2$CAMPAGNE_FIN > 2015)
+# rpg2$LIBELLE_CULTURE[keep][!rpg2$CODE[keep] %in% rpg$CODE_CULTURE]
+# rpg$CODE_CULTURE %in% rpg2$CODE[keep]

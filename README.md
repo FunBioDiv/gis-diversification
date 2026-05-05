@@ -45,6 +45,12 @@ quarto::quarto_render("analysis/06_haie.qmd")
 quarto::quarto_render("analysis/07_fields_Toulouse.qmd")
 ```
 
+#### 8. exploration of the Swiss dataset
+
+```r
+quarto::quarto_render("analysis/08_Swiss_data.qmd")
+```
+
 
 #### Mise à jour de l'index:
 ```r

@@ -189,7 +189,14 @@ mapview(
 ```
 
 
+### IGN
 
+```{r}
+library(happign)
+meta <- get_layers_metadata("wfs")
+meta <- get_layers_metadata("wmr")
+meta$Name[grep("haie", meta$Name)]
+```
 
 
 ## Comparaison des indicateurs
