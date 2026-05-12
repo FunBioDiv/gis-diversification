@@ -1,0 +1,152 @@
+﻿id,nutzung_fr,Hauptkategorie_FR,"identifiant
+groupe culture","code groupe
+culture","libelle groupe
+culture","code groupe
+intermédiaire","libelle groupe
+intermédiaire",id_group
+501,"Autres surfaces dans la SAU, avec contributions",Autre surface au sein de la SAU ,28,div,divers,div,divers,50
+502,"Autres surfaces dans la SAU, sans contributions",Autre surface au sein de la SAU ,28,div,divers,div,divers,50
+503,Asperges,Autres cultures pérennes,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+504,"Autres pepinieres (roses, fruits, etc.)",Autres cultures pérennes,28,div,divers,div,divers,50
+505,"Autres pepinieres (rosiers, plantes ornementales, etc.)",Autres cultures pérennes,,,,,,
+506,"Autres surfaces de cultures perennes, avec contributions",Autres cultures pérennes,,,,,,
+507,"Autres surfaces de cultures perennes, avec contributions, agregee",Autres cultures pérennes,,,,,,
+508,"Autres surfaces de cultures perennes, sans contributions",Autres cultures pérennes,,,,,,
+509,Baies pluriannuelles,Autres cultures pérennes,,,,,,
+510,"Buissons, arbrisseaux et arbustes ornementaux",Autres cultures pérennes,,,,,,
+511,Champignons en pleine terre,Autres cultures pérennes,28,div,divers,div,divers,50
+512,Chataigneraies entretenues (surface),Autres cultures pérennes,22,fruit_coq,fruits_a_coque,fruit_coq,fruits_a_coque,40
+513,Cultures de muriers (alimentation des vers a soie),Autres cultures pérennes,28,div,divers,div,divers,50
+514,Cultures horticoles pluriannuelles de plein air (pas en serres),Autres cultures pérennes,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+515,Houblon,Autres cultures pérennes,24,a_indus,autres_cult_indus,a_indus,autres_cult_indus,42
+516,"Matieres premieres renouvelables pluriannuelles (roseau de Chine, etc.)",Autres cultures pérennes,,,,,,
+517,Pepiniere de fruits et de baies,Autres cultures pérennes,28,div,divers,div,divers,50
+518,Pepinieres de plantes forestieres hors zone forestiere,Autres cultures pérennes,28,div,divers,div,divers,50
+519,Pepinieres viticoles,Autres cultures pérennes,28,div,divers,div,divers,50
+520,Permaculture,Autres cultures pérennes,,,,,,
+521,Plantes aromatiques et plantes medicinales pluriannuelles,Autres cultures pérennes,24,a_indus,autres_cult_indus,a_indus,autres_cult_indus,42
+522,Rhubarbe,Autres cultures pérennes,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+523,Sapins de Noel,Autres cultures pérennes,28,div,divers,div,divers,50
+524,Truffieres,Autres cultures pérennes,28,div,divers,div,divers,50
+525,"Autres cultures fruitieres (kiwis, sureau, etc.)",Cultures fruitières,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+526,Cultures fruitieres (fruits a noyau),Cultures fruitières,20,verg,vergers,verg,vergers,38
+527,Cultures fruitieres (poires),Cultures fruitières,20,verg,vergers,verg,vergers,38
+528,Cultures fruitieres (pommes),Cultures fruitières,20,verg,vergers,verg,vergers,38
+529,Cultures fruitieres agregee,Cultures fruitières,20,verg,vergers,verg,vergers,38
+530,Autres cultures sous abri avec fondations permanentes,Cultures protégées ,,,,,,
+531,"Autres cultures sous abri sans fondations permanentes, avec contributions",Cultures protégées ,,,,,,
+532,"Autres cultures sous abri sans fondations permanentes, sans contributions",Cultures protégées ,,,,,,
+533,Autres cultures speciales sous abri avec fondations permanentes,Cultures protégées ,,,,,,
+534,Autres cultures speciales sous abri sans fondations permanentes,Cultures protégées ,,,,,,
+535,Cultures horticoles sous abri avec fondations permanentes,Cultures protégées ,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+536,Cultures horticoles sous abri sans fondations permanentes,Cultures protégées ,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+537,Cultures maraicheres sous abri avec fondations permanentes,Cultures protégées ,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+538,Cultures maraicheres sous abri sans fondations permanentes,Cultures protégées ,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+539,Cultures maraicheres sous abri sans fondations permanentes; sur des tables de plantation ou des etageres,Cultures protégées ,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+540,Cultures maraicheres sous abri sans fondations permanentes; sur sol naturel,Cultures protégées ,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+541,"Cultures sous abri sans fondations permanentes, avec contributions, agregee",Cultures protégées ,,,,,,
+542,Foret,Foret,,,,,,
+543,"Haies, bosquets champetres et berges boisees (avec la bande herbeuse)","Haies, bosquets et berges boisées ",,,,,,
+544,"Haies, bosquets champetres et berges boisees (avec la bande tampon) (Surfaces de promotion de la biodiversite specifiques a la region)","Haies, bosquets et berges boisées ",,,,,,
+545,"Paturages (paturages attenants a la ferme, autres paturages sauf les paturages d'estivage)",Paturages permanents,17,esti,estives_landes,esti,estives_landes,35
+546,Paturages boises (sauf surfaces boisees),Paturages permanents,17,esti,estives_landes,esti,estives_landes,35
+547,Paturages extensifs,Paturages permanents,17,esti,estives_landes,esti,estives_landes,35
+548,Surfaces de promotion de la biodiversite specifiques a la region (paturages),Paturages permanents,17,esti,estives_landes,esti,estives_landes,35
+549,Autres prairies permanentes (sans les paturages),Prairies permanentes,,,,,,
+550,Autres surfaces herbageres (surface herbagere permanente) avec contributions,Prairies permanentes,,,,,,
+551,Autres surfaces herbageres (surface herbagere permanente) sans contributions,Prairies permanentes,,,,,,
+552,"Prairies de fauche en region d'estivage, autres",Prairies permanentes,17,esti,estives_landes,esti,estives_landes,35
+553,"Prairies de fauche en region d'estivage, type prairie peu intensive",Prairies permanentes,17,esti,estives_landes,esti,estives_landes,35
+554,Prairies extensives (sans les paturages),Prairies permanentes,18,pp,prairies_permanentes,pp,prairies_permanentes,36
+555,Prairies peu intensives (sans les paturages),Prairies permanentes,18,pp,prairies_permanentes,pp,prairies_permanentes,36
+556,Prairies riveraines (sauf les paturages),Prairies permanentes,18,pp,prairies_permanentes,pp,prairies_permanentes,36
+557,Prairies riveraines d'un cours d'eau (sauf les paturages),Prairies permanentes,18,pp,prairies_permanentes,pp,prairies_permanentes,36
+558,"Surfaces de promotion de la biodiversite specifiques a la region (Surface herbagere, sauf les paturages)",Prairies permanentes,,,,,,
+559,Paturages d'estivage,Surface d'estivage,17,esti,estives_landes,esti,estives_landes,35
+560,Surfaces a litiere dans la SAU,Surfaces à litière,,,,,,
+561,Autres surfaces situees en dehors de la SAU et la SE,Surfaces en dehors de la SAU,,,,,,
+562,Chemins naturels non stabilises,Surfaces en dehors de la SAU,,,,,,
+563,"Fosses humides, mares, etangs",Surfaces en dehors de la SAU,,,,,,
+564,Jardins potager,Surfaces en dehors de la SAU,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+565,Murs de pierres seches,Surfaces en dehors de la SAU,,,,,,
+566,"Production agricole sous abri (par ex. champignons de Paris, chicoree witloof)",Surfaces en dehors de la SAU,,,,,,
+567,Surfaces de promotion de la biodiversite specifiques a la region,Surfaces en dehors de la SAU,,,,,,
+568,"Surfaces dont l'affectation principale n'est pas l'exploitation agricole (terrains a batir equipes et surfaces comprises dans les terrains de golf et de camping, aerodromes et terrains d'entrainement militaire, surfaces delimitees des bas-cotes des lignes de chemins de fer, de routes publiques, de cours et de plans d'eau)",Surfaces en dehors de la SAU,,,,,,
+569,"Surfaces improductives (p. ex. haies sans les bandes tampons, surfaces broyees, surfaces avec un degre eleve de mauvaises herbes)",Surfaces en dehors de la SAU,28,div,divers,div,divers,50
+570,"Surfaces ruderales, tas d'epierrage et affleurements rocheux",Surfaces en dehors de la SAU,,,,,,
+571,"Amidonnier, engrain",Terres cultivées,,,,,,
+572,Autre chanvre,Terres cultivées,9,plte_fb,plante_a_fibre,CHV,chanvre,26
+573,Autres prairies artificielles donnant droit aux contributions (p.ex. paturages pour porcs et volaille),Terres cultivées,,,,,,
+574,Autres terres ouvertes avec contributions,Terres cultivées,,,,,,
+575,Autres terres ouvertes ne donnant pas droit aux contributions (surfaces de promotion de la biodiversite specifiques a la region),Terres cultivées,,,,,,
+576,Autres terres ouvertes sans contributions,Terres cultivées,,,,,,
+577,"avec des cereales ou de la cameline, au moins 30 % de lentilles lors de la recolte (pour la production de grains)",Terres cultivées,,,,,,
+578,Avoine,Terres cultivées,4,cer_2nd,autres_cereales,,,
+579,Baies annuelles (p.ex. fraises),Terres cultivées,,,,,,
+580,Bande culturale extensive,Terres cultivées,,,,,,
+581,Betteraves fourrageres,Terres cultivées,16,fou,fourrage,fou_autres,fourrage_autres,31
+582,Betteraves sucrieres,Terres cultivées,24,a_indus,autres_cult_indus,BTN,betterave_non_fourragere,43
+583,Ble d'automne (sans ble fourrager de la liste swiss granum),Terres cultivées,1,ble,ble_tendre,BTH,ble_tendre_hiver,1
+584,Ble de printemps (sans ble fourrager de la liste swiss granum),Terres cultivées,1,ble,ble_tendre,BTP,ble_tendre_printemps,2
+585,Ble dur,Terres cultivées,4,cer_2nd,autres_cereales,BDH,ble_dur_hiver,10
+586,Ble fourrager selon liste swiss granum,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd,autres_cereales,12
+587,Cameline,Terres cultivées,24,a_indus,autres_cult_indus,a_indus,autres_cult_indus,42
+588,Carthame,Terres cultivées,,,,,,
+589,Cereales ensilees,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd,autres_cereales,12
+590,Chanvre pour l'utilisation des fibres,Terres cultivées,9,plte_fb,plante_a_fibre,CHV,chanvre,26
+591,Chanvre pour l'utilisation des graines,Terres cultivées,9,plte_fb,plante_a_fibre,CHV,chanvre,26
+592,Colza d'automne comme matiere premiere renouvelable,Terres cultivées,5,colz,colza,CZH,colza_hiver,18
+593,Colza d'automne destine a la fabrication d'huile comestible,Terres cultivées,5,colz,colza,olea,autres_oleagineux,19
+594,Colza de printemps comme matiere premiere renouvelable,Terres cultivées,5,colz,colza,olea,autres_oleagineux,19
+595,Colza de printemps destine a la fabrication d'huile comestible,Terres cultivées,5,colz,colza,olea,autres_oleagineux,19
+596,Courges a huile,Terres cultivées,24,a_indus,autres_cult_indus,a_indus,autres_cult_indus,42
+597,"Cultures horticoles annuelles de plein champ (fleurs, gazon en rouleaux, etc.)",Terres cultivées,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+598,Cultures maraicheres de plein champ annuelles (sauf les legumes de conserve),Terres cultivées,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+599,Epeautre,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd_h,autres_cereales_hiver,13
+600,Graminees fourrageres destinees a la production de semences (contrat de culture),Terres cultivées,,,,,,
+601,Haricots et vesces en grains (p.ex. feveroles),Terres cultivées,25,leg_fl,legumes_fleurs,HAR,haricot_flageolet,45
+602,Jachere florale,Terres cultivées,11,gel_sp,gel_sans_prod,gel_sp,gel_sans_prod,28
+603,Jachere tournante,Terres cultivées,11,gel_sp,gel_sans_prod,gel_sp,gel_sans_prod,28
+604,Legumes de conserve cultives en plein champ,Terres cultivées,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+605,Legumineuses fourrageres destinees a la production de semences (contrat de culture),Terres cultivées,16,fou,fourrage,fou_fabacees,fourrage_fabacees,32
+606,Lentilles,Terres cultivées,15,leg_gr,legumineuses_graines,leg_gr,legumineuses_graines,30
+607,Lin,Terres cultivées,9,plte_fb,plante_a_fibre,LIF,lin_fibres,27
+608,Lupins,Terres cultivées,8,prot,proteagineux,prot,proteagineux,25
+609,Mais d'ensilage et mais vert,Terres cultivées,2,mais,mais,MIE,mais_ensilage,4
+610,Mais grain,Terres cultivées,2,mais,mais,MIS,mais_grain_semence,5
+611,Meteil de cereales fourrageres,Terres cultivées,16,fou,fourrage,fou_autres,fourrage_autres,31
+612,Meteil de cereales panifiables,Terres cultivées,,,,,,
+613,"Meteil de haricots, de vesces, de pois, de pois chiches et de lupins avec des cereales ou de la cameline, au moins 30 % de legumineuses lors de la recolte (pour la production de grains)",Terres cultivées,,,,,,
+614,"Meteil de lentilles avec des cereales ou de la cameline, au moins 30 % de lentilles lors de la recolte (pour la production de grains)",Terres cultivées,,,,,,
+615,Millet,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd_p,autres_cereales_printemps,14
+616,Millet grains,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd_p,autres_cereales_printemps,14
+617,Millet plante entiere,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd_p,autres_cereales_printemps,14
+618,Moutarde,Terres cultivées,24,a_indus,autres_cult_indus,a_indus,autres_cult_indus,42
+619,Orge d'automne,Terres cultivées,3,orge,orge,ORH,orge_hiver,6
+620,Orge de printemps,Terres cultivées,3,orge,orge,ORP,orge_printemps,7
+621,Ourlet sur terres assolees,Terres cultivées,,,,,,
+622,Pavot,Terres cultivées,,,,,,
+623,Plantes aromatiques et medicinales annuelles,Terres cultivées,24,a_indus,autres_cult_indus,a_indus,autres_cult_indus,42
+624,Plants de pommes de terre (contrat de culture),Terres cultivées,28,div,divers,div,divers,50
+625,Pois chiches,Terres cultivées,15,leg_gr,legumineuses_graines,leg_gr,legumineuses_graines,30
+626,Pois en grains (p.ex. pois proteagineux),Terres cultivées,8,prot,proteagineux,prot,proteagineux,25
+627,Pommes de terre,Terres cultivées,25,leg_fl,legumes_fleurs,PDT,pomme_de_terre,48
+628,Prairies artificielles (sans les paturages),Terres cultivées,19,pt,prairies_temporaires,pt,prairies_temporaires,37
+629,Quinoa,Terres cultivées,,,,,,
+630,Racines de chicoree,Terres cultivées,25,leg_fl,legumes_fleurs,leg_fl,legumes_fleurs,44
+631,Riz,Terres cultivées,14,riz,riz,riz,riz,29
+632,Sarrasin,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd_p,autres_cereales_printemps,14
+633,Seigle,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd,autres_cereales,12
+634,Semences de mais (contrat de culture),Terres cultivées,,,,,,
+635,Soja,Terres cultivées,7,olea,autres_oleagineux,SOJ,soja,24
+636,Sorgho,Terres cultivées,4,cer_2nd,autres_cereales,SOG,sorgho,15
+637,Sorgho grains,Terres cultivées,4,cer_2nd,autres_cereales,SOG,sorgho,15
+638,Sorgho plante entiere,Terres cultivées,4,cer_2nd,autres_cereales,SOG,sorgho,15
+639,Tabac,Terres cultivées,24,a_indus,autres_cult_indus,a_indus,autres_cult_indus,42
+640,Terres ouvertes donnant droit aux contributions (surfaces de promotion de la biodiversite specifiques a la region),Terres cultivées,11,gel_sp,gel_sans_prod,gel_sp,gel_sans_prod,28
+641,Tournesol comme matiere premiere renouvelable,Terres cultivées,6,TRN,tournesol,TRN,tournesol,20
+642,Tournesol destine a la fabrication d'huile comestible,Terres cultivées,6,TRN,tournesol,TRN,tournesol,20
+643,Triticale,Terres cultivées,4,cer_2nd,autres_cereales,cer_2nd,autres_cereales,12
+644,Surfaces viticoles presentant une biodiversite naturelle,Vignobles,21,vign,vignes,vign,vignes,39
+645,Vignes,Vignobles,21,vign,vignes,vign,vignes,39
+646,Vignes (surfaces de promotion de la biodiversite specifiques a la re-gion),Vignobles,21,vign,vignes,vign,vignes,39

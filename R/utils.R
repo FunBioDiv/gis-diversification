@@ -11,6 +11,19 @@ lunique <- function(x) {
   length(unique(as.character(x)))
 }
 
+# select the closest positive element
+which.closest <- function(x) {
+  if (sum(x <= 0) > 0) {
+    which(x <= 0)[which.max(x[x <= 0])]
+  } else {
+    which.min(x)
+  }
+}
+
+last <- function(x) {
+  x[[length(x)]]
+}
+
 panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...) {
   #usr <- par("usr")
   usr <- par()$usr

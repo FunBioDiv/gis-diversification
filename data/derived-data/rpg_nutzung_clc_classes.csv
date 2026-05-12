@@ -1,0 +1,526 @@
+﻿id,code,name,grp1,code_grp1,name_grp1,grp2,code_grp2,name_grp2,source,Other cat
+1,BTH,ble_tendre_hiver,1,ble,ble_tendre,1,BTH,ble_tendre_hiver,rpg,
+2,BTP,ble_tendre_printemps,1,ble,ble_tendre,2,BTP,ble_tendre_printemps,rpg,
+3,MID,mais_doux,2,mais,mais,3,MID,mais_doux,rpg,
+4,MIE,mais_ensilage,2,mais,mais,4,MIE,mais_ensilage,rpg,
+5,MIS,mais_grain_semence,2,mais,mais,5,MIS,mais_grain_semence,rpg,
+6,ORH,orge_hiver,3,orge,orge,6,ORH,orge_hiver,rpg,
+7,ORP,orge_printemps,3,orge,orge,7,ORP,orge_printemps,rpg,
+8,AVH,avoine_hiver,4,cer_2nd,autres_cereales,8,AVH,avoine_hiver,rpg,
+9,AVP,avoine_printemps,4,cer_2nd,autres_cereales,9,AVP,avoine_printemps,rpg,
+10,BDH,ble_dur_hiver,4,cer_2nd,autres_cereales,10,BDH,ble_dur_hiver,rpg,
+11,BDP,ble_dur_printemps,4,cer_2nd,autres_cereales,11,BDP,ble_dur_printemps,rpg,
+12,BDT,ble_dur_printemps_tardif,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+13,CAG,autre_cereale_autre_genre,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+14,CGF,autre_cereale_genre_fagopyrum,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+15,CGH,autre_cereale_genre_phalaris,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+16,CGO,autre_cereale_genre_sorghum,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+17,CGP,autre_cereale_genre_panicum,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+18,CGS,autre_cereale_genre_setaria,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+19,MCR,melange_cereales,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,rpg,
+20,CAH,autre_cereale_secondaire_hiver,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,rpg,
+21,CHA,autre_cereale_hiver_genre_avena,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,rpg,
+22,CHH,autre_cereale_hiver_genre_hordeum,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,rpg,
+23,CHS,autre_cereale_hiver_genre_secale,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,rpg,
+24,CHT,autre_cereale_hiver_genre_triticum,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,rpg,
+25,EPE,epeautre,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,rpg,
+26,SGH,seigle_hiver,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,rpg,
+27,CPA,autre_cereale_printemps_genre_avena,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+28,CPH,autre_cereale_printemps_genre_hordeum,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+29,CPS,autre_cereale_printemps_genre_secale,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+30,CPT,autre_cereale_printemps_genre_triticum,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+31,CPZ,autre_cereale_printemps_genre_zea,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+32,MCS,melange_cereales_printemps,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+33,MLT,millet,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+34,SGP,seigle_printemps,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+35,SRS,sarrasin,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,rpg,
+36,SOG,sorgho,4,cer_2nd,autres_cereales,15,SOG,sorgho,rpg,
+37,TTH,triticale_hiver,4,cer_2nd,autres_cereales,16,TTH,triticale_hiver,rpg,
+38,TTP,triticale_printemps,4,cer_2nd,autres_cereales,17,TTP,triticale_printemps,rpg,
+39,CZH,colza_hiver,5,colz,colza,18,CZH,colza_hiver,rpg,
+40,CZP,colza_printemps,5,colz,colza,19,olea,autres_oleagineux,rpg,
+41,TRN,tournesol,6,TRN,tournesol,20,TRN,tournesol,rpg,
+42,ARA,arachide,7,olea,autres_oleagineux,21,olea,autres_oleagineux,rpg,
+43,LIH,lin_non_textile_hiver,7,olea,autres_oleagineux,22,lin_non_text,lin_non_textile,rpg,
+44,LIP,lin_non_textile_printemps,7,olea,autres_oleagineux,22,lin_non_text,lin_non_textile,rpg,
+45,MOL,melange_oleagineux,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+46,NVE,navette_ete,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+47,NVH,navette_hiver,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+48,OAG,autre_oleagineux_autre_genre,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+49,OEH,autre_oleagineux_helianthus,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+50,OEI,oeillette,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+51,OHN,autre_oleagineux_hiver_brassica_napus,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+52,OHR,autre_oleagineux_hiver_brassica_rapa,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+53,OPN,autre_oleagineux_printemps_brassica_napus,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+54,OPR,autre_oleagineux_printemps_brassica_rapa,7,olea,autres_oleagineux,23,olea,autres_oleagineux,rpg,
+55,SOJ,soja,7,olea,autres_oleagineux,24,SOJ,soja,rpg,
+56,FEV,feve,8,prot,proteagineux,25,prot,proteagineux,rpg,
+57,FVL,feverole_avant_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+58,FVP,feverole_printemps,8,prot,proteagineux,25,prot,proteagineux,rpg,
+59,FVT,feverole_apres_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+60,LDH,lupin_doux_hiver,8,prot,proteagineux,25,prot,proteagineux,rpg,
+61,LDP,lupin_doux_printemps_avant_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+62,LDT,lupin_doux_printemps_apres_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+63,MPC,melange_proteagineux_avant_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+64,MPP,melange_proteagineux,8,prot,proteagineux,25,prot,proteagineux,rpg,
+65,MPT,melange_proteagineux_apres_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+66,PAG,autre_proteagineux_autre_genre,8,prot,proteagineux,25,prot,proteagineux,rpg,
+67,PHI,pois_hiver,8,prot,proteagineux,25,prot,proteagineux,rpg,
+68,PPR,pois_printemps_avant_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+69,PPT,pois_printemps_apres_juin,8,prot,proteagineux,25,prot,proteagineux,rpg,
+70,CHV,chanvre,9,plte_fb,plante_a_fibre,26,CHV,chanvre,rpg,
+71,CSE,chanvre_sans_etiquette,9,plte_fb,plante_a_fibre,26,CHV,chanvre,rpg,
+72,LIF,lin_fibres,9,plte_fb,plante_a_fibre,27,LIF,lin_fibres,rpg,
+73,J5M,jachere_temporaire,11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,rpg,
+74,J6P,jachere_permanente,11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,rpg,
+75,J6S,jachere_sie,11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,rpg,
+76,JAC,jachere,11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,rpg,
+77,JNO,jachere_noire,11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,rpg,
+78,RIZ,riz,14,riz,riz,29,riz,riz,rpg,
+79,LEC,lentille_cultivee_non_fourragere,15,leg_gr,legumineuses_graines,30,leg_gr,legumineuses_graines,rpg,
+80,PCH,pois_chiche,15,leg_gr,legumineuses_graines,30,leg_gr,legumineuses_graines,rpg,
+81,AFG,autre_fourrage_annuel_autre,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+82,BVF,betterave_fourragere,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+83,CAF,carotte_fourragere,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+84,CHF,chou_fourrager,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+85,FAG,autre_fourrage_annuel_autre_genre,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+86,FSG,autre_plante_fourragere_sarclee_autre_genre,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+87,GAI,gaillet,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+88,NVF,navet_fourrager,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+89,RDF,radis_fourrager,16,fou,fourrage,31,fou_autres,fourrage_autres,rpg,
+90,CPL,fourrage_compose,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+91,FF5,feverole_fourragere_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+92,FF6,feverole_fourragere_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+93,FF7,feverole_fourragere_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+94,FF8,feverole_fourragere_2018,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+95,FFO,autre_feverole_fourragere,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+96,GES,gesse,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+97,JO5,jarosse_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+98,JO6,jarosse_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+99,JO7,jarosse_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+100,JO8,jarosse_2018,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+101,JOD,jarosse_deshyd,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+102,JOS,autre_jarosse,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+103,LEF,lentille_fourragere,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+104,LFH,autre_lupin_fourrager_hiver,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+105,LFP,autre_lupin_fourrager_printemps,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+106,LH5,lupin_fourrager_hiver_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+107,LH6,lupin_fourrager_hiver_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+108,LH7,lupin_fourrager_hiver_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+109,LO7,lotier_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+110,LOT,lotier,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+111,LP5,lupin_fourrager_printemps_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+112,LP6,lupin_fourrager_printemps_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+113,LP7,lupin_fourrager_printemps_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+114,MC5,melange_leg_fou_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+115,MC6,melange_leg_fou_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+116,MC7,melange_leg_fou_2017_herb_entre_elles,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+117,MC8,melange_leg_fou_2018_herb_entre_elles,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+118,ME5,melilot_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+119,ME6,melilot_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+120,ME7,melilot_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+121,ME8,melilot_2018,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+122,MED,melilot_deshyd,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+123,MEL,autre_melilot,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+124,MH5,melange_leg_fou_2015_herb,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+125,MH6,melange_leg_fou_2016_herb,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+126,MH7,melange_leg_fou_2017_herb,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+127,MH8,melange_leg_fou_2018_herb,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+128,MIN,minette,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+129,ML5,melange_leg_fou_2015_herb_entre_elles,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+130,ML6,melange_leg_fou_2016_herb_entre_elles,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+131,ML7,melange_leg_fou_2017_herb_entre_elles,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+132,ML8,melange_leg_fou_2018_herb_entre_elles,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+133,MLC,melange_leg_fou_cereale,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+134,MLD,melange_leg_deshyd_entre_elles,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+135,MLF,melange_leg_fou,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+136,MLG,melange_legumineuses_preponderantes_au_semis_graminees_fourrageres_temporaire,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+137,MLS,melange_legumineuses_non_fourrageres_prep,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+138,PFH,autre_pois_fourrager_hiver,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+139,PFP,autre_pois_fourrager_printemps,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+140,PH5,pois_fourrager_hiver_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+141,PH6,pois_fourrager_hiver_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+142,PH7,pois_fourrager_hiver_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+143,PH8,pois_fourrager_hiver_2018,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+144,PP5,pois_fourrager_printemps_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+145,PP6,pois_fourrager_printemps_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+146,PP7,pois_fourrager_printemps_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+147,SA5,sainfoin_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+148,SA6,sainfoin_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+149,SA7,sainfoin_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+150,SAD,sainfoin_deshyd,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+151,SAI,autre_sainfoin,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+152,SE5,serradelle_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+153,SE6,serradelle_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+154,SE7,serradelle_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+155,SED,serradelle_deshyd,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+156,SER,autre_serradelle,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+157,TR5,trefle_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+158,TR6,trefle_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+159,TR7,trefle_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+160,TR8,trefle_2018,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+161,TRD,trefle_deshyd,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+162,TRE,autre_trefle,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+163,VE5,vesce_2015,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+164,VE6,vesce_2016,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+165,VE7,vesce_2017,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+166,VE8,vesce_2018,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+167,VED,vesce_deshyd,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+168,VES,autre_vesce,16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,rpg,
+169,DTY,dactyle_temporaire,16,fou,fourrage,33,fou_poacees,fourrage_poacees,rpg,
+170,FET,fetuque_temporaire,16,fou,fourrage,33,fou_poacees,fourrage_poacees,rpg,
+171,FLO,fleole_temporaire,16,fou,fourrage,33,fou_poacees,fourrage_poacees,rpg,
+172,GFP,autre_graminee_fourragere_pure_temporaire,16,fou,fourrage,33,fou_poacees,fourrage_poacees,rpg,
+173,MOH,moha,16,fou,fourrage,33,fou_poacees,fourrage_poacees,rpg,
+174,PAT,paturin_temporaire,16,fou,fourrage,33,fou_poacees,fourrage_poacees,rpg,
+175,XFE,x_felium_temporaire,16,fou,fourrage,33,fou_poacees,fourrage_poacees,rpg,
+176,LU5,luzerne_2015,16,fou,fourrage,34,LU,luzerne,rpg,
+177,LU6,luzerne_2016,16,fou,fourrage,34,LU,luzerne,rpg,
+178,LU7,luzerne_2017,16,fou,fourrage,34,LU,luzerne,rpg,
+179,LU8,luzerne_2018,16,fou,fourrage,34,LU,luzerne,rpg,
+180,LUD,luzerne_deshyd,16,fou,fourrage,34,LU,luzerne,rpg,
+181,LUZ,autre_luzerne,16,fou,fourrage,34,LU,luzerne,rpg,
+182,BOP,bois_pature,17,esti,estives_landes,35,esti,estives_landes,rpg,
+183,SIN,surface_pastorale_non_utilise,17,esti,estives_landes,35,esti,estives_landes,rpg,
+184,SPH,surface_pastorale_herbe_predominante,17,esti,estives_landes,35,esti,estives_landes,rpg,
+185,SPL,surface_pastorale_fourrageres_ligneuses_predominantes,17,esti,estives_landes,35,esti,estives_landes,rpg,
+186,PPH,prairie_permanente_herbe_predominante,18,pp,prairies_permanentes,36,pp,prairies_permanentes,rpg,
+187,PRL,prairie_en_rotation_longue,18,pp,prairies_permanentes,36,pp,prairies_permanentes,rpg,
+188,PTR,autre_prairie_temporaire,19,pt,prairies_temporaires,37,pt,prairies_temporaires,rpg,
+189,RGA,ray_grass_temporaire,19,pt,prairies_temporaires,37,pt,prairies_temporaires,rpg,
+190,AGR,agrume,20,verg,vergers,38,verg,vergers,rpg,
+191,ANA,ananas,20,verg,vergers,38,verg,vergers,rpg,
+192,AVO,avocat,20,verg,vergers,38,verg,vergers,rpg,
+193,BCA,banane_creole_fruit_legume_autre,20,verg,vergers,38,verg,vergers,rpg,
+194,BCF,banane_creole_fruit_legume_fermage,20,verg,vergers,38,verg,vergers,rpg,
+195,BCI,banane_creole_fruit_legume_indivision,20,verg,vergers,38,verg,vergers,rpg,
+196,BCP,banane_creole_fruit_legume_propriete,20,verg,vergers,38,verg,vergers,rpg,
+197,BCR,banane_creole_fruit_legume_reforme_fonciere,20,verg,vergers,38,verg,vergers,rpg,
+198,BEA,banane_export_autre,20,verg,vergers,38,verg,vergers,rpg,
+199,BEF,banane_export_fermage,20,verg,vergers,38,verg,vergers,rpg,
+200,BEI,banane_export_indivision,20,verg,vergers,38,verg,vergers,rpg,
+201,BEP,banane_export_propriete,20,verg,vergers,38,verg,vergers,rpg,
+202,BER,banane_export_reforme_fonciere,20,verg,vergers,38,verg,vergers,rpg,
+203,CAC,cafe_cacao,20,verg,vergers,38,verg,vergers,rpg,
+204,CBT,cerise_bigarreau_transfo,20,verg,vergers,38,verg,vergers,rpg,
+205,PFR,petit_fruit_rouge,20,verg,vergers,38,verg,vergers,rpg,
+206,PRU,prune_ente_transfo,20,verg,vergers,38,verg,vergers,rpg,
+207,PVT,peche_pavie_transfo,20,verg,vergers,38,verg,vergers,rpg,
+208,PWT,poire_williams_transfo,20,verg,vergers,38,verg,vergers,rpg,
+209,VGD,verger_dom,20,verg,vergers,38,verg,vergers,rpg,
+210,VRG,verger,20,verg,vergers,38,verg,vergers,rpg,
+211,RVI,restructuration_vignoble,21,vign,vignes,39,vign,vignes,rpg,
+212,VRC,vigne_cuve,21,vign,vignes,39,vign,vignes,rpg,
+213,VRN,vigne_cuve_non_prod,21,vign,vignes,39,vign,vignes,rpg,
+214,VRT,vigne_table,21,vign,vignes,39,vign,vignes,rpg,
+215,CAB,caroube,22,fruit_coq,fruits_a_coque,40,fruit_coq,fruits_a_coque,rpg,
+216,CTG,chataigne,22,fruit_coq,fruits_a_coque,40,fruit_coq,fruits_a_coque,rpg,
+217,NOS,noisette,22,fruit_coq,fruits_a_coque,40,fruit_coq,fruits_a_coque,rpg,
+218,NOX,noix,22,fruit_coq,fruits_a_coque,40,fruit_coq,fruits_a_coque,rpg,
+219,PIS,pistache,22,fruit_coq,fruits_a_coque,40,fruit_coq,fruits_a_coque,rpg,
+220,OLI,oliveraie,23,oliv,oliviers,41,oliv,oliviers,rpg,
+221,AAR,plante_a_non_perennes,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+222,AME,plante_a_parfum_medicinale_non_perenne,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+223,ANE,aneth,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+224,ANG,angelique,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+225,ANI,anis,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+226,ARP,plante_aromatique_perenne_autre_que_vanille,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+227,BAR,bardane,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+228,BAS,basilic,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+229,BRH,bourrache_temporaire,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+230,CAV,carvi,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+231,CHR,chardon_marie,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+232,CIB,ciboulette,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+233,CML,cameline,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+234,CMM,camomille,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+235,CRD,coriandre,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+236,CRF,cerfeuil,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+237,CUM,cumin,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+238,CUR,curcuma,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+239,EST,estragon,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+240,FNO,fenouil,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+241,FNU,fenugrec,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+242,HBL,houblon,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+243,LAV,lavande_lavandin,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+244,MAV,mauve,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+245,MLI,melisse,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+246,MLP,millepertuis,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+247,MOT,moutarde,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+248,MRJ,marjolaine_origan,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+249,MTH,menthe,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+250,ORT,ortie,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+251,OSE,oseille,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+252,PAR,plante_aromatique_autre_que_vanille,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+253,PMD,plante_medicinale,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+254,PME,plante_medicinale_perenne,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+255,PPA,autre_plante_a_parfum_aromatique_medicinale_annuelle,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+256,PPF,plante_a_parfum_autre,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+257,PPP,autre_plante_a_parfum_aromatique_medicinale_perenne,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+258,PRF,plante_a_parfum_perenne,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+259,PSL,persil,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+260,PSN,psyllium_noir_provence,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+261,PSY,plantain_psyllium,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+262,ROM,romarin,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+263,SGE,sauge,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+264,SRI,sarriette,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+265,TAB,tabac,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+266,THY,thym,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+267,TOT,tomate_transfo,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+268,VAL,valeriane,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+269,VNB,vanille_sous_bois,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+270,VNL,vanille,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+271,VNV,vanille_verte,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+272,YLA,ylang_ylang,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,rpg,
+273,BTN,betterave_non_fourragere,24,a_indus,autres_cult_indus,43,BTN,betterave_non_fourragere,rpg,
+274,AIL,ail,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+275,ART,artichaut,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+276,AUB,aubergine,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+277,BLT,bleuet,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+278,BUR,bugle_rampante,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+279,CAR,carotte,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+280,CCN,concombre_cornichon,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+281,CCT,courgette_citrouille,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+282,CEL,celeri,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+283,CES,chicoree_endive_scarole,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+284,CHU,chou,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+285,CMB,courge_musquee_butternut,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+286,CRA,cresson_alenois_temporaire,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+287,CRN,cornille,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+288,CRS,cresson,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+289,CSS,culture_sous_serre_hors_sol,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+290,DOL,dolique,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+291,EPI,epinard,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+292,FLA,autre_legume_ou_fruit_annuel,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+293,FLP,autre_legume_ou_fruit_perenne,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+294,FRA,fraise,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+295,GER,geranium,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+296,HPC,horticulture_ornementale_plein_champ,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+297,HSA,horticulture_ornementale_sous_abri,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+298,LBF,salade,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+299,LSA,legume_sous_abri,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+300,MAC,mache,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+301,MDI,maraichage_divers,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+302,MRG,marguerite,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+303,NVT,navet,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+304,OIG,oignon_echalote,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+305,PAN,panais,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+306,PAQ,paquerette,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+307,PAS,pasteque,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+308,PHF,pois_haricot_frais,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+309,PHS,pois_haricot_sec,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+310,PMV,primevere,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+311,POR,poireau,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+312,POT,potiron_potimarron,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+313,PSE,pensee,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+314,PVP,poivron_piment,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+315,RDI,radis,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+316,ROQ,roquette,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+317,RUT,rutabaga,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+318,SFI,salsifis,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+319,TOM,tomate,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+320,TOP,topinambour,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+321,VER,veronique,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,rpg,
+322,HAR,haricot_flageolet,25,leg_fl,legumes_fleurs,45,HAR,haricot_flageolet,rpg,
+323,MLO,melon,25,leg_fl,legumes_fleurs,46,MLO,melon,rpg,
+324,PPO,petits_pois,25,leg_fl,legumes_fleurs,47,PPO,petits_pois,rpg,
+325,PTC,pomme_terre_conso,25,leg_fl,legumes_fleurs,48,PDT,pomme_de_terre,rpg,
+326,PTF,pomme_terre_fec,25,leg_fl,legumes_fleurs,48,PDT,pomme_de_terre,rpg,
+327,CSA,canne_a_sucre_autre,26,cann,canne_sucre,49,cann,canne_sucre,rpg,
+328,CSF,canne_a_sucre_fermage,26,cann,canne_sucre,49,cann,canne_sucre,rpg,
+329,CSI,canne_a_sucre_indivision,26,cann,canne_sucre,49,cann,canne_sucre,rpg,
+330,CSP,canne_a_sucre_propriete,26,cann,canne_sucre,49,cann,canne_sucre,rpg,
+331,CSR,canne_a_sucre_reforme_fonciere,26,cann,canne_sucre,49,cann,canne_sucre,rpg,
+332,ACA,autre_culture_non_precisee,28,div,divers,50,div,divers,rpg,
+333,ACP,autre_culture_perenne,28,div,divers,50,div,divers,rpg,
+334,BFP,bande_avec_prod,28,div,divers,50,div,divers,rpg,
+335,BFS,bande_sans_prod,28,div,divers,50,div,divers,rpg,
+336,BOR,bordure_champ,28,div,divers,50,div,divers,rpg,
+337,BRO,brome_temporaire,28,div,divers,50,div,divers,rpg,
+338,BTA,bande_tampon,28,div,divers,50,div,divers,rpg,
+339,CAE,chataigneraie_entretenue,28,div,divers,50,div,divers,rpg,
+340,CEE,chenaie_entretenue,28,div,divers,50,div,divers,rpg,
+341,CID,cultures_interrangs_2cultures,28,div,divers,50,div,divers,rpg,
+342,CIT,cultures_interrangs_3cultures,28,div,divers,50,div,divers,rpg,
+343,CNA,chataigneraie_non_entretenue,28,div,divers,50,div,divers,rpg,
+344,CNE,chenaie_non_entretenue,28,div,divers,50,div,divers,rpg,
+345,CUA,culture_abattis,28,div,divers,50,div,divers,rpg,
+346,GRA,graminee_gazon_semence,28,div,divers,50,div,divers,rpg,
+347,MCT,miscanthus,28,div,divers,50,div,divers,rpg,
+348,MPA,autre_melange_plantes_n,28,div,divers,50,div,divers,rpg,
+349,MRS,marais_salant,28,div,divers,50,div,divers,rpg,
+350,MSW,culture_perenne_biomass,28,div,divers,50,div,divers,rpg,
+351,NYG,nyger,28,div,divers,50,div,divers,rpg,
+352,PCL,phacelie_temporaire,28,div,divers,50,div,divers,rpg,
+353,PEP,pepiniere,28,div,divers,50,div,divers,rpg,
+354,PEV,pepiniere_jeune,28,div,divers,50,div,divers,rpg,
+355,ROS,roseliere,28,div,divers,50,div,divers,rpg,
+356,SAG,roseliere_sagnes,28,div,divers,50,div,divers,rpg,
+357,SBO,surface_boisee_sur_une_ancienne_terre_agricole,28,div,divers,50,div,divers,rpg,
+358,SHD,surface_hautement_diversifié,28,div,divers,50,div,divers,rpg,
+359,SNA,surface_non_agricole_non_visible,28,div,divers,50,div,divers,rpg,
+360,SNE,surface_agricole_temporairement_non_exploitee,28,div,divers,50,div,divers,rpg,
+361,SNU,parc_elevage_couvert_degrade,28,div,divers,50,div,divers,rpg,
+362,TBT,tubercule_tropical,28,div,divers,50,div,divers,rpg,
+363,TCR,taillis_courte_rotation,28,div,divers,50,div,divers,rpg,
+364,TRU,truffiere_chenaie_plants_mycorhizes,28,div,divers,50,div,divers,rpg,
+365,VET,vetiver,28,div,divers,50,div,divers,rpg,
+366,ZZZ,culture_inconnue,28,div,divers,50,div,divers,rpg,
+501,,"Autres surfaces dans la SAU, avec contributions",28,div,divers,50,div,divers,nutzung,Autre surface au sein de la SAU 
+502,,"Autres surfaces dans la SAU, sans contributions",28,div,divers,50,div,divers,nutzung,Autre surface au sein de la SAU 
+503,,Asperges,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Autres cultures pérennes
+504,,"Autres pepinieres (roses, fruits, etc.)",28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+505,,"Autres pepinieres (rosiers, plantes ornementales, etc.)",,,,,,,nutzung,Autres cultures pérennes
+506,,"Autres surfaces de cultures perennes, avec contributions",,,,,,,nutzung,Autres cultures pérennes
+507,,"Autres surfaces de cultures perennes, avec contributions, agregee",,,,,,,nutzung,Autres cultures pérennes
+508,,"Autres surfaces de cultures perennes, sans contributions",,,,,,,nutzung,Autres cultures pérennes
+509,,Baies pluriannuelles,,,,,,,nutzung,Autres cultures pérennes
+510,,"Buissons, arbrisseaux et arbustes ornementaux",,,,,,,nutzung,Autres cultures pérennes
+511,,Champignons en pleine terre,28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+512,,Chataigneraies entretenues (surface),22,fruit_coq,fruits_a_coque,40,fruit_coq,fruits_a_coque,nutzung,Autres cultures pérennes
+513,,Cultures de muriers (alimentation des vers a soie),28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+514,,Cultures horticoles pluriannuelles de plein air (pas en serres),25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Autres cultures pérennes
+515,,Houblon,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,nutzung,Autres cultures pérennes
+516,,"Matieres premieres renouvelables pluriannuelles (roseau de Chine, etc.)",,,,,,,nutzung,Autres cultures pérennes
+517,,Pepiniere de fruits et de baies,28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+518,,Pepinieres de plantes forestieres hors zone forestiere,28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+519,,Pepinieres viticoles,28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+520,,Permaculture,,,,,,,nutzung,Autres cultures pérennes
+521,,Plantes aromatiques et plantes medicinales pluriannuelles,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,nutzung,Autres cultures pérennes
+522,,Rhubarbe,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Autres cultures pérennes
+523,,Sapins de Noel,28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+524,,Truffieres,28,div,divers,50,div,divers,nutzung,Autres cultures pérennes
+525,,"Autres cultures fruitieres (kiwis, sureau, etc.)",25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Cultures fruitières
+526,,Cultures fruitieres (fruits a noyau),20,verg,vergers,38,verg,vergers,nutzung,Cultures fruitières
+527,,Cultures fruitieres (poires),20,verg,vergers,38,verg,vergers,nutzung,Cultures fruitières
+528,,Cultures fruitieres (pommes),20,verg,vergers,38,verg,vergers,nutzung,Cultures fruitières
+529,,Cultures fruitieres agregee,20,verg,vergers,38,verg,vergers,nutzung,Cultures fruitières
+530,,Autres cultures sous abri avec fondations permanentes,,,,,,,nutzung,Cultures protégées 
+531,,"Autres cultures sous abri sans fondations permanentes, avec contributions",,,,,,,nutzung,Cultures protégées 
+532,,"Autres cultures sous abri sans fondations permanentes, sans contributions",,,,,,,nutzung,Cultures protégées 
+533,,Autres cultures speciales sous abri avec fondations permanentes,,,,,,,nutzung,Cultures protégées 
+534,,Autres cultures speciales sous abri sans fondations permanentes,,,,,,,nutzung,Cultures protégées 
+535,,Cultures horticoles sous abri avec fondations permanentes,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Cultures protégées 
+536,,Cultures horticoles sous abri sans fondations permanentes,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Cultures protégées 
+537,,Cultures maraicheres sous abri avec fondations permanentes,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Cultures protégées 
+538,,Cultures maraicheres sous abri sans fondations permanentes,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Cultures protégées 
+539,,Cultures maraicheres sous abri sans fondations permanentes; sur des tables de plantation ou des etageres,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Cultures protégées 
+540,,Cultures maraicheres sous abri sans fondations permanentes; sur sol naturel,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Cultures protégées 
+541,,"Cultures sous abri sans fondations permanentes, avec contributions, agregee",,,,,,,nutzung,Cultures protégées 
+542,,Foret,,,,,,,nutzung,Foret
+543,,"Haies, bosquets champetres et berges boisees (avec la bande herbeuse)",,,,,,,nutzung,"Haies, bosquets et berges boisées "
+544,,"Haies, bosquets champetres et berges boisees (avec la bande tampon) (Surfaces de promotion de la biodiversite specifiques a la region)",,,,,,,nutzung,"Haies, bosquets et berges boisées "
+545,,"Paturages (paturages attenants a la ferme, autres paturages sauf les paturages d'estivage)",17,esti,estives_landes,35,esti,estives_landes,nutzung,Paturages permanents
+546,,Paturages boises (sauf surfaces boisees),17,esti,estives_landes,35,esti,estives_landes,nutzung,Paturages permanents
+547,,Paturages extensifs,17,esti,estives_landes,35,esti,estives_landes,nutzung,Paturages permanents
+548,,Surfaces de promotion de la biodiversite specifiques a la region (paturages),17,esti,estives_landes,35,esti,estives_landes,nutzung,Paturages permanents
+549,,Autres prairies permanentes (sans les paturages),,,,,,,nutzung,Prairies permanentes
+550,,Autres surfaces herbageres (surface herbagere permanente) avec contributions,,,,,,,nutzung,Prairies permanentes
+551,,Autres surfaces herbageres (surface herbagere permanente) sans contributions,,,,,,,nutzung,Prairies permanentes
+552,,"Prairies de fauche en region d'estivage, autres",17,esti,estives_landes,35,esti,estives_landes,nutzung,Prairies permanentes
+553,,"Prairies de fauche en region d'estivage, type prairie peu intensive",17,esti,estives_landes,35,esti,estives_landes,nutzung,Prairies permanentes
+554,,Prairies extensives (sans les paturages),18,pp,prairies_permanentes,36,pp,prairies_permanentes,nutzung,Prairies permanentes
+555,,Prairies peu intensives (sans les paturages),18,pp,prairies_permanentes,36,pp,prairies_permanentes,nutzung,Prairies permanentes
+556,,Prairies riveraines (sauf les paturages),18,pp,prairies_permanentes,36,pp,prairies_permanentes,nutzung,Prairies permanentes
+557,,Prairies riveraines d'un cours d'eau (sauf les paturages),18,pp,prairies_permanentes,36,pp,prairies_permanentes,nutzung,Prairies permanentes
+558,,"Surfaces de promotion de la biodiversite specifiques a la region (Surface herbagere, sauf les paturages)",,,,,,,nutzung,Prairies permanentes
+559,,Paturages d'estivage,17,esti,estives_landes,35,esti,estives_landes,nutzung,Surface d'estivage
+560,,Surfaces a litiere dans la SAU,,,,,,,nutzung,Surfaces à litière
+561,,Autres surfaces situees en dehors de la SAU et la SE,,,,,,,nutzung,Surfaces en dehors de la SAU
+562,,Chemins naturels non stabilises,,,,,,,nutzung,Surfaces en dehors de la SAU
+563,,"Fosses humides, mares, etangs",,,,,,,nutzung,Surfaces en dehors de la SAU
+564,,Jardins potager,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Surfaces en dehors de la SAU
+565,,Murs de pierres seches,,,,,,,nutzung,Surfaces en dehors de la SAU
+566,,"Production agricole sous abri (par ex. champignons de Paris, chicoree witloof)",,,,,,,nutzung,Surfaces en dehors de la SAU
+567,,Surfaces de promotion de la biodiversite specifiques a la region,,,,,,,nutzung,Surfaces en dehors de la SAU
+568,,"Surfaces dont l'affectation principale n'est pas l'exploitation agricole (terrains a batir equipes et surfaces comprises dans les terrains de golf et de camping, aerodromes et terrains d'entrainement militaire, surfaces delimitees des bas-cotes des lignes de chemins de fer, de routes publiques, de cours et de plans d'eau)",,,,,,,nutzung,Surfaces en dehors de la SAU
+569,,"Surfaces improductives (p. ex. haies sans les bandes tampons, surfaces broyees, surfaces avec un degre eleve de mauvaises herbes)",28,div,divers,50,div,divers,nutzung,Surfaces en dehors de la SAU
+570,,"Surfaces ruderales, tas d'epierrage et affleurements rocheux",,,,,,,nutzung,Surfaces en dehors de la SAU
+571,,"Amidonnier, engrain",,,,,,,nutzung,Terres cultivées
+572,,Autre chanvre,9,plte_fb,plante_a_fibre,26,CHV,chanvre,nutzung,Terres cultivées
+573,,Autres prairies artificielles donnant droit aux contributions (p.ex. paturages pour porcs et volaille),,,,,,,nutzung,Terres cultivées
+574,,Autres terres ouvertes avec contributions,,,,,,,nutzung,Terres cultivées
+575,,Autres terres ouvertes ne donnant pas droit aux contributions (surfaces de promotion de la biodiversite specifiques a la region),,,,,,,nutzung,Terres cultivées
+576,,Autres terres ouvertes sans contributions,,,,,,,nutzung,Terres cultivées
+577,,"avec des cereales ou de la cameline, au moins 30 % de lentilles lors de la recolte (pour la production de grains)",,,,,,,nutzung,Terres cultivées
+578,,Avoine,4,cer_2nd,autres_cereales,,,,nutzung,Terres cultivées
+579,,Baies annuelles (p.ex. fraises),,,,,,,nutzung,Terres cultivées
+580,,Bande culturale extensive,,,,,,,nutzung,Terres cultivées
+581,,Betteraves fourrageres,16,fou,fourrage,31,fou_autres,fourrage_autres,nutzung,Terres cultivées
+582,,Betteraves sucrieres,24,a_indus,autres_cult_indus,43,BTN,betterave_non_fourragere,nutzung,Terres cultivées
+583,,Ble d'automne (sans ble fourrager de la liste swiss granum),1,ble,ble_tendre,1,BTH,ble_tendre_hiver,nutzung,Terres cultivées
+584,,Ble de printemps (sans ble fourrager de la liste swiss granum),1,ble,ble_tendre,2,BTP,ble_tendre_printemps,nutzung,Terres cultivées
+585,,Ble dur,4,cer_2nd,autres_cereales,10,BDH,ble_dur_hiver,nutzung,Terres cultivées
+586,,Ble fourrager selon liste swiss granum,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,nutzung,Terres cultivées
+587,,Cameline,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,nutzung,Terres cultivées
+588,,Carthame,,,,,,,nutzung,Terres cultivées
+589,,Cereales ensilees,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,nutzung,Terres cultivées
+590,,Chanvre pour l'utilisation des fibres,9,plte_fb,plante_a_fibre,26,CHV,chanvre,nutzung,Terres cultivées
+591,,Chanvre pour l'utilisation des graines,9,plte_fb,plante_a_fibre,26,CHV,chanvre,nutzung,Terres cultivées
+592,,Colza d'automne comme matiere premiere renouvelable,5,colz,colza,18,CZH,colza_hiver,nutzung,Terres cultivées
+593,,Colza d'automne destine a la fabrication d'huile comestible,5,colz,colza,19,olea,autres_oleagineux,nutzung,Terres cultivées
+594,,Colza de printemps comme matiere premiere renouvelable,5,colz,colza,19,olea,autres_oleagineux,nutzung,Terres cultivées
+595,,Colza de printemps destine a la fabrication d'huile comestible,5,colz,colza,19,olea,autres_oleagineux,nutzung,Terres cultivées
+596,,Courges a huile,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,nutzung,Terres cultivées
+597,,"Cultures horticoles annuelles de plein champ (fleurs, gazon en rouleaux, etc.)",25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Terres cultivées
+598,,Cultures maraicheres de plein champ annuelles (sauf les legumes de conserve),25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Terres cultivées
+599,,Epeautre,4,cer_2nd,autres_cereales,13,cer_2nd_h,autres_cereales_hiver,nutzung,Terres cultivées
+600,,Graminees fourrageres destinees a la production de semences (contrat de culture),,,,,,,nutzung,Terres cultivées
+601,,Haricots et vesces en grains (p.ex. feveroles),25,leg_fl,legumes_fleurs,45,HAR,haricot_flageolet,nutzung,Terres cultivées
+602,,Jachere florale,11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,nutzung,Terres cultivées
+603,,Jachere tournante,11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,nutzung,Terres cultivées
+604,,Legumes de conserve cultives en plein champ,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Terres cultivées
+605,,Legumineuses fourrageres destinees a la production de semences (contrat de culture),16,fou,fourrage,32,fou_fabacees,fourrage_fabacees,nutzung,Terres cultivées
+606,,Lentilles,15,leg_gr,legumineuses_graines,30,leg_gr,legumineuses_graines,nutzung,Terres cultivées
+607,,Lin,9,plte_fb,plante_a_fibre,27,LIF,lin_fibres,nutzung,Terres cultivées
+608,,Lupins,8,prot,proteagineux,25,prot,proteagineux,nutzung,Terres cultivées
+609,,Mais d'ensilage et mais vert,2,mais,mais,4,MIE,mais_ensilage,nutzung,Terres cultivées
+610,,Mais grain,2,mais,mais,5,MIS,mais_grain_semence,nutzung,Terres cultivées
+611,,Meteil de cereales fourrageres,16,fou,fourrage,31,fou_autres,fourrage_autres,nutzung,Terres cultivées
+612,,Meteil de cereales panifiables,,,,,,,nutzung,Terres cultivées
+613,,"Meteil de haricots, de vesces, de pois, de pois chiches et de lupins avec des cereales ou de la cameline, au moins 30 % de legumineuses lors de la recolte (pour la production de grains)",,,,,,,nutzung,Terres cultivées
+614,,"Meteil de lentilles avec des cereales ou de la cameline, au moins 30 % de lentilles lors de la recolte (pour la production de grains)",,,,,,,nutzung,Terres cultivées
+615,,Millet,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,nutzung,Terres cultivées
+616,,Millet grains,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,nutzung,Terres cultivées
+617,,Millet plante entiere,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,nutzung,Terres cultivées
+618,,Moutarde,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,nutzung,Terres cultivées
+619,,Orge d'automne,3,orge,orge,6,ORH,orge_hiver,nutzung,Terres cultivées
+620,,Orge de printemps,3,orge,orge,7,ORP,orge_printemps,nutzung,Terres cultivées
+621,,Ourlet sur terres assolees,,,,,,,nutzung,Terres cultivées
+622,,Pavot,,,,,,,nutzung,Terres cultivées
+623,,Plantes aromatiques et medicinales annuelles,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,nutzung,Terres cultivées
+624,,Plants de pommes de terre (contrat de culture),28,div,divers,50,div,divers,nutzung,Terres cultivées
+625,,Pois chiches,15,leg_gr,legumineuses_graines,30,leg_gr,legumineuses_graines,nutzung,Terres cultivées
+626,,Pois en grains (p.ex. pois proteagineux),8,prot,proteagineux,25,prot,proteagineux,nutzung,Terres cultivées
+627,,Pommes de terre,25,leg_fl,legumes_fleurs,48,PDT,pomme_de_terre,nutzung,Terres cultivées
+628,,Prairies artificielles (sans les paturages),19,pt,prairies_temporaires,37,pt,prairies_temporaires,nutzung,Terres cultivées
+629,,Quinoa,,,,,,,nutzung,Terres cultivées
+630,,Racines de chicoree,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,nutzung,Terres cultivées
+631,,Riz,14,riz,riz,29,riz,riz,nutzung,Terres cultivées
+632,,Sarrasin,4,cer_2nd,autres_cereales,14,cer_2nd_p,autres_cereales_printemps,nutzung,Terres cultivées
+633,,Seigle,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,nutzung,Terres cultivées
+634,,Semences de mais (contrat de culture),,,,,,,nutzung,Terres cultivées
+635,,Soja,7,olea,autres_oleagineux,24,SOJ,soja,nutzung,Terres cultivées
+636,,Sorgho,4,cer_2nd,autres_cereales,15,SOG,sorgho,nutzung,Terres cultivées
+637,,Sorgho grains,4,cer_2nd,autres_cereales,15,SOG,sorgho,nutzung,Terres cultivées
+638,,Sorgho plante entiere,4,cer_2nd,autres_cereales,15,SOG,sorgho,nutzung,Terres cultivées
+639,,Tabac,24,a_indus,autres_cult_indus,42,a_indus,autres_cult_indus,nutzung,Terres cultivées
+640,,Terres ouvertes donnant droit aux contributions (surfaces de promotion de la biodiversite specifiques a la region),11,gel_sp,gel_sans_prod,28,gel_sp,gel_sans_prod,nutzung,Terres cultivées
+641,,Tournesol comme matiere premiere renouvelable,6,TRN,tournesol,20,TRN,tournesol,nutzung,Terres cultivées
+642,,Tournesol destine a la fabrication d'huile comestible,6,TRN,tournesol,20,TRN,tournesol,nutzung,Terres cultivées
+643,,Triticale,4,cer_2nd,autres_cereales,12,cer_2nd,autres_cereales,nutzung,Terres cultivées
+644,,Surfaces viticoles presentant une biodiversite naturelle,21,vign,vignes,39,vign,vignes,nutzung,Vignobles
+645,,Vignes,21,vign,vignes,39,vign,vignes,nutzung,Vignobles
+646,,Vignes (surfaces de promotion de la biodiversite specifiques a la re-gion),21,vign,vignes,39,vign,vignes,nutzung,Vignobles
+1001,,Sealed,,,,,,,clcplus,
+1002,,Woody needle leaved trees,,,,,,,clcplus,
+1003,,Woody Broadleaved deciduous trees,,,,,,,clcplus,
+1004,,Woody Broadleaved evergreen trees,,,,,,,clcplus,
+1005,,Low-growing woody plants,,,,,,,clcplus,
+1006,,Permanent herbaceous,,,,,,,clcplus,
+1007,,Periodically herbaceous,,,,,,,clcplus,
+1008,,Lichens and mosses,,,,,,,clcplus,
+1009,,Non and sparsely vegetated,,,,,,,clcplus,
+1010,,Water,,,,,,,clcplus,
+1011,,Snow and ice,,,,,,,clcplus,
+1254,,Outside area,,,,,,,clcplus,
+1255,,No data,,,,,,,clcplus

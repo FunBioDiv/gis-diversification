@@ -60,7 +60,7 @@ ext_liubio <- exactextractr::exact_extract(
   progress = FALSE
 )
 
-plot(ext_liucov, ext_liubio)
+# plot(ext_liucov, ext_liubio)
 
 out <- data.frame(
   "ID" = all$Funbiodiv_ID,

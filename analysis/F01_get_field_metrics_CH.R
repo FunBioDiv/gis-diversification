@@ -1,7 +1,14 @@
-# Get all plots around the fields coordinates in a buffer
-# considering the year of the measurement
-
-# For the Swiss dataset, we use data received from Selma Cadot
+# Get agricultural plots around the fields coordinates
+# considering a buffer and the year of the measurement
+#
+# input:
+#   data/raw-data/coordinates_year_crop.csv
+#   data/raw-data/CH/nutz_20XX.gpkg (2019-2023)
+# output:
+#   data/derived-data/metrics_rpg.csv (metrics)
+#   data/derived-data/nutz_fields.gpkg (spatial polygons of crop fields)
+#
+# For the Swiss dataset, we use data received from Selma Cadot on 18/02/2026
 # Run in ~1min
 
 library(terra)
@@ -15,8 +22,9 @@ devtools::load_all()
 # data are available for the period 2019 - 2023
 period <- 2019:2023
 nutz_layer <- "nutz_XXXX.gpkg"
-labRPG <- c("id_parcel", "code_cultu", "code_group")
 colNUTZ <- c("nutzungsidentifikator", "nutzung_fr", "Hauptkategorie_FR")
+# do we want to keep RPG column names?
+# labRPG <- c("id_parcel", "code_cultu", "code_group")
 
 buffer_fields <- c(500, 1000, 1500) #in m
 years <- 5 # for crop rotation
@@ -27,6 +35,9 @@ outfolder <- here("data", "derived-data")
 # get the coordinates from the points
 # from shinyFunbiodiv/analysis/03_update_data.R
 df <- read.csv(here(datafolder, "coordinates_year_crop.csv"))
+# create an ID
+df$ID <- paste(df$Study_ID, df$Plot_ID, df$Year, sep = "_")
+# transform as spatial points
 pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
 # project in EPSG 2056
 pts <- project(pts, "EPSG:2056")
@@ -39,7 +50,7 @@ keep <- pts$Study_ID %in% "PestiRed" & !is.na(df$Lat)
 # table(nutz$Hauptkategorie_FR, useNA="ifany")
 rmCat <- c(
   "Forêt",
-  "Haies, bosquets et berges boisées",
+  "Haies, bosquets et berges boisées ", #space is important !
   "Surfaces en dehors de la SAU"
 )
 
@@ -144,4 +155,5 @@ write.csv(df_out, file.path(outfolder, "metrics_nutz.csv"), row.names = FALSE)
 
 # save rpg fields
 nutz_all <- do.call(rbind, nutz_out)
-writeVector(nutz_all, file.path(outfolder, "nutz_fields.gpkg"))
+#fmt: skip
+writeVector(nutz_all, file.path(outfolder, "nutz_fields.gpkg"), overwrite = TRUE)
