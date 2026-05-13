@@ -34,10 +34,10 @@ nutz <- vect(file.path(outfolder, "nutz_fields.gpkg"))
 
 # project and select only ID
 rpg_3035 <- project(rpg, crs(liucov))
-rpg_3035 <- rpg_3035[, "Funbiodiv_ID"]
+rpg_3035 <- rpg_3035[, c("Funbiodiv_ID", "Area_ha")]
 
 nutz_3035 <- project(nutz, crs(liucov))
-nutz_3035 <- nutz_3035[, "Funbiodiv_ID"]
+nutz_3035 <- nutz_3035[, c("Funbiodiv_ID", "Area_ha")]
 
 # merge rpg and nutz
 all <- rbind(rpg_3035, nutz_3035)
@@ -56,16 +56,18 @@ ext_liucov <- exactextractr::exact_extract(
 ext_liubio <- exactextractr::exact_extract(
   liubio,
   st_as_sf(buff),
-  fun = "mean",
+  fun = "sum",
   progress = FALSE
 )
+# sum here and divide by field size afterward
 
 # plot(ext_liucov, ext_liubio)
 
 out <- data.frame(
   "ID" = all$Funbiodiv_ID,
   "haie_cover" = ext_liucov,
-  "haie_biomass_kgperha" = ext_liubio
+  "haie_biomass_kg" = ext_liubio,
+  "haie_biomass_kgperha" = ext_liubio / all$Area_ha
 )
 
 
