@@ -111,7 +111,6 @@ fields <- rbind(rpg, nutz)
 ```{r}
 #| label: fig-yearstudy
 #| fig-cap: "Number of observations per year and per project"
-
 df_year <- as.data.frame(table(pts$Study_ID, pts$Year))
 names(df_year) <- c("Dataset", "Year", "Nobs")
 plot_ly(
@@ -132,7 +131,6 @@ plot_ly(
 ```{r}
 #| label: tbl-yearstudy
 #| tbl-cap: "Number of observations per year and per project"
-
 n_year <- as.data.frame.matrix(table(pts$Study_ID, pts$Year))
 n_year$TOTAL <- rowSums(n_year)
 n_year['TOTAL', ] <- colSums(n_year)
@@ -173,7 +171,6 @@ We identified the crop field from `RPG` or `Nutzung` dataset corresponding to th
 ```{r}
 #| label: tbl-inrpg
 #| tbl-cap: "Number of observations in fields from RPG"
-
 # select relevant rows
 ind <- ind[
   ind$Year %in% 2015:2024 & !is.na(ind$Lat) & ind$Study_ID != "DURUM_MIX_GM",
@@ -196,7 +193,6 @@ There are disparities among projects with `BACCHUS_OPERA`, `FRAMEwork_BVD` and `
 ```{r}
 #| label: fig-outbacchus
 #| fig-cap: "Case of BACCHUS_OPERA observations in 2023 with overlaied RPG"
-
 sel <- ind$ID[
   ind$Study_ID == "BACCHUS_OPERA" & ind$Year == "2023" & is.na(ind$Crop_N)
 ]
@@ -234,7 +230,6 @@ We calculated the area and the perimeter of the crop fields corresponding to the
 ```{r}
 #| label: fig-boxareastudy
 #| fig-cap: "Field area in ha per project. The dashed line show the median area."
-
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$Area_ha ~ ind$Study_ID,
@@ -251,7 +246,6 @@ abline(h = median(ind$Area_ha, na.rm = TRUE), lwd = 2, lty = 3)
 ```{r}
 #| label: tbl-areastudy
 #| tbl-cap: "Summary statistics per project of the area (in ha) of crop fields"
-
 sum_area <- sapply(
   tapply(ind$Area_ha, ind$Study_ID, summary),
   function(x) x[1:6]
@@ -273,7 +267,6 @@ knitr::kable(t(round(sum_area, 2)))
 ```{r}
 #| label: fig-boxperimstudy
 #| fig-cap: "Field perimeter in m per project. The dashed line show the median perimeter."
-
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$Perim_m ~ ind$Study_ID,
@@ -338,7 +331,6 @@ There is a strong relation between area and perimeter (@fig-areaperim). In media
 ```{r}
 #| label: fig-highperim
 #| fig-cap: "Field with small area and large perimeter"
-
 minA <- fields[fields$Funbiodiv_ID == ind$ID[which.min(ind$Area_ha)]]
 minP <- pts[pts$ID %in% minA$Funbiodiv_ID]
 mapview(
@@ -402,7 +394,6 @@ We see that some observations don't have crop field within 500m (N=2). These obs
 ```{r}
 #| label: tbl-nofield500
 #| tbl-cap: "Observations with no fields within a 500m buffer."
-
 miss_b500 <- ind[is.na(ind$Mean_fieldsize_500m_ha), ]
 miss_b500[
   order(miss_b500$Study_ID, miss_b500$Year),
@@ -414,15 +405,12 @@ miss_b500[
 ```{r}
 #| label: fig-corfsize
 #| fig-cap: "Correlation among field areas per buffer size"
-
 meansize <- data.frame(
   "B_500m" = ind$Mean_fieldsize_500m_ha,
   "B_1000m" = ind$Mean_fieldsize_1000m_ha,
   "B_1500m" = ind$Mean_fieldsize_1500m_ha
 )
 pairs(meansize, lower.panel = panel.smooth, upper.panel = panel.cor)
-# pairs() not sure why pairs do no work...
-
 ```
 
 
@@ -433,7 +421,6 @@ pairs(meansize, lower.panel = panel.smooth, upper.panel = panel.cor)
 ```{r}
 #| label: fig-fsize500
 #| fig-cap: "Average field size with buffer of 500m"
-
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$Mean_fieldsize_500m_ha ~ ind$Study_ID,
@@ -450,7 +437,6 @@ abline(h = median(ind$Mean_fieldsize_500m_ha, na.rm = TRUE), lwd = 2, lty = 3)
 ```{r}
 #| label: fig-fsize1000
 #| fig-cap: "Average field size with buffer of 1000m"
-
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$Mean_fieldsize_1000m_ha ~ ind$Study_ID,
@@ -467,7 +453,6 @@ abline(h = median(ind$Mean_fieldsize_1000m_ha, na.rm = TRUE), lwd = 2, lty = 3)
 ```{r}
 #| label: fig-fsize1500
 #| fig-cap: "Average field size with buffer of 1500m"
-
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$Mean_fieldsize_1500m_ha ~ ind$Study_ID,
@@ -661,6 +646,10 @@ lulc_id <- t(apply(lulc_lab, 1, function(x) ref$id[match(x, ref$name)]))
 nyear <- apply(lulc_lab, 1, function(x) length(x[!is.na(x)]))
 ncrop <- apply(lulc_lab, 1, function(x) length(unique(x[!is.na(x)])))
 # ngroup <- apply(lulc_group, 1, function(x) length(unique(x[!is.na(x)])))
+
+ind$ncrop <- ncrop
+ind$ncrop[nyear < 5] <- NA
+# table(ind$ncrop, useNA="ifany")
 ```
 
 ::: {.panel-tabset}
@@ -669,7 +658,6 @@ ncrop <- apply(lulc_lab, 1, function(x) length(unique(x[!is.na(x)])))
 ```{r}
 #| label: fig-nyearstudy
 #| fig-cap: "Length of the land cover time series per project."
-
 nyeardb <- data.frame(table(nyear, ind$Study_ID))
 names(nyeardb) <- c("NYear", "Dataset", "Nobs")
 plot_ly(
@@ -685,7 +673,6 @@ plot_ly(
   add_bars() %>%
   layout(barmode = "stack") %>%
   config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
-
 ```
 
 ## table
@@ -693,7 +680,6 @@ plot_ly(
 ```{r}
 #| label: tbl-cropy
 #| tbl-cap: "Number of observations per length of crop rotation data (in years) available"
-
 info <- table(ind$Study_ID, nyear)
 # percentage <- round(colSums(info) / nrow(ind) * 100, 2)
 # info <- rbind(info, percentage)
@@ -728,7 +714,6 @@ plot_ly(
   add_bars() %>%
   layout(barmode = "stack") %>%
   config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
-
 ```
 
 ## table
@@ -764,7 +749,6 @@ We overlaid the field as defined in `RPG*` ((+ a 10m buffer) with the tree cover
 ```{r}
 #| label: fig-boxhaiecover
 #| fig-cap: "Hedgerow cover (%) per project. The dashed line show the median cover."
-
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$haie_cover ~ ind$Study_ID,
@@ -801,7 +785,6 @@ knitr::kable(t(round(sum_area, 2)))
 ```{r}
 #| label: fig-boxhaiebiomass
 #| fig-cap: "Hedgerow biomass density (kg per ha) per project. The dashed line show the median biomass."
-
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$haie_biomass_kgperha ~ ind$Study_ID,
@@ -817,7 +800,6 @@ abline(h = median(ind$haie_biomass_kgperha, na.rm = TRUE), lwd = 2, lty = 3)
 ```{r}
 #| label: tbl-haiebiomass
 #| tbl-cap: "Summary statistics per project of the hedgerow biomass density (kg per ha)"
-
 sum_area <- sapply(
   tapply(ind$haie_cover, ind$Study_ID, summary),
   function(x) x[1:6]
@@ -943,7 +925,6 @@ mapview::mapview(
 ```{r}
 #| label: tbl-bcover
 #| tbl-cap: "Summary of the land cover classes  composition in 1500m buffer"
-
 m1500 <- grep("frac1500", names(ind))
 l1500 <- gsub("frac1500_", "", names(ind)[m1500])
 n1500 <- as.numeric(substr(l1500, 1, regexpr("_", l1500) - 1))
@@ -979,7 +960,6 @@ In average, roughly half of the buffer areas are filled with land cover classes 
 ```{r}
 #| label: tbl-topcover
 #| tbl-cap: "Top 10 most frequent land cover classes"
-
 mean_frac <- apply(ind[, m1500], 2, mean, na.rm = TRUE)
 top10 <- sort(mean_frac, decreasing = TRUE)[1:10]
 round(top10, 2)
@@ -993,7 +973,6 @@ round(top10, 2)
 ```{r}
 #| label: fig-coverforest
 #| fig-cap: "Average land cover per project with buffer of 500m"
-
 boxplot(
   ind$frac1500_1003_Woody.Broadleaved.deciduous.trees ~ ind$Study_ID,
   las = 2,
@@ -1013,7 +992,6 @@ abline(
 ```{r}
 #| label: fig-coversealed
 #| fig-cap: "Average land cover per project with buffer of 500m"
-
 boxplot(
   ind$frac1500_1001_Sealed ~ ind$Study_ID,
   las = 2,
@@ -1029,19 +1007,18 @@ abline(h = median(ind$frac1500_1001_Sealed, na.rm = TRUE), lwd = 2, lty = 3)
 ```{r}
 #| label: fig-covervine
 #| fig-cap: "Average land cover per project with buffer of 500m"
-
 mvigne <- grep("vigne", tolower(names(ind)))
-frac_vigne <- rowSums(ind[, mvigne], na.rm = TRUE)
+ind$frac_vigne <- rowSums(ind[, mvigne], na.rm = TRUE)
 
 boxplot(
-  frac_vigne ~ ind$Study_ID,
+  ind$frac_vigne ~ ind$Study_ID,
   las = 2,
   xlab = "",
   ylab = "%",
   main = "% vineyard"
 )
 abline(
-  h = median(frac_vigne, na.rm = TRUE),
+  h = median(ind$frac_vigne, na.rm = TRUE),
   lwd = 2,
   lty = 3
 )
@@ -1062,6 +1039,28 @@ abline(
 
 
 ## Summary and questions about metrics
+
+```{r}
+#| label: fig-corr
+#| fig-cap: "Correlation among field diversity metrics"
+out <- data.frame(
+  "Area\nha" = ind$Area_ha,
+  "Perim\nm" = ind$Perim_m,
+  "Fieldsize\nB500 ha" = ind$Mean_fieldsize_500m_ha,
+  "Fieldsize\nB1500 ha" = ind$Mean_fieldsize_1500m_ha,
+  "Croprotation\n5yr N" = ind$ncrop,
+  "hedgerow\nperc" = ind$haie_cover,
+  "woody\nB1500 perc" = ind$frac1500_1003_Woody.Broadleaved.deciduous.trees,
+  "sealed\nB1500 perc" = ind$frac1500_1001_Sealed,
+  "vigne\nB1500 perc" = ind$frac_vigne,
+  check.names = FALSE
+)
+
+pairs(out, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+
+
 
 - Most observations have a corresponding crop field in RPG dataset (@tbl-inrpg).    
  

@@ -1,6 +1,6 @@
 # Overview {.unnumbered}
 
-Explorations des jeux de données en cours:    
+Explorations des jeux de données en cours (Fr):    
 
 1. [Données RPG, RPG complété et BD haies](https://funbiodiv.github.io/gis-diversification/analysis/01_explore_points.html)  
 2. [Croisement RPG+OSO](https://funbiodiv.github.io/gis-diversification/analysis/02_land_cover.html)
@@ -12,3 +12,6 @@ Further exploration:
 
 6. [Comparaison des données sur les haies](https://funbiodiv.github.io/gis-diversification/analysis/06_haie.html)
 7. [Identification des parcelles vers Toulouse](https://funbiodiv.github.io/gis-diversification/analysis/07_fields_Toulouse.html)
+
+Last calculation of metrics (FR+CH):  
+10. [Summary 2](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html)

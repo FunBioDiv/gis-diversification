@@ -95,7 +95,7 @@
     "href": "index.html",
     "title": "Overview",
     "section": "",
-    "text": "Overview\nExplorations des jeux de données en cours:\n\nDonnées RPG, RPG complété et BD haies\n\nCroisement RPG+OSO\nComparaison taille des parcelles RPG\nLongueurs d’interfaces\nSummary\n\nFurther exploration:\n\nComparaison des données sur les haies\nIdentification des parcelles vers Toulouse"
+    "text": "Overview\nExplorations des jeux de données en cours (Fr):\n\nDonnées RPG, RPG complété et BD haies\n\nCroisement RPG+OSO\nComparaison taille des parcelles RPG\nLongueurs d’interfaces\nSummary\n\nFurther exploration:\n\nComparaison des données sur les haies\nIdentification des parcelles vers Toulouse\n\nLast calculation of metrics (FR+CH):\n10. Summary 2"
   },
   {
     "objectID": "analysis/03_field_size.html",
@@ -417,7 +417,7 @@
     "href": "analysis/10_summary_FRCH.html#summary-and-questions-about-metrics",
     "title": "Calculation of diversification indicators and other covariates",
     "section": "Summary and questions about metrics",
-    "text": "Summary and questions about metrics\n\nMost observations have a corresponding crop field in RPG dataset (Table 2).\nFurther work on land cover class homogeneization is needed to make use of the extracted information. This will be done independantly from the GIS data extraction.\nThe edge density needs further thinking to decide which kind of edges should be quantified, and at what scale.\nThe sampling location within the field might influence the results (different impact of hedgerows, or of agricultural practices). We might want to add an indicator reflecting the distance to the center of the field and/or the distance to the closest field boundary?"
+    "text": "Summary and questions about metrics\n\n\n\n\n\n\n\n\nFigure 28: Correlation among field diversity metrics\n\n\n\n\n\n\nMost observations have a corresponding crop field in RPG dataset (Table 2).\nFurther work on land cover class homogeneization is needed to make use of the extracted information. This will be done independantly from the GIS data extraction.\nThe edge density needs further thinking to decide which kind of edges should be quantified, and at what scale.\nThe sampling location within the field might influence the results (different impact of hedgerows, or of agricultural practices). We might want to add an indicator reflecting the distance to the center of the field and/or the distance to the closest field boundary?"
   },
   {
     "objectID": "analysis/10_summary_FRCH.html#field-size",

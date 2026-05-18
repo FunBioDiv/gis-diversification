@@ -1,0 +1,2 @@
+var data = data || {}; data["Liu 2023 Biomass"] = 
+[[10190,10228,4348,null,null],[6399,4094,12337,null,null],[3900,261,16106,null,null],[3900,261,16106,null,null],[2761,1032,9511,null,null],[1947,29,6473,null,null],[null,null,null,null,null],[null,null,null,null,null]];

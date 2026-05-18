@@ -4,7 +4,7 @@ Extraction des métriques de diversification depuis les coordonnées des sites d
 
 Les données sont sauvegardées dans le répertoire Nextcloud WP2/gis-diversification/data/
 
-Pour le moment, ce sont seulement des documents exploratoires: 
+## Exploration of the French dataset
 
 #### 1. exploration des données RPG, RPG complété et BD haies  
 ```r
@@ -27,7 +27,7 @@ quarto::quarto_render("analysis/03_field_size.qmd")
 quarto::quarto_render("analysis/04_bordure.qmd")
 ```
 
-#### 5. summary 
+#### 5. summary Fr 
 (~5 min to render)
 ```r
 quarto::quarto_render("analysis/05_summary.qmd")
@@ -45,10 +45,17 @@ quarto::quarto_render("analysis/06_haie.qmd")
 quarto::quarto_render("analysis/07_fields_Toulouse.qmd")
 ```
 
-#### 8. exploration of the Swiss dataset
+
+
+## Calculation and summary of French+Swiss metrics
+
+Updated calculation considering France and Switzerland. The file `make.R` run all the calculations while the file `10_summary_FRCH.qmd` provides a summary of the calculated metrics.
 
 ```r
-quarto::quarto_render("analysis/08_Swiss_data.qmd")
+# re compute all the indicators
+source("make.R")
+# or only compute the summary 
+quarto::quarto_render("analysis/10_summary_FRCH.qmd")
 ```
 
 
