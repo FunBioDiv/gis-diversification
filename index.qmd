@@ -14,4 +14,5 @@ Further exploration:
 7. [Identification des parcelles vers Toulouse](https://funbiodiv.github.io/gis-diversification/analysis/07_fields_Toulouse.html)
 
 Last calculation of metrics (FR+CH):  
+
 10. [Summary 2](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html)
