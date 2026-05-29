@@ -129,7 +129,7 @@ rpg_ch <- vect(file)
 # table(nutz$Hauptkategorie_FR, useNA="ifany")
 rmCat <- c(
   "Forêt",
-  "Haies, bosquets et berges boisées",
+  "Haies, bosquets et berges boisées ",
   "Surfaces en dehors de la SAU"
 )
 colNUTZ <- c("nutzungsidentifikator", "nutzung_fr", "Hauptkategorie_FR")
@@ -140,89 +140,3 @@ ta <- data.frame(rpg_ch)[, c("nutzung_fr", "Hauptkategorie_FR")]
 ta <- ta[!duplicated(ta), ]
 ta <- ta[order(ta$Hauptkategorie_FR, ta$nutzung_fr), ]
 write.csv(ta, "nutzung_cl.csv")
-
-ta <- cbind(ta, ref[match(ref$nutzung_fr, ta$nutzung_fr), -(1:2)])
-View(ta)
-
-
-## Grain bocager
-library(happign)
-# check out which RPG layer is available
-meta_rast <- get_layers_metadata("wms-r") # all layers for altimetrie wms
-look_up <- "bocage"
-# #fmt: skip
-found <- grepl(tolower(look_up), tolower(meta_vect$Name)) |
-  grepl(tolower(look_up), tolower(meta_vect$Name))
-meta_rast$Name[found]
-meta_rast[found, ]
-layer <- "INRAE_GRAIN-BOCAGER"
-
-# transform in 2154
-buff_2154 <- st_transform(st_as_sf(buffi), "EPSG:2154")
-rpgi <- get_wms_raster(
-  x = buff_2154,
-  layer = layer
-)
-# doesn't work
-
-# else old school
-# https://cartes.gouv.fr/rechercher-une-donnee/dataset/INRAE_GRAIN-BOCAGER
-#       https://data.geopf.fr/telechargement/download/INRAE_GRAIN-BOCAGER/GRAIN-BOCAGER_1-0__TIFF_LAMB93_D002_2021-01-01/GRAIN-BOCAGER_1-0__TIFF_LAMB93_D002_2021-01-01.7z
-url <- "https://data.geopf.fr/telechargement/download/INRAE_GRAIN-BOCAGER/GRAIN-BOCAGER_1-0__TIFF_LAMB93_D0XX_20YY-01-01/GRAIN-BOCAGER_1-0__TIFF_LAMB93_D0XX_20YY-01-01.7z"
-tif <- "GRAIN-BOCAGER_1-0__TIFF_LAMB93_D0XX_20YY-01-01/grain_bocager_5m_XX_20YY.tif"
-tempdir <- "GRAIN-BOCAGER_1-0__TIFF_LAMB93_D0XX_20YY-01-01"
-options(timeout = 1000)
-zipdir <- here("data", "zip")
-datadir <- here("data", "raw-data", "GrainBocager")
-dep <- ifelse(nchar(1:95) == 1, paste0("0", 1:95), 1:95)
-try_catch <- function(exprs) {
-  !inherits(try(eval(exprs)), "try-error")
-}
-for (i in sample(dep, 10)) {
-  outi <- file.path(datadir, paste0("grain_bocager_", i, ".tif"))
-  if (!file.exists(outi)) {
-    temp <- file.path(zipdir, paste0("grain_bocager_", i, ".7z"))
-    yr <- 21
-    test <- try_catch(download.file(
-      gsub("YY", yr, gsub("XX", i, url)),
-      temp,
-      mode = "wb"
-    ))
-    if (!test) {
-      yr <- 22
-      test <- try_catch(download.file(
-        gsub("YY", yr, gsub("XX", i, url)),
-        temp,
-        mode = "wb"
-      ))
-    }
-    if (!test) {
-      yr <- 23
-      test <- try_catch(download.file(
-        gsub("YY", yr, gsub("XX", i, url)),
-        temp,
-        mode = "wb"
-      ))
-    }
-
-    # extract only the grain_bocager_5m_XX_20YY.tif
-    archive::archive_extract(
-      temp,
-      dir = datadir,
-      files = gsub("YY", yr, gsub("XX", i, tif))
-    )
-    # copy and rename
-    file.copy(
-      from = file.path(datadir, gsub("YY", yr, gsub("XX", i, tif))),
-      to = outi
-    )
-    # remove temporary files
-    file.remove(file.path(datadir, gsub("YY", yr, gsub("XX", i, tif))))
-    # file.remove(temp) # keep the zip file in case of issue
-    # remove temporary repository
-    unlink(
-      file.path(datadir, gsub("YY", yr, gsub("XX", i, tempdir))),
-      recursive = TRUE
-    )
-  }
-}

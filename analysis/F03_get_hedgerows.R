@@ -5,6 +5,8 @@
 #   data/raw-data/coordinates_year_crop.csv
 #   data/raw-data/planet_canopy_cover_30m_v0.1.tif" # cover
 #   data/raw-data/planet_agb_30m_v0.1.tif # biomass density (=cover*height) in kg/ha
+#   data/raw-data/CH/hedges_2023.gpkg # hedges in nutzung 2023
+#   data/raw-data/haie_2-0.gpkg # BD Haies v2
 #   data/derived-data/rpg_fields.gpkg
 #   data/derived-data/nutz_fields.gpkg
 # output:
@@ -72,20 +74,11 @@ out <- data.frame(
 
 
 # compare with information in NUTZ
-dirfile <- here("data", "raw-data", "CH")
-file <- file.path(dirfile, "buffer_4000_lnf_hk_area_distance_nutz_60.gpkg")
-# super heavy (2.4Gb)
-rpg_ch <- vect(file)
-hedge <- rpg_ch[
-  rpg_ch$Hauptkategorie_FR == "Haies, bosquets et berges boisées ",
-]
-# table(nutz$Hauptkategorie_FR, useNA="ifany")
-# remove duplicated polygons
-uhedge <- unique(hedge[, "Hauptkategorie_FR"])
+hedges <- vect(here(datafolder, "CH", paste0("hedges_2023.gpkg")))
 
-buffer_hedge <- intersect(uhedge, project(buff, "EPSG:2056"))
+buffer_hedge <- intersect(hedges, project(buff, "EPSG:2056"))
 buffer_hedge$Area_ha <- expanse(buffer_hedge) * 0.0001
-
+buffer_hedge$Perim_m <- perim(buffer_hedge)
 hedge_area <- tapply(buffer_hedge$Area_ha, buffer_hedge$Funbiodiv_ID, sum)
 m0 <- match(out$ID, names(hedge_area))
 out$haie_nutzung_ha <- ifelse(out$ID %in% names(hedge_area), hedge_area[m0], NA)
@@ -94,22 +87,33 @@ out$haie_nutzung_ha[
 ] <- 0
 out$haie_nutzung_perc <- out$haie_nutzung_ha / (expanse(buff) * 0.0001) * 100
 
-## compare with information in BD Haies v2
+hedge_perim <- tapply(buffer_hedge$Perim_m, buffer_hedge$Funbiodiv_ID, sum)
+out$haie_nutzung_length_m <- ifelse(
+  out$ID %in% names(hedge_area),
+  hedge_perim[m0] / 2,
+  NA
+)
+out$haie_nutzung_length_m[
+  grepl("^PestiRed_", out$ID) & is.na(out$haie_nutzung_m)
+] <- 0
 
+## compare with information in BD Haies v2
 haie <- vect(here(datafolder, "haie_2-0.gpkg"))
 
-lab <- "haie_bdhaie_length_m"
 haie_buf <- intersect(haie, project(buff, crs(haie)))
-length_haie_buf <- tapply(perim(haie_buf), haie_buf$Funbiodiv_ID, sum)
-
+haie_buf$length <- perim(haie_buf)
+length_haie_buf <- tapply(haie_buf$length, haie_buf$Funbiodiv_ID, sum)
+# summary(length_haie_buf)
 m1 <- match(out$ID, names(length_haie_buf))
 #fmt: skip
-out$haie_bdhaie_length_m <- ifelse(out$ID %in% names(length_haie_buf), length_haie_buf[m0], NA)
+out$haie_bdhaie_length_m <- ifelse(out$ID %in% names(length_haie_buf), length_haie_buf[m1], NA)
 inFrance <- !grepl("^PestiRed_", out$ID) & is.na(out$haie_bdhaie_length_m)
 out$haie_bdhaie_length_m[inFrance] <- 0
-#fmt: skip
-out$haie_bdhaie_density_mperha <- out$haie_bdhaie_length_m / (expanse(buff) * 0.0001) * 100
 
+out$haie_bdhaie_ha <- out$haie_bdhaie_length_m * 10 * 0.0001
+out$haie_bdhaie_perc <- out$haie_bdhaie_ha / (expanse(buff) * 0.0001) * 100
 
 # export indicators
 write.csv(out, file.path(outfolder, "metrics_hedgerows.csv"), row.names = FALSE)
+
+# pairs(out[, -1], lower.panel = panel.smooth, upper.panel = panel.cor)
