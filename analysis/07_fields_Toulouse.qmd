@@ -36,7 +36,6 @@ muesliF <- vect(here(
   "toulouse",
   "30parcellesAgricoles_MUESLI_Toulouse_L93_Dynafor.shp"
 ))
-
 ```
 
 

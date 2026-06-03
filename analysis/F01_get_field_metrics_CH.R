@@ -9,28 +9,40 @@
 #   data/derived-data/nutz_fields.gpkg (spatial polygons of crop fields)
 #
 # For the Swiss dataset, we use data received from Selma Cadot on 18/02/2026
+#   updated for 2024-2025 in data received on 20/05/2026 (not yet)
 # Run in ~1min
 
 library(terra)
-library(sf)
 library(here)
 
 # Load home made functions
 devtools::load_all()
 
-# The data was split per year using S01_prep_data.R
-# data are available for the period 2019 - 2023
-period <- 2019:2023
-nutz_layer <- "nutz_XXXX.gpkg"
-colNUTZ <- c("nutzungsidentifikator", "nutzung_fr", "Hauptkategorie_FR")
-# do we want to keep RPG column names?
-# labRPG <- c("id_parcel", "code_cultu", "code_group")
-
-buffer_fields <- c(500, 1000, 1500) #in m
-years <- 5 # for crop rotation
-
 datafolder <- here("data", "raw-data")
 outfolder <- here("data", "derived-data")
+
+# The data was split per year using S01_prep_data.R
+nutz_layer <- "nutz_XXXX.gpkg"
+colNUTZ <- c("nutzungsidentifikator", "nutzung_fr", "id_cultu") #, "Hauptkategorie_FR")
+# do we want to keep RPG column names?
+# labRPG <- c("id_parcel", "code_cultu", "id_cultu")
+
+# data are available for the period 2019 - 2023
+period <- 2019:2023
+# size of buffers
+buffer_fields <- c(500, 1000) #in m
+# time period for crop rotation
+years <- 4
+
+# get crop reference
+ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+
+rmCat <- sort(unique(ref$name[ref$keep_ag == "0" & ref$source == "nutzung"]))
+# rmCat <- c(
+#   "Forêt",
+#   "Haies, bosquets et berges boisées ", #space is important !
+#   "Surfaces en dehors de la SAU"
+# )
 
 # get the coordinates from the points
 # from shinyFunbiodiv/analysis/03_update_data.R
@@ -48,12 +60,6 @@ keep <- pts$Study_ID %in% "PestiRed" & !is.na(df$Lat)
 # table(pts$Year[keep])
 
 # table(nutz$Hauptkategorie_FR, useNA="ifany")
-rmCat <- c(
-  "Forêt",
-  "Haies, bosquets et berges boisées ", #space is important !
-  "Surfaces en dehors de la SAU"
-)
-
 nutz_out <- c() # save the nutz information
 df_out <- c() # save the parameters
 # for testing: sample(which(keep), 10)
@@ -73,7 +79,9 @@ for (i in which(keep)) {
   )
 
   # remove non agricultural fields
-  nutzi <- nutzi[!nutzi$Hauptkategorie_FR %in% rmCat, ]
+  nutzi <- nutzi[!nutzi$nutzung_fr %in% rmCat, ]
+
+  nutzi$id_cultu <- ref$id[match(nutzi$nutzung_fr, ref$name)]
   # continue only if some fields in nutz
   if (nrow(nutzi) > 0) {
     # calculate geometrical characteristics
@@ -108,10 +116,10 @@ for (i in which(keep)) {
     # average field size in buffer
     cat(".")
     for (f in buffer_fields) {
-      lab <- paste0("Mean_fieldsize_", f, "m_ha")
-      buf_pts <- buffer(pti, f)
-      nutz_buf <- relate(nutzi, buf_pts, "intersects")
-      out_i[, lab] <- mean(nutzi$Area_ha[nutz_buf], na.rm = TRUE)
+      lab <- paste0("Median_fieldsize_", f, "m_ha")
+      buf_pts <- terra::buffer(pti, f)
+      nutz_buf <- terra::relate(nutzi, buf_pts, "intersects")
+      out_i[, lab] <- median(nutzi$Area_ha[nutz_buf], na.rm = TRUE)
     }
 
     ##
@@ -134,7 +142,7 @@ for (i in which(keep)) {
         )
 
         if (nrow(nutzy) > 0) {
-          rey <- relate(nutzy, pti, "intersects")
+          rey <- terra::relate(nutzy, pti, "intersects")
           if (sum(rey) > 1) {
             nutzy <- nutzi[which(rey)[1], ]
             # add information in out_i

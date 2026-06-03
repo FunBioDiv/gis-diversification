@@ -14,23 +14,40 @@ for (i in 2019:2023) {
   writeVector(chi, file.path(dirfile, paste0("nutz_", i, ".gpkg")))
 }
 
+
 zoomin <- ext(c(2508265, 2509047, 1119836, 1121222)) + 2000
 v <- vect(file.path(dirfile, "nutz_2019.gpkg"), extent = zoomin)
 mapview::mapview(v)
 
+rpg19 <- vect(file.path(dirfile, "nutz_2019.gpkg"))
 
-rpg2 <- vect(file.path(
+rpg25 <- vect(file.path(
   dirfile,
   "buffer_3000_lnf_hk_area_distance_nutz_24to25_true.gpkg"
 ))
-table(f24$year, useNA = "ifany")
+table(rpg25$year, useNA = "ifany") # 401436
 # only 2025 : to be checked with Selma
-# split the file per year (400Mb)
-# for (i in 2014:2025) {
-#   chi <- rpg2[rpg2$year == i, ]
-#   # could also select the relevant column to make the data smaller
-#   writeVector(chi, file.path(dirfile, paste0("nutz_", i, ".gpkg")))
-# }
+table(rpg25$Hauptkategorie_FR)
+
+rpg24 <- vect(file.path(
+  dirfile,
+  "buffer_4000_lnf_hk_2024.gpkg"
+))
+names(rpg19)
+names(rpg24) #different than
+names(rpg25)
+
+table(rpg24$year, useNA = "ifany") # 202042
+table(rpg24$hauptkategorie_fr)
+plot(rpg24)
+plot(rpg25, col = "red", add = TRUE)
+
+zoomin <- ext(c(2508265, 2509047, 1119836, 1121222)) + 2000
+v4 <- crop(rpg24, zoomin)
+v5 <- crop(rpg25, zoomin)
+mapview::mapview(v4) +
+  mapview::mapview(v5)
+
 
 # semi naturel elements
 snh23 <- vect(file.path(
@@ -38,11 +55,10 @@ snh23 <- vect(file.path(
   "buffer_4000_snh_2023_60.gpkg"
 ))
 
-table(snh23$type_source) # semi_nat
+table(snh23$type_source) # semi_nat : 943975
 table(snh23$year) # 2023
 table(snh23$element_typ) # not sure what does that mean
 unique(snh23$typ_flaechen) # more interesting
-head(snh23)
 h23 <- snh23[grep("Hecken", snh23$typ_flaechen), ]
 
 
@@ -51,13 +67,14 @@ snh24 <- vect(file.path(
   dirfile,
   "buffer_3000_snh_2024.gpkg"
 ))
-
-table(snh24$type_source) # semi_nat
-table(snh24$year) # 2023
-table(snh24$element_typ) # not sure what does that mean
+table(snh24$type_source) # semi_nat : 530788
+table(snh24$year) # 2024
 table(snh24$typ_flaechen) # more interesting
 h24 <- snh24[grep("Hecken", snh24$typ_flaechen), ]
-plot(h24, add = TRUE, border = "blue")
+
+# plot(h23, col = "red")
+# plot(h24, col = "blue", add=TRUE)
+d34 <- symdif(h23, h24)
 
 
 ## Hecken 2023

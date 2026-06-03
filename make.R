@@ -23,7 +23,7 @@ devtools::load_all()
 ##
 # 1 Get metrics from field data
 # from the French RPG
-source("analysis/F01_get_field_metrics_FR.R") # 3mins
+source("analysis/F01_get_field_metrics_FR.R") # 3mins or 3h if nothing downloaded
 # from the Swiss Nutzung
 source("analysis/F01_get_field_metrics_CH.R") #1 min
 
@@ -31,6 +31,7 @@ source("analysis/F01_get_field_metrics_CH.R") #1 min
 # 2 Get metrics for land cover
 source("analysis/F02_get_cover_metrics.R")
 # 15 minutes when everything recomputed, else 3mins
+# takes longer now with vineFR to be checked for each points
 
 ##
 # 3 Get hedgerow statistics

@@ -20,7 +20,8 @@ Depends:
     R (>= 3.5.0),
     here,
     sf,
-    terra
+    terra,
+    happign
 Imports: 
     knitr,
     rmarkdown

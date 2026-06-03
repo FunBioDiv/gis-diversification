@@ -140,3 +140,19 @@ ta <- data.frame(rpg_ch)[, c("nutzung_fr", "Hauptkategorie_FR")]
 ta <- ta[!duplicated(ta), ]
 ta <- ta[order(ta$Hauptkategorie_FR, ta$nutzung_fr), ]
 write.csv(ta, "nutzung_cl.csv")
+
+
+# classes
+ref0 <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+ref1 <- read.csv(file.path(outfolder, "nutzung_classes.csv"))
+# fmt: skip
+names(ref1) <- c("id", "name", "Other", "grp1", "code_grp1", "name_grp1", "code_grp2", "name_grp2", "grp2")
+ref1$source <- "nutzung"
+ref1$code <- NA
+ref1$keep_ag <- TRUE
+# names(ref0) %in% names(ref1)
+ref1 <- ref1[, names(ref0)]
+
+ref <- rbind(ref0, ref1[!ref1$name %in% ref0$name[ref0$source == "nutzung"], ])
+ref <- ref[order(ref$id), ]
+write.csv(ref, file.path(outfolder, "rpg_nutzung_clc.csv"), row.names = FALSE)

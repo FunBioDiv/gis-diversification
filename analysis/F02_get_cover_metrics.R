@@ -4,42 +4,43 @@
 # input:
 #   data/raw-data/coordinates_year_crop.csv
 #   data/raw-data/CH/nutz_20XX.gpkg (2019-2023) (2.3Gb)
-#   data/raw-data/happign (2015-2024) (570Mb)
+#   data/raw-data/happign (2015-2024) (532Mb)
 #   data/raw-data/clcplus (downloaded from F00_get_rawdata.R)
-#   data/derived-data/rpg_classes.csv
-#   data/derived-data/nutzung_classes.csv
+#   data/raw-data/rpg_nutzung_clc.csv homogenized classes of RPG, Nutzung and CLCplus
+#   data/raw-data/VergersVignes/CVI_Parcelles_France_Entiere_2021.gpkg vignes from Fred
 # output:
 #   data/derived-data/metrics_lulc.csv (metrics)
 #   data/derived-data/lulc (overlaid land cover, 86 Mb)
 
 library(terra)
-library(sf)
 library(here)
-
-
 # Load home made functions
 devtools::load_all()
 
 period <- 2015:2024
-buffer_fields <- c(500, 1000, 1500) #in m
+buffer_fields <- 1000 #in m
 
 datafolder <- here("data", "raw-data")
 outfolder <- here("data", "derived-data")
 tempfolder <- file.path(outfolder, "lulc")
 
+# get reference on classes
+ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+
 # directory with rpg data from happign
 happignfolder <- file.path(datafolder, "happign")
+
+# key column id_cultu, code_cultu
+colRPG <- c("id_parcel", "code_cultu", "id_cultu")
+
 # remove non agricultural fields from RPG
-rmRPG <- c("BFP", "BFS", "BOR", "BTA", "SNA")
+# rmRPG <- c("BFP", "BFS", "BOR", "BTA", "SBO", "SNA")
+rmRPG <- sort(unique(ref$code[ref$keep_ag == "0" & ref$source == "rpg"]))
 
 # file with nutz dataset
 nutz_layer <- file.path(datafolder, "CH", "nutz_XXXX.gpkg")
 # remove non agricultural fields from NUTZ
-rmNUTZ <- c(
-  "Forêt",
-  "Haies, bosquets et berges boisées",
-  "Surfaces en dehors de la SAU"
-)
+rmNUTZ <- sort(unique(ref$name[ref$keep_ag == "0" & ref$source == "nutzung"]))
 
 # directory with Corine Land cover data
 clcfile <- file.path(
@@ -49,9 +50,18 @@ clcfile <- file.path(
 )
 clcyear <- c(2018, 2021, 2023)
 
-# nutz classes
-ref_rpg <- read.csv(file.path(outfolder, "rpg_classes.csv"))
-ref_nutz <- read.csv(file.path(outfolder, "nutzung_classes.csv"))
+# extra dataset to complete orchards and vineyards
+vvfolder <- file.path(datafolder, "VergersVignes")
+
+# vine from Adrien Rusch 19/05/2026
+# orchard from Claire Lavigne 19/05/2026
+# already included in F01_get_field_metrics
+
+# vine from Frederic Fabre  26/05/2026
+vineFr <- vect(file.path(vvfolder, "CVI_Parcelles_France_Entiere_2021.gpkg"))
+vineFr <- project(vineFr, "EPSG:3035")
+# set to code 411
+vineFr$gp <- ref$id[ref$source == "Fred"]
 
 # get the coordinates from the points
 # from shinyFunbiodiv/analysis/03_update_data.R
@@ -70,6 +80,7 @@ keep <- pts$Year %in% period & !is.na(df$Lat)
 
 df_out <- list() # save the metrics
 # for testing: sample(which(keep), 10)
+# for processing: which(keep)
 for (i in which(keep)) {
   cat(i)
 
@@ -92,27 +103,36 @@ for (i in which(keep)) {
       # load nutz data within buffer i
       rpgi <- vect(gsub("XXXX", pti$Year, nutz_layer), ext = buffi_2056)
       # remove non agricultural fields
-      rpgi <- rpgi[!rpgi$Hauptkategorie_FR %in% rmNUTZ, ]
+      rpgi <- rpgi[!rpgi$nutzung_fr %in% rmNUTZ, ]
       # get numeric id
-      m_rpg <- match(rpgi$nutzung_fr, ref_nutz$nutzung_fr)
-      rpgi$gp <- ref_nutz$id[m_rpg]
+      m_rpg <- match(rpgi$nutzung_fr, ref$name)
+      if (sum(is.na(m_rpg)) > 0) {
+        # fmt:skip
+        print(paste("Missing values for NUTZ", i, ":",
+          rpgi$nutzung_fr[is.na(m_rpg)]
+        ))
+      }
+      rpgi$gp <- ref$id[m_rpg]
     } else {
-      rpgfi <- file.path(happignfolder, paste0("RPGbuf_", pti$ID, ".gpkg"))
-      rpgi <- vect(rpgfi)
+      rpgbi <- file.path(happignfolder, paste0("RPGbuf_", pti$ID, ".gpkg"))
+      rpgci <- file.path(happignfolder, paste0("RPGcomp_", pti$ID, ".gpkg"))
+      if (file.exists(rpgci)) {
+        rpgi <- vect(rpgci)
+      } else {
+        rpgi <- vect(rpgbi)
+      }
+
       # remove non agricultural fields
       rpgi <- rpgi[!rpgi$code_cultu %in% rmRPG, ]
       # get numeric id
-      m_rpg <- match(rpgi$code_cultu, ref_rpg$code.culture)
+      m_rpg <- match(rpgi$code_cultu, ref$code)
       if (sum(is.na(m_rpg)) > 0) {
-        print(paste(
-          "Missing values for RPG",
-          i,
-          ":",
+        # fmt:skip
+        print(paste("Missing values for RPG", i, ":",
           rpgi$code_cultu[is.na(m_rpg)]
         ))
       }
-      rpgi$code_cultu[is.na(rpgi$gp)]
-      rpgi$gp <- ref_rpg$id[m_rpg]
+      rpgi$gp <- ref$id[m_rpg]
     }
     # project to 3035
     rpgi <- project(rpgi, "EPSG:3035")
@@ -125,13 +145,25 @@ for (i in which(keep)) {
     clci <- crop(clci, buffi) #, mask = TRUE)
     clci <- as.numeric(clci) + 1000
 
-    # Rasterize NUTZ
+    # Rasterize rpg
     # transform code cultivated with correct id
     rpgi_r <- rasterize(rpgi, clci, "gp")
 
-    # Combine NUTZ+CLC
-    alli <- merge(rpgi_r, clci, first = TRUE)
+    # select vineyard around i
+    vini <- crop(vineFr, ext(buffi) + 0.01)
+    # crop for all even if no vine
+    # is.related(ext(vineFr), buffi, "intersects")
 
+    if (nrow(vini) > 0) {
+      # rasterize vignes
+      vini_r <- rasterize(vini, clci, "gp")
+
+      # Combine Vineyards+RPG+CLC
+      alli <- merge(vini_r, rpgi_r, clci, first = TRUE)
+    } else {
+      # Combine RPG*+CLC
+      alli <- merge(rpgi_r, clci, first = TRUE)
+    }
     # export
     writeRaster(alli, filename = outi)
   }
@@ -171,4 +203,4 @@ write.csv(
   row.names = FALSE
 )
 
-apply(df_out[-1], 2, sum)
+# apply(df_out[-1], 2, sum)
