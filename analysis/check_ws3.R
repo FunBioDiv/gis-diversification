@@ -14,19 +14,22 @@ pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
 ind <- read.csv(file.path(outfolder, "metrics.csv"))
 
 # classes
-ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc_classes.csv"))
+ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
 
 ## Land cover ---------------------------------------
 
 # get cover classes
-m1500 <- grep("frac1500", names(ind))
-l1500 <- gsub("frac1500_", "", names(ind)[m1500])
-n1500 <- as.numeric(substr(l1500, 1, regexpr("_", l1500) - 1))
+m1500 <- grep("frac1000", names(ind))
+l1500 <- gsub("frac1000_", "", names(ind)[m1500])
 
 # how much is covered by Low-growing woody plants, Permanent herbaceous, Periodically herbaceous
 keepC <- c(1005, 1006, 1007)
-
-unwanted <- rowSums(ind[, m1500[n1500 %in% keepC]], na.rm = TRUE)
+keepC <- c(
+  "low.growing.woody.plants",
+  "permanent.herbaceous",
+  "periodically.herbaceous"
+)
+unwanted <- rowSums(ind[, m1500[l1500 %in% keepC]], na.rm = TRUE)
 png(
   file = file.path(fig_folder, "Unwanted_clc.png"),
   width = 1200,
@@ -45,12 +48,7 @@ dev.off()
 
 
 # who has verger?
-mverger <- c(
-  grep("verger", tolower(names(ind))), #rpg
-  grep("cultures.fruitieres", tolower(names(ind))) #nutzung
-)
 
-verger <- rowSums(ind[, mverger], na.rm = TRUE)
 png(
   file = file.path(fig_folder, "Verger_RPG.png"),
   width = 1200,
@@ -59,7 +57,7 @@ png(
 )
 par(mar = c(12, 4, 1, 1))
 boxplot(
-  verger ~ ind$Study_ID,
+  ind$frac1000_vergers ~ ind$Study_ID,
   las = 2,
   ylab = "%",
   xlab = "",
@@ -77,7 +75,10 @@ dev.off()
 #   main = "Hors foret - bati - eau et RPG*"
 # )
 
-in_rpg <- rowSums(ind[, m1500[n1500 < 1000]], na.rm = TRUE)
+in_rpg <- rowSums(
+  ind[, m1500[l1500 %in% ref$name_grp2[ref$source == "rpg"]]],
+  na.rm = TRUE
+)
 
 png(
   file = file.path(fig_folder, "In_RPG.png"),
@@ -104,7 +105,7 @@ png(
 )
 par(mar = c(12, 4, 1, 1))
 boxplot(
-  ind$frac1500_1007_Periodically.herbaceous ~ ind$Study_ID,
+  ind$frac1000_periodically.herbaceous ~ ind$Study_ID,
   las = 2,
   ylab = "%",
   xlab = "",
@@ -120,7 +121,7 @@ png(
 )
 par(mar = c(12, 4, 1, 1))
 boxplot(
-  ind$frac1500_1006_Permanent.herbaceous ~ ind$Study_ID,
+  ind$frac1000_permanent.herbaceous ~ ind$Study_ID,
   las = 2,
   ylab = "%",
   xlab = "",
@@ -136,7 +137,7 @@ png(
 )
 par(mar = c(12, 4, 1, 1))
 boxplot(
-  ind$frac1500_1005_Low.growing.woody.plants ~ ind$Study_ID,
+  ind$frac1000_low.growing.woody.plants ~ ind$Study_ID,
   las = 2,
   ylab = "%",
   xlab = "",

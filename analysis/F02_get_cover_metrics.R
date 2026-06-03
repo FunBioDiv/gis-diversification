@@ -124,15 +124,7 @@ for (i in which(keep)) {
 
       # remove non agricultural fields
       rpgi <- rpgi[!rpgi$code_cultu %in% rmRPG, ]
-      # get numeric id
-      m_rpg <- match(rpgi$code_cultu, ref$code)
-      if (sum(is.na(m_rpg)) > 0) {
-        # fmt:skip
-        print(paste("Missing values for RPG", i, ":",
-          rpgi$code_cultu[is.na(m_rpg)]
-        ))
-      }
-      rpgi$gp <- ref$id[m_rpg]
+      rpgi$gp <- rpgi$id_cultu
     }
     # project to 3035
     rpgi <- project(rpgi, "EPSG:3035")
@@ -146,23 +138,27 @@ for (i in which(keep)) {
     clci <- as.numeric(clci) + 1000
 
     # Rasterize rpg
-    # transform code cultivated with correct id
-    rpgi_r <- rasterize(rpgi, clci, "gp")
+    if (nrow(rpgi) > 0) {
+      # transform code cultivated with correct id
+      rpgi_r <- rasterize(rpgi, clci, "gp")
 
-    # select vineyard around i
-    vini <- crop(vineFr, ext(buffi) + 0.01)
-    # crop for all even if no vine
-    # is.related(ext(vineFr), buffi, "intersects")
+      # select vineyard around i
+      vini <- crop(vineFr, ext(buffi) + 0.01)
+      # crop for all even if no vine
+      # is.related(ext(vineFr), buffi, "intersects")
 
-    if (nrow(vini) > 0) {
-      # rasterize vignes
-      vini_r <- rasterize(vini, clci, "gp")
+      if (nrow(vini) > 0) {
+        # rasterize vignes
+        vini_r <- rasterize(vini, clci, "gp")
 
-      # Combine Vineyards+RPG+CLC
-      alli <- merge(vini_r, rpgi_r, clci, first = TRUE)
+        # Combine Vineyards+RPG+CLC
+        alli <- merge(vini_r, rpgi_r, clci, first = TRUE)
+      } else {
+        # Combine RPG*+CLC
+        alli <- merge(rpgi_r, clci, first = TRUE)
+      }
     } else {
-      # Combine RPG*+CLC
-      alli <- merge(rpgi_r, clci, first = TRUE)
+      alli <- clci
     }
     # export
     writeRaster(alli, filename = outi)

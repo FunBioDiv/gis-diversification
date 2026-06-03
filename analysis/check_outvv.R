@@ -5,6 +5,18 @@ devtools::load_all()
 datafolder <- here("data", "raw-data")
 outfolder <- here("data", "derived-data")
 
+ind <- read.csv(file.path(outfolder, "metrics_lulc.csv"))
+
+sel <- grep("BVD", ind$ID)
+ind[sel, -1]
+ind$ID[sel]
+i = which(pts$ID == "EXCLU_BVD_194_2023")
+v1 <- vect("data/raw-data/happign/RPGcomp_EXCLU_BVD_194_2023.gpkg")
+r1 <- rast("data/derived-data/lulc/LULC_EXCLU_BVD_194_2023.tif")
+table(r1$id_cultu)
+plot(r1)
+plot(project(v1, "EPSG:3035"), add = TRUE)
+ind[ind$ID == "EXCLU_BVD_194_2023", ]
 ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
 ind <- read.csv(file.path(outfolder, "metrics.csv"))
 table(is.na(ind$Crop_N))
