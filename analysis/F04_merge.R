@@ -17,7 +17,7 @@ rpg <- read.csv(file.path(outfolder, "metrics_rpg.csv"))
 nutz <- read.csv(file.path(outfolder, "metrics_nutz.csv"))
 
 # get reference
-ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
 
 col <- c(
   "Perim_m",
@@ -62,6 +62,17 @@ for (y in 1:years) {
 # table(df$CropGroup_N1, useNA = "ifany") # 105 NA
 # sum(!is.na(crop1_fr)) + sum(!is.na(crop1_ch)) == sum(!is.na(df$Crop_N1))
 
+# get summary over the 5 years
+lulc_id <- df[, grep("CropCode_N", names(df))]
+lulc_gp <- df[, grep("CropGroup_N", names(df))]
+nyear <- apply(lulc_id, 1, function(x) length(x[!is.na(x)]))
+ncrop <- apply(lulc_id, 1, function(x) length(unique(x[!is.na(x)])))
+ngroup <- apply(lulc_gp, 1, function(x) length(unique(x[!is.na(x)])))
+
+df$rot5_Nyear <- nyear
+df$rot5_Ncrop <- ifelse(nyear < 5, NA, ncrop)
+df$rot5_Ngroup <- ifelse(nyear < 5, NA, ngroup)
+
 # hedgerow metrics
 hedge <- read.csv(file.path(outfolder, "metrics_hedgerows.csv"))
 col <- !names(hedge) %in% names(df)
@@ -71,7 +82,6 @@ df <- cbind(df, hedge[m_hedge, col])
 
 # lulc metrics
 lulc <- read.csv(file.path(outfolder, "metrics_lulc.csv"))
-ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
 
 codeC <- gsub("frac1000_", "", names(lulc)[-1])
 # if not transformation

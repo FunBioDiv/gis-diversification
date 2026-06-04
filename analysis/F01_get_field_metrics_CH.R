@@ -4,6 +4,7 @@
 # input:
 #   data/raw-data/coordinates_year_crop.csv
 #   data/raw-data/CH/nutz_20XX.gpkg (2019-2023)
+#   data/raw-data/classes_rpg_nutzung_clc.csv homogenized classes of RPG, Nutzung and CLCplus
 # output:
 #   data/derived-data/metrics_rpg.csv (metrics)
 #   data/derived-data/nutz_fields.gpkg (spatial polygons of crop fields)
@@ -35,7 +36,7 @@ buffer_fields <- c(500, 1000) #in m
 years <- 4
 
 # get crop reference
-ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
 
 rmCat <- sort(unique(ref$name[ref$keep_ag == "0" & ref$source == "nutzung"]))
 # rmCat <- c(

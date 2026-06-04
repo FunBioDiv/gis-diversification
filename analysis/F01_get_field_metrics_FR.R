@@ -3,7 +3,7 @@
 #
 # input:
 #   data/raw-data/coordinates_year_crop.csv crop field coordinates
-#   data/raw-data/rpg_nutzung_clc.csv homogenized classes of RPG, Nutzung and CLCplus
+#   data/raw-data/classes_rpg_nutzung_clc.csv homogenized classes of RPG, Nutzung and CLCplus
 #   data/raw-data/VergersVignes/vergers_anonyme.gpkg vergers from Claire
 #   data/raw-data/VergersVignes/OCS_2018_19_20_21_VF.shp vignes from Adrien
 # output:
@@ -45,7 +45,7 @@ happignfolder <- file.path(datafolder, "happign")
 colRPG <- c("id_parcel", "code_cultu", "id_cultu")
 
 # get reference
-ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
 
 # extra dataset to complete orchards and vineyards
 vvfolder <- file.path(datafolder, "VergersVignes")

@@ -6,7 +6,7 @@
 #   data/raw-data/CH/nutz_20XX.gpkg (2019-2023) (2.3Gb)
 #   data/raw-data/happign (2015-2024) (532Mb)
 #   data/raw-data/clcplus (downloaded from F00_get_rawdata.R)
-#   data/raw-data/rpg_nutzung_clc.csv homogenized classes of RPG, Nutzung and CLCplus
+#   data/raw-data/classes_rpg_nutzung_clc.csv homogenized classes of RPG, Nutzung and CLCplus
 #   data/raw-data/VergersVignes/CVI_Parcelles_France_Entiere_2021.gpkg vignes from Fred
 # output:
 #   data/derived-data/metrics_lulc.csv (metrics)
@@ -25,7 +25,7 @@ outfolder <- here("data", "derived-data")
 tempfolder <- file.path(outfolder, "lulc")
 
 # get reference on classes
-ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
 
 # directory with rpg data from happign
 happignfolder <- file.path(datafolder, "happign")

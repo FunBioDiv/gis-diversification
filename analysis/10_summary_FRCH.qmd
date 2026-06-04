@@ -37,7 +37,7 @@ execute:
 
 - **BD Haies v2** (6.8Gb): hedgerows dataset for France available on the IGN website: <https://geoservices.ign.fr/bdhaie>. BD Haie v2 was produced from satellite images of 2020-2022.  
 
-- [Land cover class harmonization](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/rpg_nutzung_clc.csv): list all classes from `RPG`, `Nutzung` and `CLCplus` and how to categorize them. This file has been completed during WS3 and can be further customized for the project objectives.
+- [Land cover class harmonization](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_rpg_nutzung_clc.csv): list all classes from `RPG`, `Nutzung` and `CLCplus` and how to categorize them. This file has been completed during WS3 and can be further customized for the project objectives.
 
 - Orchards and vineyards from individual projects to further complete the agricultural land use.
 
@@ -71,7 +71,7 @@ pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
 ind <- read.csv(file.path(outfolder, "metrics.csv"))
 
 # classes
-ref <- read.csv(file.path(outfolder, "rpg_nutzung_clc.csv"))
+ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
 
 # liu et al. 2023
 # fmt:skip
@@ -604,31 +604,13 @@ legend(
 
 ## Crop rotation (N-4:N)
 
-```{r}
-# make small correspondance table
-
-# transform with class id
-lulc_id <- ind[, grep("CropCode_N", names(ind))]
-lulc_gp <- ind[, grep("CropGroup_N", names(ind))]
-nyear <- apply(lulc_id, 1, function(x) length(x[!is.na(x)]))
-ncrop <- apply(lulc_id, 1, function(x) length(unique(x[!is.na(x)])))
-ngroup <- apply(lulc_gp, 1, function(x) length(unique(x[!is.na(x)])))
-
-ind$ncrop <- ncrop
-ind$ncrop[nyear < 5] <- NA
-
-ind$ngroup <- ngroup
-ind$ngroup[nyear < 5] <- NA
-# table(ind$ncrop, useNA="ifany")
-```
-
 ::: {.panel-tabset}
 ## barplot
 
 ```{r}
 #| label: fig-nyearstudy
 #| fig-cap: "Length of the land cover time series per project."
-nyeardb <- data.frame(table(nyear, ind$Study_ID))
+nyeardb <- data.frame(table(ind$rot5_Nyear, ind$Study_ID))
 names(nyeardb) <- c("NYear", "Dataset", "Nobs")
 plot_ly(
   nyeardb,
@@ -650,7 +632,7 @@ plot_ly(
 ```{r}
 #| label: tbl-cropy
 #| tbl-cap: "Number of observations per length of crop rotation data (in years) available"
-info <- table(ind$Study_ID, nyear)
+info <- table(ind$Study_ID, ind$rot5_Nyear)
 # percentage <- round(colSums(info) / nrow(ind) * 100, 2)
 # info <- rbind(info, percentage)
 knitr::kable(info)
@@ -659,7 +641,7 @@ knitr::kable(info)
 :::
 
 The number of observations in the period N-4:N in @tbl-cropy is a results of the number of observations per year (@tbl-yearstudy). 
-Most observations have 5 years of data on crop rotation (```r round(sum(nyear==5)/nrow(ind)*100)```%, N=```r sum(nyear==5)```).
+Most observations have 5 years of data on crop rotation (```r round(sum(ind$rot5_Nyear==5)/nrow(ind)*100)```%, N=```r sum(ind$rot5_Nyear==5)```).
 
 
 Let's have a look at the crop rotations over the 5-year period (N:N-4).  
@@ -669,7 +651,10 @@ Let's have a look at the crop rotations over the 5-year period (N:N-4).
 ```{r}
 #| label: fig-ncroprot
 #| fig-cap: "Number of different crop cultivated in the period N:N-4. Only observations with complete information on land cover for the 5 years are included."
-ncrop_db <- data.frame(table(ncrop[nyear == 5], ind$Study_ID[nyear == 5]))
+ncrop_db <- data.frame(table(
+  ind$rot5_Ncrop[ind$rot5_Nyear == 5],
+  ind$Study_ID[ind$rot5_Nyear == 5]
+))
 names(ncrop_db) <- c("Ncrop", "Dataset", "Nobs")
 plot_ly(
   ncrop_db,
@@ -691,7 +676,10 @@ plot_ly(
 ```{r}
 #| label: fig-ngrouprot
 #| fig-cap: "Number of different crop groups cultivated in the period N:N-4. Only observations with complete information on land cover for the 5 years are included."
-ngroup_db <- data.frame(table(ngroup[nyear == 5], ind$Study_ID[nyear == 5]))
+ngroup_db <- data.frame(table(
+  ind$rot5_Ngroup[ind$rot5_Nyear == 5],
+  ind$Study_ID[ind$rot5_Nyear == 5]
+))
 names(ngroup_db) <- c("Ngroup", "Dataset", "Nobs")
 plot_ly(
   ngroup_db,
@@ -710,15 +698,17 @@ plot_ly(
 
 :::
 
-From ```r sum(nyear==5)``` observations with complete crop rotation information in [N-4:N], ```r sum(ncrop[nyear == 5] == 1)``` have the same crop for the whole time period, while ```r sum(ncrop[nyear == 5] == 4)``` fields have four different crop groups in the past 5 years (@fig-ncroprot).
+From ```r sum(ind$rot5_Nyear==5)``` observations with complete crop rotation information in [N-4:N], ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 1)``` have the same crop for the whole time period, while ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 4)``` fields have four different crop groups in the past 5 years (@fig-ncroprot).
 
 ```{r}
 #| label: tbl-grprot
 #| tbl-cap: "Most populat crop group rotation cultivated in the 5 years before observations"
+lulc_gp <- ind[, grep("CropGroup_N", names(ind))]
 gpts <- apply(lulc_gp, 1, concat)
 gpu <- apply(lulc_gp, 1, paste_unique)
 
-head(sort(table(gpu[nyear == 5]), decreasing = TRUE), 20) |> knitr::kable()
+head(sort(table(gpu[ind$rot5_Nyear == 5]), decreasing = TRUE), 20) |>
+  knitr::kable()
 ```
 
 
@@ -819,17 +809,19 @@ knitr::kable(round(phaie, 2))
 ## ex1
 ```{r}
 #| label: fig-highhaiecover
-#| fig-cap: "Field with high hedgerows cover"
+#| fig-cap: "Field with high hedgerows cover in BD Haie but not in Liu 2023"
 diffhaie <- (nathaie - ind$haie_cover)
 ex1 <- which.max(diffhaie)
 
 pts_ex1 <- pts[pts$ID == ind$ID[ex1]]
 rpg_ex1 <- fields[fields$Funbiodiv_ID == ind$ID[ex1]]
-r10_ex1 <- buffer(rpg_ex1, 10) |> project(crs(liucov))
-liu_ex1 <- crop(liucov, r10_ex1)
+r10_ex1 <- buffer(rpg_ex1, 10)
+rliu_ex1 <- ext(project(r10_ex1, crs(liucov))) + 100
+liu_ex1 <- crop(liucov, rliu_ex1)
+
 haie_ex1 <- vect(
   here("data", "raw-data", "haie_2-0.gpkg"),
-  filter = project(vect(ext(r10_ex1), crs(liucov)), y = "EPSG:2154")
+  filter = project(vect(rliu_ex1, crs(liucov)), y = "EPSG:2154")
 )
 
 mapview::mapview(
@@ -849,8 +841,7 @@ mapview::mapview(
 ## ex2
 ```{r}
 #| label: fig-highhaiebiomass
-#| fig-cap: "Field with high hedgerows biomass"
-diffhaie <- (nathaie - ind$haie_cover)
+#| fig-cap: "Field with low hedgerows cover in BD Haie but high in Liu 2023"
 ex2 <- which.min(diffhaie)
 
 pts_ex2 <- pts[pts$ID == ind$ID[ex2]]
@@ -860,7 +851,7 @@ rliu_ex2 <- ext(project(r10_ex2, crs(liucov))) + 100
 liu_ex2 <- crop(liucov, rliu_ex2)
 haie_ex2 <- vect(
   here("data", "raw-data", "haie_2-0.gpkg"),
-  filter = project(vect(ext(r10_ex2), crs(pts)), y = "EPSG:2154")
+  filter = project(vect(rliu_ex2, crs(liucov)), y = "EPSG:2154")
 )
 
 mapview::mapview(
@@ -1028,6 +1019,40 @@ abline(
 
 :::
 
+::: {.panel-tabset}
+
+## boxplot 
+
+```{r}
+#| label: fig-boxshannon
+#| fig-cap: "Shannon diversity in land cover buffer of 1000m. The dashed line show the median area."
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$shannon_1000 ~ ind$Study_ID,
+  las = 2,
+  ylab = "Shannon",
+  xlab = "",
+  main = "Shannon diversity - Buffer 1000m"
+)
+abline(h = median(ind$shannon_1000, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## table
+
+```{r}
+#| label: tbl-shannon
+#| tbl-cap: "Summary statistics per project of the Shannon diversity in land cover buffer of 1000m"
+shannon <- sapply(
+  tapply(ind$shannon_1000, ind$Study_ID, summary),
+  function(x) x[1:6]
+)
+
+knitr::kable(t(round(shannon, 2)))
+```
+
+:::
+
+
 **Remarks:**    
 
 - All buffers include some amount of forest (5-20%) and sealed area (5-10%), while the crop composition is highly project specific. 
@@ -1042,13 +1067,12 @@ abline(
 #| fig-cap: "Correlation among field diversity metrics"
 out <- data.frame(
   "Area\nha" = ind$Area_ha,
-  "Perim\nm" = ind$Perim_m,
   "Field size\nB500 ha" = ind$Median_fieldsize_500m_ha,
-  "Field size\nB1500 ha" = ind$Median_fieldsize_1000m_ha,
-  "Crop rotation\n5yr N" = ind$ncrop,
+  "Field size\nB1000 ha" = ind$Median_fieldsize_1000m_ha,
+  "Crop rotation\n5yr N" = ind$rot5_Ncrop,
   "Hedgerow\nperc" = ind$haie_cover,
   "Shannon\nB1000" = ind$shannon_1000,
-  "Woody\nB1000 perc" = ind$frac1000_forest,
+  "Forest\nB1000 perc" = ind$frac1000_forest,
   "Sealed\nB1000 perc" = ind$frac1000_sealed,
   "Vineyard\nB1000 perc" = ind$frac1000_vignes,
   "Wheat\nB1000 perc" = ind$frac_wheat,
