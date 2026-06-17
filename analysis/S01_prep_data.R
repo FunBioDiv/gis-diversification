@@ -33,10 +33,14 @@ rpg24 <- vect(file.path(
   dirfile,
   "buffer_4000_lnf_hk_2024.gpkg"
 ))
+
+colNUTZ <- c("nutzungsidentifikator", "nutzung_fr")
+colNUTZ %in% names(rpg24)
 names(rpg19)
 names(rpg24) #different than
 names(rpg25)
 
+table(rpg25$year, useNA = "ifany") # 202042
 table(rpg24$year, useNA = "ifany") # 202042
 table(rpg24$hauptkategorie_fr)
 plot(rpg24)

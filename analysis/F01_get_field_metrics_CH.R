@@ -45,6 +45,20 @@ rmCat <- sort(unique(ref$name[ref$keep_ag == "0" & ref$source == "nutzung"]))
 #   "Surfaces en dehors de la SAU"
 # )
 
+rot <- readxl::read_xlsx(
+  file.path(datafolder, "CH", "PestiRed_17to19_FunBioDiv.xlsx")
+)
+# all nutzung are in ref :)
+# all(rot$nutzung_fr %in% ref$name[ref$source == "nutzung"])
+rot$id_cultu <- ref$id[match(rot$nutzung_fr, ref$name)]
+# create plot ID, temoin = 1, innovante = 2
+rot$Plot_ID <- paste0(
+  rot$ID_CODE,
+  ".",
+  ifelse(rot$parcelle == "innovante", 2, 1)
+)
+rot$nutzungsidentifikator <- "rotation1719"
+
 # get the coordinates from the points
 # from shinyFunbiodiv/analysis/03_update_data.R
 df <- read.csv(here(datafolder, "coordinates_year_crop.csv"))
@@ -126,12 +140,6 @@ for (i in which(keep)) {
     ##
     # crop rotation
     cat(".")
-    if (sum(rei) > 0) {
-      nutz_time <- exi[, colNUTZ]
-      nutz_time$Year <- pti$Year
-    } else {
-      nutz_time <- vect()
-    }
     for (y in 1:years) {
       out_i[paste0("N-", y)] <- pti$Year - y
       lab <- paste0(colNUTZ, "_N-", y)
@@ -148,10 +156,13 @@ for (i in which(keep)) {
             nutzy <- nutzi[which(rey)[1], ]
             # add information in out_i
             out_i[, lab] <- data.frame(nutzy)[, colNUTZ]
-            # keep it for save
-            nutzy$Year <- pti$Year - y
-            nutz_time <- rbind(nutz_time, nutzy[c(colNUTZ, "Year")])
           }
+        }
+      }
+      if ((pti$Year - y) %in% 2017:2019) {
+        sel_rot <- rot$Plot_ID %in% pti$Plot_ID & rot$annee %in% (pti$Year - y)
+        if (sum(sel_rot) >= 1) {
+          out_i[, lab] <- data.frame(rot[which(sel_rot)[1], colNUTZ])
         }
       }
     }
