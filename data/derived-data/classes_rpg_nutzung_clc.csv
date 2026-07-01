@@ -517,6 +517,9 @@
 644,VRC,Surfaces viticoles presentant une biodiversite naturelle,nutzung,21,vign,vignes,39,vign,vignes,1
 645,VRC,Vignes,nutzung,21,vign,vignes,39,vign,vignes,1
 646,VRC,Vignes (surfaces de promotion de la biodiversite specifiques a la re-gion),nutzung,21,vign,vignes,39,vign,vignes,1
+647,PFR,Cultures des baies sous abri sans fondations permanentes; sur sol naturel,nutzung,20,verg,vergers,38,verg,vergers,1
+648,PFR,Cultures des baies sous abri sans fondations permanentes; sur des tables de plantation ou  des etageres,nutzung,20,verg,vergers,38,verg,vergers,1
+649,LSA,Champignons sous abri avec fondations permanentes,nutzung,25,leg_fl,legumes_fleurs,44,leg_fl,legumes_fleurs,1
 1001,CON,Sealed,clcplus,31,CON,sealed,51,CON,sealed,0
 1002,FOR,Woody needle leaved trees,clcplus,32,FOR,forest,52,FOR,forest,0
 1003,FOR,Woody Broadleaved deciduous trees,clcplus,32,FOR,forest,52,FOR,forest,0

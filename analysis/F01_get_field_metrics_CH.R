@@ -13,6 +13,10 @@
 #   updated for 2024-2025 in data received on 20/05/2026 (not yet)
 # Run in ~1min
 
+# Caution (not considered yet):
+# land cover and field areas are not reliable in Soleure from 2019 to 2020 (ID between 71 and 90).
+# should we replace the values with NA?
+
 library(terra)
 library(here)
 
@@ -24,12 +28,13 @@ outfolder <- here("data", "derived-data")
 
 # The data was split per year using S01_prep_data.R
 nutz_layer <- "nutz_XXXX.gpkg"
-colNUTZ <- c("nutzungsidentifikator", "nutzung_fr", "id_cultu") #, "Hauptkategorie_FR")
+
+colNUTZ <- c("nutzungsidentifikator", "nutzung_fr", "id_cultu") #,"objectid", "Hauptkategorie_FR")
 # do we want to keep RPG column names?
 # labRPG <- c("id_parcel", "code_cultu", "id_cultu")
 
 # data are available for the period 2019 - 2023
-period <- 2019:2023
+period <- 2019:2025
 # size of buffers
 buffer_fields <- c(500, 1000) #in m
 # time period for crop rotation
@@ -70,8 +75,9 @@ pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
 pts <- project(pts, "EPSG:2056")
 
 # select only observation in Switzerland
-keep <- pts$Study_ID %in% "PestiRed" & !is.na(df$Lat)
-# table(keep) # 203 points
+# Pestired only for now as I didn't receive data for Agro4st
+keep <- pts$Study_ID %in% "PestiRed" & !is.na(df$Lat) & pts$Year %in% period
+# table(keep) # 352 points
 # table(pts$Year[keep])
 
 # table(nutz$Hauptkategorie_FR, useNA="ifany")
@@ -113,7 +119,10 @@ for (i in which(keep)) {
       # add funbiodiv ID
       exi$Funbiodiv_ID <- pti$ID
       # keep in nutz_out
-      nutz_out <- c(nutz_out, exi)
+      nutz_out <- c(
+        nutz_out,
+        exi[c("Funbiodiv_ID", colNUTZ, "Perim_m", "Area_ha")]
+      )
       out_i <- data.frame(
         data.frame(pti),
         data.frame(exi)[, c(colNUTZ, "Perim_m", "Area_ha")]
@@ -175,5 +184,6 @@ write.csv(df_out, file.path(outfolder, "metrics_nutz.csv"), row.names = FALSE)
 
 # save rpg fields
 nutz_all <- do.call(rbind, nutz_out)
+
 #fmt: skip
 writeVector(nutz_all, file.path(outfolder, "nutz_fields.gpkg"), overwrite = TRUE)

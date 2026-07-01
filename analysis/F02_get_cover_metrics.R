@@ -17,7 +17,7 @@ library(here)
 # Load home made functions
 devtools::load_all()
 
-period <- 2015:2024
+period <- 2015:2025
 buffer_fields <- 1000 #in m
 
 datafolder <- here("data", "raw-data")
@@ -75,8 +75,8 @@ pts <- project(pts, "EPSG:3035")
 # table(pts$Year)
 
 # select only observation in France between 2015 and 2024
-keep <- pts$Year %in% period & !is.na(df$Lat)
-# table(keep) # 1931 points
+keep <- pts$Year %in% period & !is.na(df$Lat) & pts$Study_ID != "Agro4st"
+# table(keep) # 2597 points
 
 df_out <- list() # save the metrics
 # for testing: sample(which(keep), 10)
@@ -102,6 +102,7 @@ for (i in which(keep)) {
       buffi_2056 <- project(buffi, "EPSG:2056")
       # load nutz data within buffer i
       rpgi <- vect(gsub("XXXX", pti$Year, nutz_layer), ext = buffi_2056)
+
       # remove non agricultural fields
       rpgi <- rpgi[!rpgi$nutzung_fr %in% rmNUTZ, ]
       # get numeric id
@@ -109,7 +110,7 @@ for (i in which(keep)) {
       if (sum(is.na(m_rpg)) > 0) {
         # fmt:skip
         print(paste("Missing values for NUTZ", i, ":",
-          rpgi$nutzung_fr[is.na(m_rpg)]
+          unique(rpgi$nutzung_fr[is.na(m_rpg)])
         ))
       }
       rpgi$gp <- ref$id[m_rpg]

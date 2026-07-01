@@ -20,7 +20,7 @@ execute:
 | [perimeter and area of the field](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html#field-size)             | RPG*                  | vectoriel   |
 | [mean field size within buffer](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html#field-size-within-buffer) | RPG*                  | vectoriel   |
 | [crop rotation (N-4:N)](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html#crop-rotation-n-4n)               | RPG*                  | vectoriel   |
-| [hedgerows around field](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html#hedgerows-length)         | RPG* + Liu 2023       | vectoriel   |
+| [hedgerows around field](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html#hedgerows-length)         | RPG* <br> Liu 2023       | vectoriel <br> raster 30m   |
 | [% land cover within buffer](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html#land-cover-within-buffer)    | RPG* + CLCplus        | raster 10m  |
 | *edge density*                             | Not available        | NA              | 
 
@@ -64,12 +64,15 @@ outfolder <- here("data", "derived-data")
 df <- read.csv(file.path(datafolder, "coordinates_year_crop.csv"))
 # create an ID
 df$ID <- paste(df$Study_ID, df$Plot_ID, df$Year, sep = "_")
+
+df <- df[df$Study_ID != "Agro4st", ]
+
 # transform as spatial points
 pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
 
 # raster indicators
 ind <- read.csv(file.path(outfolder, "metrics.csv"))
-
+ind <- ind[ind$Study_ID != "Agro4st", ]
 # classes
 ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
 
@@ -84,7 +87,6 @@ rpg <- vect(file.path(outfolder, "rpg_fields.gpkg"))
 colr <- c(
   "id_parcel",
   "code_cultu",
-  "id_cultu",
   "Perim_m",
   "Area_ha",
   "Funbiodiv_ID"
@@ -97,7 +99,6 @@ nutz <- vect(file.path(outfolder, "nutz_fields.gpkg"))
 coln <- c(
   "nutzungsidentifikator",
   "nutzung_fr",
-  "Hauptkategorie_FR",
   "Perim_m",
   "Area_ha",
   "Funbiodiv_ID"
@@ -697,6 +698,40 @@ plot_ly(
 ```
 
 :::
+
+
+::: {.panel-tabset}
+## crop
+```{r}
+#| label: fig-crop5
+#| fig-cap: "Number of different crops cultivated in the past 5 years"
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$rot5_Ncrop ~ ind$Study_ID,
+  las = 2,
+  ylab = "N crop",
+  xlab = "",
+  main = "Number of crops cultivated in the past 5 years"
+)
+abline(h = mean(ind$rot5_Ncrop, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## cropgroup
+```{r}
+#| label: fig-cropgroup5
+#| fig-cap: "Number of different crop groups cultivated in the past 5 years"
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$rot5_Ngroup ~ ind$Study_ID,
+  las = 2,
+  ylab = "N crop group",
+  xlab = "",
+  main = "Number of crop groups cultivated in the past 5 years"
+)
+abline(h = mean(ind$rot5_Ngroup, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+::: 
 
 From ```r sum(ind$rot5_Nyear==5)``` observations with complete crop rotation information in [N-4:N], ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 1)``` have the same crop for the whole time period, while ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 4)``` fields have four different crop groups in the past 5 years (@fig-ncroprot).
 

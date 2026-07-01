@@ -72,9 +72,9 @@ orchard <- project(orchard, "EPSG:4326")
 orchard$id_parcel <- orchard$gid
 # set to code 402: verger
 orchard$id_cultu <- 401
-orchard$id_cultu[orchard$ocs_fr_ %in% "olivier"] = 402
-orchard$id_cultu[orchard$ocs_fr_ %in% "poirier"] = 403
-orchard$id_cultu[orchard$ocs_fr_ %in% c("pommier", "pommier_ou_poirier")] = 404
+orchard$id_cultu[orchard$ocs_fr_ %in% "olivier"] <- 402
+orchard$id_cultu[orchard$ocs_fr_ %in% "poirier"] <- 403
+orchard$id_cultu[orchard$ocs_fr_ %in% c("pommier", "pommier_ou_poirier")] <- 404
 # add code_cultu
 orchard$code_cultu <- ref$code[match(orchard$id_cultu, ref$id)]
 # simplify the format
@@ -103,8 +103,8 @@ pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
 # table(pts$Year)
 
 # select only observation in France between 2015 and 2024
-keep <- pts$Year %in% period & !pts$Study_ID %in% "PestiRed"
-# table(keep) # 1728 points
+keep <- pts$Year %in% period & !pts$Study_ID %in% c("PestiRed", "Agro4st")
+# table(keep) # 2206 points
 
 rpg_out <- c() # save the rpg information
 df_out <- c() # save the parameters

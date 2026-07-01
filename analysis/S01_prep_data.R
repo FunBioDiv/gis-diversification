@@ -4,6 +4,10 @@ library(here)
 dirfile <- here("data", "raw-data", "CH")
 file <- file.path(dirfile, "buffer_4000_lnf_hk_area_distance_nutz_60.gpkg")
 
+# get crop reference
+ref <- read.csv(here("data", "derived-data", "classes_rpg_nutzung_clc.csv"))
+
+colNUTZ <- c("objectid", "nutzung_fr")
 # super heavy (2.4Gb)
 rpg_ch <- vect(file)
 
@@ -15,30 +19,81 @@ for (i in 2019:2023) {
 }
 
 
-zoomin <- ext(c(2508265, 2509047, 1119836, 1121222)) + 2000
-v <- vect(file.path(dirfile, "nutz_2019.gpkg"), extent = zoomin)
-mapview::mapview(v)
+# zoomin <- ext(c(2508265, 2509047, 1119836, 1121222)) + 2000
+# v <- vect(file.path(dirfile, "nutz_2019.gpkg"), extent = zoomin)
+# mapview::mapview(v)
 
-rpg19 <- vect(file.path(dirfile, "nutz_2019.gpkg"))
+# rpg19 <- vect(file.path(dirfile, "nutz_2019.gpkg"))
 
 rpg25 <- vect(file.path(
   dirfile,
   "buffer_3000_lnf_hk_area_distance_nutz_24to25_true.gpkg"
 ))
-table(rpg25$year, useNA = "ifany") # 401436
+rpg25$nutzungsidentifikator <- paste(
+  rpg25$kanton,
+  rpg25$bezugsjahr,
+  rpg25$bezugsjahr,
+  rpg25$qgis_id,
+  sep = "_"
+)
+# table(rpg25$year, useNA = "ifany") # 401436
 # only 2025 : to be checked with Selma
-table(rpg25$Hauptkategorie_FR)
+# table(rpg25$Hauptkategorie_FR)
+# table(duplicated(data.frame(rpg25)))
+#remove duplicates
+rpg25 <- rpg25[!duplicated(data.frame(rpg25)), ]
+rpg25$nutzung_fr <- gsub("Riz en culture seche", "Riz", rpg25$nutzung_fr)
+# get numeric id
+m_rpg <- match(rpg25$nutzung_fr, ref$name)
+# table(is.na(m_rpg))
+# unique(rpg25$nutzung_fr[is.na(m_rpg)])
+
+# table(rpg25$nutzung_fr)
+writeVector(rpg25, file.path(dirfile, "nutz_2025.gpkg"), overwrite = TRUE)
+
 
 rpg24 <- vect(file.path(
   dirfile,
   "buffer_4000_lnf_hk_2024.gpkg"
 ))
+# table(rpg24$year, useNA = "ifany") # 401436
+# head(rpg24)
+Encoding(rpg24$nutzung_fr)
+rpg24$nutzung_fr <- iconv(
+  rpg24$nutzung_fr,
+  from = "UTF-8",
+  to = "ASCII//TRANSLIT"
+)
+rpg24$nutzungsidentifikator <- rpg24$id_kanton_agis
+
+rpg24$nutzung_fr <- gsub("surface agricole utile", "SAU", rpg24$nutzung_fr)
+rpg24$nutzung_fr <- gsub("surface d'estivage", "SE", rpg24$nutzung_fr)
+rpg24$nutzung_fr <- gsub(
+  "Surfaces dont l'affectation principale n'est pas l'exploitation agricole (terrains a batir equipes et surfaces comprises dans les terrains de golf et de camping, aerodromes et terrains d'entrainement ",
+  "Surfaces dont l'affectation principale n'est pas l'exploitation agricole (terrains a batir equipes et surfaces comprises dans les terrains de golf et de camping, aerodromes et terrains d'entrainement militaire, surfaces delimitees des bas-cotes des lignes de chemins de fer, de routes publiques, de cours et de plans d'eau)",
+  rpg24$nutzung_fr,
+  fixed = TRUE
+)
+
+# get numeric id
+m_rpg <- match(rpg24$nutzung_fr, ref$name)
+# table(is.na(m_rpg))
+# unique(rpg24$nutzung_fr[is.na(m_rpg)])
+
+writeVector(
+  rpg24,
+  file.path(dirfile, "nutz_2024.gpkg"),
+  overwrite = TRUE
+)
 
 colNUTZ <- c("nutzungsidentifikator", "nutzung_fr")
 colNUTZ %in% names(rpg24)
 names(rpg19)
 names(rpg24) #different than
 names(rpg25)
+
+rpg23 <- vect(file.path(dirfile, "nutz_2023.gpkg"))
+table(duplicated(data.frame(rpg23)))
 
 table(rpg25$year, useNA = "ifany") # 202042
 table(rpg24$year, useNA = "ifany") # 202042

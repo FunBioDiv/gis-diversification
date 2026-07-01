@@ -4,7 +4,7 @@
 #' extract diversification metrics on crop fields
 #'
 #' @author Romain Frelat
-#' @date 12 May 2026
+#' @date 1st July 2026
 
 ## Install Dependencies (listed in DESCRIPTION) ----
 # rdeps::add_deps() # update automatically the list of dependencies
@@ -40,7 +40,6 @@ source("analysis/F03_get_hedgerows.R")
 ##
 # 4 Merge all indicators
 source("analysis/F04_merge.R")
-
 
 ##
 # 5 Explore dataset
