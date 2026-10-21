@@ -923,7 +923,7 @@ mapview::mapview(
 
 ```{r}
 #| label: tbl-bcover
-#| #| tbl-cap: "Summary of the land cover classes  composition in 1000m buffer"
+#| tbl-cap: "Number of land cover classes and percentage of cover from RPG* in 1000m buffer per project"
 m1000 <- grep("frac1000", names(ind))
 l1000 <- gsub("frac1000_", "", names(ind)[m1000])
 
@@ -956,15 +956,16 @@ knitr::kable(info)
 
 
 
-After grouping, there are ```r length(m1000)``` different categories covered by the 1000m buffers (@tbl-bcover). 
+After grouping, there are ```r length(m1000)``` different categories covered by the 1000m buffers . 
 
-In average, roughly 70% of the buffer areas are filled with land cover classes from `RPG` (and the other half are `CLC` classes). The proportion of `RPG` classes vary greatly by project.
+In average, roughly 75% of the buffer areas are filled with land cover classes from `RPG` (and the remaining quarter with `CLC` classes) (@tbl-bcover).
 
 ```{r}
 #| label: tbl-topcover
 #| tbl-cap: "Top 10 most frequent land cover classes"
 mean_frac <- apply(ind[, m1000], 2, mean, na.rm = TRUE)
 top10 <- sort(mean_frac, decreasing = TRUE)[1:10]
+names(top10) <- gsub("frac1000_", "", names(top10))
 round(top10, 2)
 ```
 
@@ -1130,7 +1131,5 @@ pairs(out, lower.panel = panel.smooth, upper.panel = panel.cor)
 **Remarks:**  
 
 - Most observations have a corresponding crop field in RPG dataset or in complementary dataset (@tbl-inrpg).    
-
-- The sampling location within the field might influence the results (different impact of hedgerows, or of agricultural practices). We might want to add an indicator reflecting the distance to the center of the field and/or the distance to the closest field boundary?  
 
 

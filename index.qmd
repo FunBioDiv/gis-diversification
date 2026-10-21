@@ -1,18 +1,23 @@
-# Overview {.unnumbered}
+# Overview of the data visualizations {.unnumbered}
 
-Explorations des jeux de données en cours (Fr):    
+
+### Current data extraction (France + Switzerland)
+
+1. [Overview of the field coordinates](https://funbiodiv.github.io/gis-diversification/analysis/Q1_overview_fields.html)
+2. [Summary of the diversification metrics](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html)
+
+<br> <br> <br>
+
+
+
+### *DEPRECATED*: Data exploration for French datasets    
+
+*kept for archive only*
 
 1. [Données RPG, RPG complété et BD haies](https://funbiodiv.github.io/gis-diversification/analysis/01_explore_points.html)  
 2. [Croisement RPG+OSO](https://funbiodiv.github.io/gis-diversification/analysis/02_land_cover.html)
 3. [Comparaison taille des parcelles RPG](https://funbiodiv.github.io/gis-diversification/analysis/03_field_size.html)
 4. [Longueurs d'interfaces](https://funbiodiv.github.io/gis-diversification/analysis/04_bordure.html)
 5. [Summary](https://funbiodiv.github.io/gis-diversification/analysis/05_summary.html)
-
-Further exploration:  
-
 6. [Comparaison des données sur les haies](https://funbiodiv.github.io/gis-diversification/analysis/06_haie.html)
 7. [Identification des parcelles vers Toulouse](https://funbiodiv.github.io/gis-diversification/analysis/07_fields_Toulouse.html)
-
-Last calculation of metrics (FR+CH):  
-
-10. [Summary 2](https://funbiodiv.github.io/gis-diversification/analysis/10_summary_FRCH.html)

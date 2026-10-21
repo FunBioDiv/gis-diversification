@@ -55,7 +55,7 @@ namean <- tapply(is.na(met$Perim_m), met$Plot_ID, mean)
 
 There are two issues identified so far:  
 
-- three points have no information on fields (```r names(namean)[namean == 1]```): they lay just outside the field edges.  
+- three points have no information on fields (```r names(namean)[namean == 1]```): they lay just outside the field edges (for 3.1 and 16.2) or the field is absent from nutzung (for 39.2).  
 
 - ```r length(names(namean)[namean < 1 & namean > 0])``` points have no information for 2020 (from ID 71 to 89), Nutzung data is incomplete in this region for 2020.
 
@@ -205,57 +205,6 @@ mapview::mapview(nutzi, layer.name = "Nutzung") +
   )
 ```
 
-## 2022
-```{r}
-i <- which(df$Plot_ID == "71.1" & df$Year == "2022")
-
-# select point i
-pti <- pts[i]
-
-# create maximum buffer
-buffi <- buffer(pti, max(buffer_fields))
-
-# get rpg around buffer
-nutzi <- vect(
-  file.path(datafolder, gsub("XXXX", pti$Year, nutz_layer)),
-  ext = buffi
-)
-
-# checks
-mapview::mapview(nutzi, layer.name = "Nutzung") +
-  mapview::mapview(
-    pti,
-    color = "red",
-    col.regions = "red",
-    layer.name = "coordinate"
-  )
-```
-
-## 2023
-```{r}
-i <- which(df$Plot_ID == "71.1" & df$Year == "2023")
-
-# select point i
-pti <- pts[i]
-
-# create maximum buffer
-buffi <- buffer(pti, max(buffer_fields))
-
-# get rpg around buffer
-nutzi <- vect(
-  file.path(datafolder, gsub("XXXX", pti$Year, nutz_layer)),
-  ext = buffi
-)
-
-# checks
-mapview::mapview(nutzi, layer.name = "Nutzung") +
-  mapview::mapview(
-    pti,
-    color = "red",
-    col.regions = "red",
-    layer.name = "coordinate"
-  )
-```
 
 ## 2024
 ```{r}
