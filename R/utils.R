@@ -11,6 +11,41 @@ lunique <- function(x) {
   length(unique(as.character(x)))
 }
 
+# length unique --------------------------------
+#' number of unique elements
+#'
+#' @export
+length_unique <- function(x) {
+  #remove empty string
+  x <- x[!is.na(x)]
+  x <- x[x != ""]
+  x <- x[x != "NA_NA"]
+  x <- firstup(x)
+  length(unique(x[!is.na(x)]))
+}
+
+# concat ---------------------------------------
+#' concatenate unique list of characters
+#'
+#' @export
+concat_unique <- function(x, sep = ", ") {
+  #remove empty string
+  x <- x[!is.na(x)]
+  x <- x[x != ""]
+  x <- firstup(x)
+  paste(sort(unique(x)), collapse = sep)
+}
+
+# firstup ---------------------------------------
+#' Capitalize characters
+#'
+#' @export
+firstup <- function(x) {
+  x <- tolower(x)
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  return(x)
+}
+
 # select the closest positive element
 which.closest <- function(x) {
   if (sum(x <= 0) > 0) {

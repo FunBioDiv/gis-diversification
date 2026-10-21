@@ -1,0 +1,286 @@
+---
+title: "Check missing field in Nutzung"
+author: Romain Frelat
+date: today
+format: 
+  html:
+    toc: true
+execute:
+  echo: false
+  warning: false
+---
+
+
+```{r setup}
+library(terra) |> suppressWarnings()
+library(sf) |> suppressWarnings()
+library(here) |> suppressWarnings()
+library(mapview)
+mapviewOptions(basemaps = c("OpenStreetMap", "Esri.WorldImagery"))
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data", "nutzung")
+outfolder <- here("data", "derived-data")
+
+# The data was split per year using S01_prep_data.R
+nutz_layer <- "nutz_XXXX.gpkg"
+colNUTZ <- c("nutzungsidentifikator", "nutzung_fr", "id_cultu")
+
+buffer_fields <- c(500, 1000) #in m
+
+# get crop reference
+ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
+rmCat <- sort(unique(ref$name[ref$keep_ag == "0" & ref$source == "nutzung"]))
+
+# get the coordinates from the points
+# from shinyFunbiodiv/analysis/03_update_data.R
+df <- read.csv(here(outfolder, "coordinates_year_crop.csv"))
+# create an ID
+df$ID <- paste(df$Study_ID, df$Plot_ID, df$Year, sep = "_")
+# transform as spatial points
+pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
+# project in EPSG 2056
+pts <- project(pts, "EPSG:2056")
+
+met <- read.csv(file.path(outfolder, "metrics.csv"))
+met <- met[met$Study_ID == "PestiRed", ]
+
+namean <- tapply(is.na(met$Perim_m), met$Plot_ID, mean)
+# names(namean)[namean == 1]
+# names(namean)[namean < 1 & namean > 0]
+```
+
+## Summary
+
+There are two issues identified so far:  
+
+- three points have no information on fields (```r names(namean)[namean == 1]```): they lay just outside the field edges.  
+
+- ```r length(names(namean)[namean < 1 & namean > 0])``` points have no information for 2020 (from ID 71 to 89), Nutzung data is incomplete in this region for 2020.
+
+
+
+## Coordinates outside the field
+
+
+::: {.panel-tabset}
+
+## 3.1
+
+```{r}
+i <- which(df$Plot_ID %in% c("3.1", "3.2") & df$Year == "2020")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", unique(pti$Year), nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    zcol = "Plot_ID",
+    layer.name = "coordinate"
+  )
+```
+
+## 16.2
+
+```{r}
+i <- which(df$Plot_ID %in% c("16.1", "16.2") & df$Year == "2025")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", unique(pti$Year), nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    zcol = "Plot_ID",
+    layer.name = "coordinate"
+  )
+```
+
+## 39.2
+
+```{r}
+i <- which(df$Plot_ID %in% c("39.1", "39.2") & df$Year == "2025")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", unique(pti$Year), nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    zcol = "Plot_ID",
+    layer.name = "coordinate"
+  )
+```
+
+:::
+
+
+## Incomplete Nutzung for 2020
+
+The issue with coordinates from ID 71 to 89 is only for the year 2020 when the Nutzung data is incomplete. As an exemple, we will show 71.1.
+
+::: {.panel-tabset}
+
+## 2020
+```{r}
+i <- which(df$Plot_ID == "71.1" & df$Year == "2020")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", pti$Year, nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    color = "red",
+    col.regions = "red",
+    layer.name = "coordinate"
+  )
+```
+
+## 2021
+```{r}
+i <- which(df$Plot_ID == "71.1" & df$Year == "2021")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", pti$Year, nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    color = "red",
+    col.regions = "red",
+    layer.name = "coordinate"
+  )
+```
+
+## 2022
+```{r}
+i <- which(df$Plot_ID == "71.1" & df$Year == "2022")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", pti$Year, nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    color = "red",
+    col.regions = "red",
+    layer.name = "coordinate"
+  )
+```
+
+## 2023
+```{r}
+i <- which(df$Plot_ID == "71.1" & df$Year == "2023")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", pti$Year, nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    color = "red",
+    col.regions = "red",
+    layer.name = "coordinate"
+  )
+```
+
+## 2024
+```{r}
+i <- which(df$Plot_ID == "71.1" & df$Year == "2024")
+
+# select point i
+pti <- pts[i]
+
+# create maximum buffer
+buffi <- buffer(pti, max(buffer_fields))
+
+# get rpg around buffer
+nutzi <- vect(
+  file.path(datafolder, gsub("XXXX", pti$Year, nutz_layer)),
+  ext = buffi
+)
+
+# checks
+mapview::mapview(nutzi, layer.name = "Nutzung") +
+  mapview::mapview(
+    pti,
+    color = "red",
+    col.regions = "red",
+    layer.name = "coordinate"
+  )
+```
+
+:::

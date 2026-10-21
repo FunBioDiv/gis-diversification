@@ -1,0 +1,1136 @@
+---
+title: "Calculation of diversification indicators and other covariates"
+author: Romain Frelat
+date: today
+format: 
+  html:
+    toc: true
+execute:
+  echo: false
+  warning: false
+---
+
+
+## Summary
+
+### Indicators 
+
+|**Indicator**                               |**Data**              |**Format**       |
+|:-------------------------------------------|:---------------------|:----------------|
+| [perimeter and area of the field](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#field-size)             | RPG*                  | vectoriel   |
+| [mean field size within buffer](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#field-size-within-buffer) | RPG*                  | vectoriel   |
+| [crop rotation (N-4:N)](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#crop-rotation-n-4n)               | RPG*                  | vectoriel   |
+| [hedgerows around field](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#hedgerows-length)         | RPG* <br> Liu 2023       | vectoriel <br> raster 30m   |
+| [% land cover within buffer](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#land-cover-within-buffer)    | RPG* + CLCplus        | raster 10m  |
+| *edge density*                             | Not available        | NA              | 
+
+
+### Datasets 
+
+- **Registre Parcellaire Graphique (RPG)**: annual field crop data for the period 2015-2024 available for France on IGN website: <https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_RPG>. The dataset differentiates [366 crop categories](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/rpg_classes.csv)   
+
+- **Geodienste - nutzungsflaechen (Nutzung)**: Swiss equivalent of the RPG, not entirely open yet but raw data provided by Selma Cadot: <https://geodienste.ch/services/lwb_nutzungsflaechen>. The dataset differentiates [146 crop categories](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/nutzung_classes.csv). It also contains hedgerows and semi-natural habitat.
+
+- **Corine Land Cover plus (CLCplus)**: land cover at European scale with 10m resolution and [11 basic land cover classes](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/clc_classes.csv), available on Corine Land Monitoring Service <https://land.copernicus.eu/en/products/clc-backbone>. 
+
+- **Liu *et al.* (2023)**: European tree cover and biomass map at 30m resolution for Europe <https://zenodo.org/records/8154445> derived from 3m resolution PlanetScope imagery of 2019.
+
+- **BD Haies v2** (6.8Gb): hedgerows dataset for France available on the IGN website: <https://geoservices.ign.fr/bdhaie>. BD Haie v2 was produced from satellite images of 2020-2022.  
+
+- [Land cover class harmonization](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_rpg_nutzung_clc.csv): list all classes from **RPG**, **Nutzung** and **CLCplus** and how to categorize them. This file has been completed during WS3 and can be further customized for the project objectives.
+
+- Orchards and vineyards from individual projects to further complete the agricultural land use in France.
+
+
+## Field observations
+
+```{r}
+suppressWarnings({
+  library(terra)
+  library(sf)
+  library(here)
+  library(mapview)
+  library(leaflet)
+  library(tmap)
+  library(plotly)
+})
+mapviewOptions(basemaps = c("OpenStreetMap", "Esri.WorldImagery"))
+
+# Load home made functions
+devtools::load_all()
+
+datafolder <- here("data", "raw-data")
+outfolder <- here("data", "derived-data")
+
+df <- read.csv(file.path(outfolder, "coordinates_year_crop.csv"))
+# create an ID
+df$ID <- paste(df$Study_ID, df$Plot_ID, df$Year, sep = "_")
+
+# df <- df[df$Study_ID != "Agro4st", ]
+
+# transform as spatial points
+pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
+
+# raster indicators
+ind <- read.csv(file.path(outfolder, "metrics.csv"))
+# ind <- ind[ind$Study_ID != "Agro4st", ]
+
+# classes
+ref <- read.csv(file.path(outfolder, "classes_rpg_nutzung_clc.csv"))
+
+# liu et al. 2023
+# fmt:skip
+liucov <- rast(file.path(datafolder, "Liu2023", "planet_canopy_cover_30m_v0.1.tif"))
+liubio <- rast(file.path(datafolder, "Liu2023", "planet_agb_30m_v0.1.tif"))
+
+# load rpg fields
+rpg <- vect(file.path(outfolder, "rpg_fields.gpkg"))
+# simplify
+colr <- c(
+  "id_parcel",
+  "code_cultu",
+  "Perim_m",
+  "Area_ha",
+  "Funbiodiv_ID"
+)
+rpg <- rpg[, colr]
+
+# load nutz fields
+nutz <- vect(file.path(outfolder, "nutz_fields.gpkg"))
+# match rpg columns
+coln <- c(
+  "nutzungsidentifikator",
+  "nutzung_fr",
+  "Perim_m",
+  "Area_ha",
+  "Funbiodiv_ID"
+)
+nutz <- nutz[, coln]
+names(nutz) <- colr
+nutz <- project(nutz, crs(rpg))
+# merge rpg and nutz
+fields <- rbind(rpg, nutz)
+```
+
+::: {.panel-tabset}
+
+## barplot
+```{r}
+#| label: fig-yearstudy
+#| fig-cap: "Number of observations per year and per project"
+df_year <- as.data.frame(table(pts$Study_ID, pts$Year))
+names(df_year) <- c("Dataset", "Year", "Nobs")
+plot_ly(
+  df_year,
+  x = ~Year,
+  y = ~Nobs,
+  color = ~Dataset,
+  text = ~Dataset,
+  textposition = "none",
+  hoverinfo = "x+y+text"
+) %>%
+  add_bars() %>%
+  layout(barmode = "stack") %>%
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
+```
+
+## table
+```{r}
+#| label: tbl-yearstudy
+#| tbl-cap: "Number of observations per year and per project"
+n_year <- as.data.frame.matrix(table(pts$Study_ID, pts$Year))
+n_year$TOTAL <- rowSums(n_year)
+n_year['TOTAL', ] <- colSums(n_year)
+
+knitr::kable(n_year)
+```
+
+:::
+
+```{r}
+#| label: fig-mapobs
+#| fig-cap: "Map of field observations"
+tmap_mode("view")
+tm_basemap("OpenStreetMap") +
+  tm_shape(pts, is.main = TRUE) +
+  tm_symbols(
+    fill = "Study_ID",
+    fill.scale = tm_scale_categorical(
+      values = "cols4all.friendly13",
+      values.repeat = FALSE
+    )
+  ) +
+  tm_view(
+    set_zoom_limits = c(3, 8),
+    set_view = c(mean(ext(pts)[1:2]), mean(ext(pts)[3:4]), zoom = 5)
+  )
+```
+
+More detailled overview of the field observations can be found [here](https://funbiodiv.github.io/gis-diversification/analysis/Q1_overview_fields.html)
+
+
+### Identification of the crop field
+
+Because of data availability, we will only focus on the observations made in the period 2015-2024 with field coordinates. The project `DURUM_MIX_GM` has only one coordinates leading to the entrance of the Institut Agro-Montpellier, without registered crop field within 1000m from the coordinates so it was also excluded.  
+
+We identified the crop field from `RPG` or `Nutzung` dataset corresponding to the observations based on the coordinates and the year of the sampling.
+
+```{r}
+#| label: tbl-inrpg
+#| tbl-cap: "Number of observations in fields from RPG"
+# select relevant rows
+ind <- ind[
+  ind$Year %in% 2015:2024 & !is.na(ind$Lat) & ind$Study_ID != "DURUM_MIX_GM",
+]
+rpgplus <- !is.na(ind$CropCode_N) &
+  (ind$CropCode_N < 400 | ind$CropCode_N >= 500)
+vv <- !is.na(ind$CropCode_N) & ind$CropCode_N >= 400 & ind$CropCode_N < 500
+
+in_rpg <- data.frame(
+  "Nobs" = as.numeric(table(ind$Study_ID)),
+  "in_RPG" = table(ind$Study_ID, rpgplus)[, 2],
+  "in_VineOrchard" = table(ind$Study_ID, vv)[, 2]
+)
+
+#fmt: skip
+in_rpg$Perc <- round((in_rpg$in_RPG + in_rpg$in_VineOrchard) / in_rpg$Nobs * 100, 2)
+
+knitr::kable(in_rpg)
+```
+
+
+
+
+**Remarks:**   
+
+- In total, ```r round(sum(!is.na(ind$CropCode_N)) / nrow(ind) * 100)``` % of the fields observations are covered with information on crop field.   
+- It is important to know and acknowledge that `RPG` is incomplete but the vineyards and orchards provided by data providers helps characterizing projects with permanent crops.
+
+
+## Field size
+
+We calculated the area and the perimeter of the crop fields corresponding to the samplings.
+
+::: {.panel-tabset}
+
+## boxplot 
+
+```{r}
+#| label: fig-boxareastudy
+#| fig-cap: "Field area in ha per project. The dashed line show the median area."
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$Area_ha ~ ind$Study_ID,
+  las = 2,
+  ylab = "ha",
+  xlab = "",
+  main = "Crop field area"
+)
+abline(h = median(ind$Area_ha, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## table
+
+```{r}
+#| label: tbl-areastudy
+#| tbl-cap: "Summary statistics per project of the area (in ha) of crop fields"
+sum_area <- sapply(
+  tapply(ind$Area_ha, ind$Study_ID, summary),
+  function(x) x[1:6]
+)
+# remove DURUM_MIX_GM
+sum_area <- sum_area[, !is.na(sum_area[1, ])]
+
+# colnames(sum_area) <- gsub("_", "<br>", colnames(sum_area))
+knitr::kable(t(round(sum_area, 2)))
+```
+
+:::
+
+
+::: {.panel-tabset}
+
+## boxplot 
+
+```{r}
+#| label: fig-boxperimstudy
+#| fig-cap: "Field perimeter in m per project. The dashed line show the median perimeter."
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$Perim_m ~ ind$Study_ID,
+  las = 2,
+  ylab = "m",
+  xlab = "",
+  main = "Crop field perimeter",
+)
+abline(h = median(ind$Perim_m, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## table
+```{r}
+#| label: tbl-perimstudy
+#| tbl-cap: "Summary statistics per project of the perimeter (in m) of crop fields"
+sum_area <- sapply(
+  tapply(ind$Perim_m, ind$Study_ID, summary),
+  function(x) x[1:6]
+)
+# remove DURUM_MIX_GM
+sum_area <- sum_area[, !is.na(sum_area[1, ])]
+
+#colnames(sum_area) <- gsub("_", "<br>", colnames(sum_area))
+knitr::kable(t(round(sum_area, 2)))
+```
+
+:::
+
+
+
+```{r}
+#| label: fig-areaperim
+#| fig-cap: "Relation between area and perimeter (in log scale)"
+ind$Study_fac <- as.factor(ind$Study_ID)
+
+plot_ly(ind) |>
+  add_markers(
+    x = ~Area_ha,
+    y = ~Perim_m,
+    color = ~Study_ID,
+    colors = rainbow(nlevels(ind$Study_fac)),
+    text = ~ID,
+    hoverinfo = "text"
+  ) |>
+  layout(
+    xaxis = list(title = "Area (ha)", type = "log"),
+    yaxis = list(title = "Perimeter (m)", type = "log")
+  ) |>
+  config(
+    modeBarButtons = list(list("toImage")),
+    displaylogo = FALSE
+  )
+```
+
+There is a strong relation between area and perimeter (@fig-areaperim). In median, field size is ```r round(median(ind$Area_ha, na.rm=TRUE),1)``` ha and field perimeter is ```r round(median(ind$Perim_m, na.rm=TRUE),0)```m.  
+
+**Outliers**
+
+::::{ .columns }
+:::{ .column width="50%"}
+
+```{r}
+#| label: fig-highperim
+#| fig-cap: "Field with small area and large perimeter"
+minA <- fields[fields$Funbiodiv_ID == ind$ID[which.min(ind$Area_ha)]]
+minP <- pts[pts$ID %in% minA$Funbiodiv_ID]
+mapview(
+  minA,
+  layer.name = "Field with small area",
+  alpha.regions = 0.1,
+  lwd = 2
+) +
+  mapview(minP, layer.name = "P") # not up to date
+```
+
+:::
+
+:::{ .column width="50%"}
+```{r}
+#| label: fig-largearea
+#| fig-cap: "Field with large area"
+#fmt: skip
+minF <- fields[fields$Funbiodiv_ID == ind$ID[which.max(ind$Area_ha)]]
+minP <- pts[pts$ID == ind$ID[which.max(ind$Area_ha)]]
+mapview(
+  minF,
+  layer.name = "Field with large area",
+  alpha.regions = 0.1,
+  lwd = 2
+) +
+  mapview(minP, layer.name = "P")
+```
+
+:::
+
+::::
+
+**Remarks:**  
+
+- Some fields are defines as a strip (large perimeter, small area), e.g. @fig-highperim
+
+- Some fields include many sub-plots, e.g. @fig-largearea.
+
+
+
+
+## Field size within buffer
+    
+Using the coordinates of the sampling sites, we calculated the average area of all crop fields within a buffer (500m, and 1000m).
+
+```{r}
+#| label: tbl-fsizebuffer
+#| tbl-cap: "Summary statistics of the field area (in ha) within different buffer size"
+buff_size <- cbind(
+  "B_500m" = summary(ind$Median_fieldsize_500m_ha),
+  "B_1000m" = summary(ind$Median_fieldsize_1000m_ha)
+)
+
+knitr::kable(round(buff_size, 2))
+```
+
+We see that some observations don't have crop field within 500m (N=2). These observations (listed in @tbl-nofield500) would need to be checked and ensure that they are close to agricultural lands.  
+
+```{r}
+#| label: tbl-nofield500
+#| tbl-cap: "Observations with no fields within a 500m buffer."
+miss_b500 <- ind[is.na(ind$Median_fieldsize_500m_ha), ]
+miss_b500[
+  order(miss_b500$Study_ID, miss_b500$Year),
+  c("Study_ID", "Plot_ID", "Year")
+] |>
+  knitr::kable()
+```
+
+```{r}
+#| label: fig-corfsize
+#| fig-cap: "Correlation among field areas per buffer size"
+plot_ly(ind) |>
+  add_markers(
+    x = ~Median_fieldsize_500m_ha,
+    y = ~Median_fieldsize_1000m_ha,
+    color = ~Study_ID,
+    colors = rainbow(nlevels(ind$Study_fac)),
+    text = ~ID,
+    hoverinfo = "text"
+  ) |>
+  layout(
+    xaxis = list(title = "500m buffer"), #, type = "log"),
+    yaxis = list(title = "1000m buffer"), #, type = "log")
+    title = 'Median field size per buffer'
+  ) |>
+  config(
+    modeBarButtons = list(list("toImage")),
+    displaylogo = FALSE
+  )
+```
+
+
+::: {.panel-tabset}
+
+## 500m 
+
+```{r}
+#| label: fig-fsize500
+#| fig-cap: "Average field size with buffer of 500m"
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$Median_fieldsize_500m_ha ~ ind$Study_ID,
+  las = 2,
+  ylab = "ha",
+  xlab = "",
+  main = "Average field size within 500m buffer"
+)
+abline(h = median(ind$Median_fieldsize_500m_ha, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## 1000m 
+
+```{r}
+#| label: fig-fsize1000
+#| fig-cap: "Average field size with buffer of 1000m"
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$Median_fieldsize_1000m_ha ~ ind$Study_ID,
+  las = 2,
+  ylab = "ha",
+  xlab = "",
+  main = "Average field size within 1000m buffer"
+)
+abline(
+  h = median(ind$Median_fieldsize_1000m_ha, na.rm = TRUE),
+  lwd = 2,
+  lty = 3
+)
+```
+
+:::
+
+
+
+**Outliers**
+
+::::{ .columns }
+:::{ .column width="50%"}
+
+```{r}
+#| label: fig-highfsize
+#| fig-cap: "Highest average field size within 1000m buffer"
+#fmt: skip
+id1 <- which.max(
+    replace(ind$Median_fieldsize_1000m_ha, ind$Study_ID == "PestiRed", -Inf)
+)
+ex1 <- ind$ID[id1]
+
+f1 <- vect(paste0(datafolder, "/happign/RPGbuf_", ex1, ".gpkg"))
+pts_ex1 <- pts[pts$ID == ex1]
+b500_ex1 <- buffer(pts_ex1, 500)
+b1000_ex1 <- buffer(pts_ex1, 1000)
+
+plot(f1, col = NA, border = "black", main = ex1)
+plot(b1000_ex1, col = NA, border = "blue", add = TRUE)
+plot(b500_ex1, col = NA, border = "green", add = TRUE)
+plot(pts_ex1, add = TRUE)
+
+lab <- c(
+  paste("B_500m:", round(ind$Median_fieldsize_500m_ha[id1], 2), "ha"),
+  paste("B_1000m:", round(ind$Median_fieldsize_1000m_ha[id1], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+
+:::
+
+:::{ .column width="50%"}
+```{r}
+#| label: fig-lowfsize
+#| fig-cap: "Lowest average field size within 1000m buffer"
+
+# find which field has lowest value, except PestiRed
+id2 <- which.min(
+  replace(ind$Median_fieldsize_1000m_ha, ind$Study_ID == "PestiRed", Inf)
+)
+ex2 <- ind$ID[id2]
+
+f2 <- vect(paste0(datafolder, "/happign/RPGbuf_", ex2, ".gpkg"))
+#file.exists(paste0(datafolder, "/happign/RPGcomp_", ex2, ".gpkg"))
+
+pts_ex2 <- pts[pts$ID == ex2, ]
+b500_ex2 <- buffer(pts_ex2, 500)
+b1000_ex2 <- buffer(pts_ex2, 1000)
+
+plot(f2, col = NA, border = "black", main = ex2)
+plot(b1000_ex2, col = NA, border = "blue", add = TRUE)
+plot(b500_ex2, col = NA, border = "green", add = TRUE)
+plot(pts_ex2, add = TRUE)
+lab <- c(
+  paste("B_500m:", round(ind$Median_fieldsize_500m_ha[id2], 2), "ha"),
+  paste("B_1000m:", round(ind$Median_fieldsize_1000m_ha[id2], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue", "red"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+:::
+
+::::
+
+
+::::{ .columns }
+:::{ .column width="50%"}
+
+```{r}
+#| label: fig-deltafsize1500
+#| fig-cap: "Highest difference between 500 and 1000m buffer"
+var1 <- (ind$Median_fieldsize_1000m_ha - ind$Median_fieldsize_500m_ha) /
+  (ind$Median_fieldsize_1000m_ha + ind$Median_fieldsize_500m_ha)
+
+# select the maximum not in PestiRed
+id3 <- which.max(replace(var1, ind$Study_ID == "PestiRed", -Inf))
+
+ex3 <- ind$ID[id3]
+
+f3 <- vect(paste0(datafolder, "/happign/RPGbuf_", ex3, ".gpkg"))
+
+pts_ex3 <- pts[pts$ID == ex3]
+b500_ex3 <- buffer(pts_ex3, 500)
+b1000_ex3 <- buffer(pts_ex3, 1000)
+
+plot(f3, col = NA, border = "black", main = ex3)
+plot(b1000_ex3, col = NA, border = "blue", add = TRUE)
+plot(b500_ex3, col = NA, border = "green", add = TRUE)
+plot(pts_ex3, add = TRUE)
+lab <- c(
+  paste("B_500m:", round(ind$Median_fieldsize_500m_ha[id3], 2), "ha"),
+  paste("B_1000m:", round(ind$Median_fieldsize_1000m_ha[id3], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+:::
+
+:::{ .column width="50%"}
+```{r}
+#| label: fig-deltafsize1000
+#| fig-cap: "Lowest difference between 500 and 1000m buffer"
+#| 
+id4 <- which.min(replace(var1, ind$Study_ID == "PestiRed", Inf))
+ex4 <- ind$ID[id4]
+
+f4 <- vect(paste0(datafolder, "/happign/RPGbuf_", ex4, ".gpkg"))
+
+pts_ex4 <- pts[pts$ID == ex4]
+b500_ex4 <- buffer(pts_ex4, 500)
+b1000_ex4 <- buffer(pts_ex4, 1000)
+
+plot(f4, col = NA, border = "black", main = ex4)
+plot(b1000_ex4, col = NA, border = "blue", add = TRUE)
+plot(b500_ex4, col = NA, border = "green", add = TRUE)
+plot(pts_ex4, add = TRUE)
+lab <- c(
+  paste("B_500m:", round(ind$Median_fieldsize_500m_ha[id4], 2), "ha"),
+  paste("B_1000m:", round(ind$Median_fieldsize_1000m_ha[id4], 2), "ha")
+)
+legend(
+  "bottomleft",
+  legend = lab,
+  col = c("green", "blue"),
+  lty = 1,
+  xpd = NA
+)
+```
+
+:::
+
+::::
+
+
+
+
+## Crop rotation (N-4:N)
+
+::: {.panel-tabset}
+## barplot
+
+```{r}
+#| label: fig-nyearstudy
+#| fig-cap: "Length of the land cover time series per project."
+nyeardb <- data.frame(table(ind$rot5_Nyear, ind$Study_ID))
+names(nyeardb) <- c("NYear", "Dataset", "Nobs")
+plot_ly(
+  nyeardb,
+  x = ~NYear,
+  y = ~Nobs,
+  color = ~Dataset,
+  text = ~Dataset,
+  colors = pals::glasbey(lunique(nyeardb$Dataset)),
+  textposition = "none",
+  hoverinfo = "x+y+text"
+) %>%
+  add_bars() %>%
+  layout(barmode = "stack") %>%
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
+```
+
+## table
+
+```{r}
+#| label: tbl-cropy
+#| tbl-cap: "Number of observations per length of crop rotation data (in years) available"
+info <- table(ind$Study_ID, ind$rot5_Nyear)
+# percentage <- round(colSums(info) / nrow(ind) * 100, 2)
+# info <- rbind(info, percentage)
+knitr::kable(info)
+```
+
+:::
+
+The number of observations in the period N-4:N in @tbl-cropy is a results of the number of observations per year (@tbl-yearstudy). 
+Most observations have 5 years of data on crop rotation (```r round(sum(ind$rot5_Nyear==5)/nrow(ind)*100)```%, N=```r sum(ind$rot5_Nyear==5)```).
+
+
+Let's have a look at the crop rotations over the 5-year period (N:N-4).  
+
+::: {.panel-tabset}
+## crop
+```{r}
+#| label: fig-ncroprot
+#| fig-cap: "Number of different crop cultivated in the period N:N-4. Only observations with complete information on land cover for the 5 years are included."
+ncrop_db <- data.frame(table(
+  ind$rot5_Ncrop[ind$rot5_Nyear == 5],
+  ind$Study_ID[ind$rot5_Nyear == 5]
+))
+names(ncrop_db) <- c("Ncrop", "Dataset", "Nobs")
+plot_ly(
+  ncrop_db,
+  x = ~Ncrop,
+  y = ~Nobs,
+  color = ~Dataset,
+  text = ~Dataset,
+  colors = pals::glasbey(lunique(ncrop_db$Dataset)),
+  textposition = "none",
+  hoverinfo = "x+y+text"
+) %>%
+  add_bars() %>%
+  layout(barmode = "stack") %>%
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
+```
+
+## crop group
+
+```{r}
+#| label: fig-ngrouprot
+#| fig-cap: "Number of different crop groups cultivated in the period N:N-4. Only observations with complete information on land cover for the 5 years are included."
+ngroup_db <- data.frame(table(
+  ind$rot5_Ngroup[ind$rot5_Nyear == 5],
+  ind$Study_ID[ind$rot5_Nyear == 5]
+))
+names(ngroup_db) <- c("Ngroup", "Dataset", "Nobs")
+plot_ly(
+  ngroup_db,
+  x = ~Ngroup,
+  y = ~Nobs,
+  color = ~Dataset,
+  text = ~Dataset,
+  colors = pals::glasbey(lunique(ngroup_db$Dataset)),
+  textposition = "none",
+  hoverinfo = "x+y+text"
+) %>%
+  add_bars() %>%
+  layout(barmode = "stack") %>%
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE)
+```
+
+:::
+
+
+::: {.panel-tabset}
+## crop
+```{r}
+#| label: fig-crop5
+#| fig-cap: "Number of different crops cultivated in the past 5 years"
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$rot5_Ncrop ~ ind$Study_ID,
+  las = 2,
+  ylab = "N crop",
+  xlab = "",
+  main = "Number of crops cultivated in the past 5 years"
+)
+abline(h = mean(ind$rot5_Ncrop, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## cropgroup
+```{r}
+#| label: fig-cropgroup5
+#| fig-cap: "Number of different crop groups cultivated in the past 5 years"
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$rot5_Ngroup ~ ind$Study_ID,
+  las = 2,
+  ylab = "N crop group",
+  xlab = "",
+  main = "Number of crop groups cultivated in the past 5 years"
+)
+abline(h = mean(ind$rot5_Ngroup, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+::: 
+
+From ```r sum(ind$rot5_Nyear==5)``` observations with complete crop rotation information in [N-4:N], ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 1)``` have the same crop for the whole time period, while ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 4)``` fields have four different crop groups in the past 5 years (@fig-ncroprot).
+
+```{r}
+#| label: tbl-grprot
+#| tbl-cap: "Most populat crop group rotation cultivated in the 5 years before observations"
+lulc_gp <- ind[, grep("CropGroup_N", names(ind))]
+gpts <- apply(lulc_gp, 1, concat)
+gpu <- apply(lulc_gp, 1, paste_unique)
+
+head(sort(table(gpu[ind$rot5_Nyear == 5]), decreasing = TRUE), 20) |>
+  knitr::kable()
+```
+
+
+
+**Remarks:**    
+
+- Crop rotations depends a lot on the project targeting either annual vs perrenial cropping systems.
+
+
+
+## Hedgerows length
+
+We overlaid the field as defined in `RPG*` (+ a 10m buffer) with the tree cover density from `Liu et al. 2023` and with other national information on hedgerows (`BDHaie` and `Nutzung`).
+
+
+```{r}
+#| label: fig-haiecor
+#| fig-cap: "Correlation among hedgerow indicators"
+haie <- ind[, grep("haie", names(ind))]
+names(haie) <- c(
+  "liu_cover\nperc",
+  "liu_biomass\nkg",
+  "liu_density\nkgperha",
+  "nutzung_area\nha",
+  "nutzung_cover\nperc",
+  "nutzung_length\nm",
+  "bdhaie_length\nm",
+  "bdhaie_area\nha",
+  "bdhaie_cover\nperc"
+)
+
+pairs(haie, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+::: {.panel-tabset}
+
+## liu 2023 
+
+```{r}
+#| label: fig-boxhaieliu
+#| fig-cap: "Hedgerow cover (%) per project from Liu 2023. The dashed line show the median biomass."
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$haie_cover ~ ind$Study_ID,
+  las = 2,
+  ylab = "%",
+  xlab = "",
+  main = "Hedgerow cover - Liu et al.",
+)
+abline(h = median(ind$haie_cover, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## national BD
+
+```{r}
+#| label: fig-boxhaienat
+#| fig-cap: "Hedgerow cover (%) per project from national database. The dashed line show the median biomass."
+nathaie <- ifelse(
+  ind$Study_ID == "PestiRed",
+  ind$haie_nutzung_perc,
+  ind$haie_bdhaie_perc
+)
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  nathaie ~ ind$Study_ID,
+  las = 2,
+  ylab = "%",
+  xlab = "",
+  main = "Hedgerow cover - National BD",
+)
+abline(h = median(nathaie, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## percentages
+
+```{r}
+#| label: tbl-haiebiomass
+#| tbl-cap: "Percentage of fields with some hedgerow detected per data source"
+nhaie <- data.frame(
+  "Liu" = tapply(ind$haie_cover > 1, ind$Study_ID, sum, na.rm = TRUE),
+  "National" = tapply(nathaie > 0, ind$Study_ID, sum, na.rm = TRUE)
+)
+phaie <- nhaie / table(ind$Study_ID) * 100
+
+#colnames(sum_area) <- gsub("_", "<br>", colnames(sum_area))
+knitr::kable(round(phaie, 2))
+```
+
+:::
+
+
+
+**Outliers**
+
+
+::: {.panel-tabset}
+
+## ex1
+```{r}
+#| label: fig-highhaiecover
+#| fig-cap: "Field with high hedgerows cover in BD Haie but not in Liu 2023"
+diffhaie <- (nathaie - ind$haie_cover)
+ex1 <- which.max(diffhaie)
+
+pts_ex1 <- pts[pts$ID == ind$ID[ex1]]
+rpg_ex1 <- fields[fields$Funbiodiv_ID == ind$ID[ex1]]
+r10_ex1 <- buffer(rpg_ex1, 10)
+rliu_ex1 <- ext(project(r10_ex1, crs(liucov))) + 100
+liu_ex1 <- crop(liucov, rliu_ex1)
+
+haie_ex1 <- vect(
+  here("data", "raw-data", "haie_2-0.gpkg"),
+  filter = project(vect(rliu_ex1, crs(liucov)), y = "EPSG:2154")
+)
+
+mapview::mapview(
+  r10_ex1,
+  alpha.regions = 0.1,
+  lwd = 2,
+  layer.name = "Field+10m"
+) +
+  mapview::mapview(
+    liu_ex1,
+    alpha.regions = 0.4,
+    layer.name = "Liu 2023 Cover"
+  ) +
+  mapview::mapview(haie_ex1, layer.name = "BD Haie")
+```
+
+## ex2
+```{r}
+#| label: fig-highhaiebiomass
+#| fig-cap: "Field with low hedgerows cover in BD Haie but high in Liu 2023"
+ex2 <- which.min(diffhaie)
+
+pts_ex2 <- pts[pts$ID == ind$ID[ex2]]
+rpg_ex2 <- fields[fields$Funbiodiv_ID == ind$ID[ex2]]
+r10_ex2 <- buffer(rpg_ex2, 10)
+rliu_ex2 <- ext(project(r10_ex2, crs(liucov))) + 100
+liu_ex2 <- crop(liucov, rliu_ex2)
+haie_ex2 <- vect(
+  here("data", "raw-data", "haie_2-0.gpkg"),
+  filter = project(vect(rliu_ex2, crs(liucov)), y = "EPSG:2154")
+)
+
+mapview::mapview(
+  r10_ex2,
+  alpha.regions = 0.1,
+  lwd = 2,
+  layer.name = "Field+10m"
+) +
+  mapview::mapview(
+    liu_ex2,
+    alpha.regions = 0.4,
+    layer.name = "Liu 2023 Cover"
+  ) +
+  mapview::mapview(haie_ex2, layer.name = "BD Haie")
+```
+
+:::
+
+
+
+
+
+
+## Land cover within buffer 
+
+```{r}
+#| label: tbl-bcover
+#| #| tbl-cap: "Summary of the land cover classes  composition in 1000m buffer"
+m1000 <- grep("frac1000", names(ind))
+l1000 <- gsub("frac1000_", "", names(ind)[m1000])
+
+noag <- unique(ref$name_grp2[ref$source == "clcplus"])
+
+# pc1000 <- ind[, m1000]
+# pc1000 <- pc1000[complete.cases(pc1000),]
+# plotly_df(pc1000)
+# gr1500 <- t(rowsum(
+#   t(indr[, m1500]),
+#   ref$grp_label[match(l1500, ref$new_code)],
+#   na.rm = TRUE
+# ))
+in_rpg <- tapply(
+  100 - rowSums(ind[, m1000[l1000 %in% noag]]),
+  ind$Study_ID,
+  mean,
+  na.rm = TRUE
+)
+
+sum_study <- rowsum(ind[, m1000], ind$Study_ID, na.rm = TRUE)
+n_class <- rowSums(sum_study > 0)
+
+info <- data.frame(
+  "n_classes" = n_class,
+  "av_perc_rpg" = round(in_rpg, 2)
+)
+knitr::kable(info)
+```
+
+
+
+After grouping, there are ```r length(m1000)``` different categories covered by the 1000m buffers (@tbl-bcover). 
+
+In average, roughly 70% of the buffer areas are filled with land cover classes from `RPG` (and the other half are `CLC` classes). The proportion of `RPG` classes vary greatly by project.
+
+```{r}
+#| label: tbl-topcover
+#| tbl-cap: "Top 10 most frequent land cover classes"
+mean_frac <- apply(ind[, m1000], 2, mean, na.rm = TRUE)
+top10 <- sort(mean_frac, decreasing = TRUE)[1:10]
+round(top10, 2)
+```
+
+
+```{r}
+#| label: fig-coverstudy
+#| fig-cap: "Average land cover per project with buffer of 1000m"
+tot_study <- as.numeric(tapply(
+  rowSums(ind[, m1000], na.rm = TRUE) > 0,
+  ind$Study_ID,
+  sum
+))
+
+avcover <- sum_study / tot_study
+names(avcover) <- gsub("frac1000_", "", names(avcover))
+plotly_df(avcover, xlab = "%")
+```
+
+::: {.panel-tabset}
+
+## Forest
+
+```{r}
+#| label: fig-coverforest
+#| fig-cap: "Average forest cover per project with buffer of 1000m"
+boxplot(
+  ind$frac1000_forest ~ ind$Study_ID,
+  las = 2,
+  xlab = "",
+  ylab = "%",
+  main = "% forest"
+)
+abline(
+  h = median(ind$frac1000_forest, na.rm = TRUE),
+  lwd = 2,
+  lty = 3
+)
+```
+
+## Sealed
+
+```{r}
+#| label: fig-coversealed
+#| fig-cap: "Average sealed cover per project with buffer of 1000m"
+boxplot(
+  ind$frac1000_sealed ~ ind$Study_ID,
+  las = 2,
+  xlab = "",
+  ylab = "%",
+  main = "% sealed"
+)
+abline(h = median(ind$frac1000_sealed, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## Vineyard
+
+```{r}
+#| label: fig-covervine
+#| fig-cap: "Average vineyard cover per project with buffer of 1000m"
+boxplot(
+  ind$frac1000_vignes ~ ind$Study_ID,
+  las = 2,
+  xlab = "",
+  ylab = "%",
+  main = "% vineyard"
+)
+abline(
+  h = median(ind$frac1000_vignes, na.rm = TRUE),
+  lwd = 2,
+  lty = 3
+)
+```
+
+## Wheat
+
+```{r}
+#| label: fig-coverwheat
+#| fig-cap: "Average wheat cover per project with buffer of 1000m"
+#
+mble <- grep("_ble", tolower(names(ind)))
+ind$frac_wheat <- rowSums(ind[, mble], na.rm = TRUE)
+
+boxplot(
+  ind$frac_wheat ~ ind$Study_ID,
+  las = 2,
+  xlab = "",
+  ylab = "%",
+  main = "% wheat"
+)
+abline(
+  h = median(ind$frac_wheat, na.rm = TRUE),
+  lwd = 2,
+  lty = 3
+)
+```
+
+:::
+
+::: {.panel-tabset}
+
+## boxplot 
+
+```{r}
+#| label: fig-boxshannon
+#| fig-cap: "Shannon diversity in land cover buffer of 1000m. The dashed line show the median area."
+par(mar = c(8, 4, 4, 1))
+boxplot(
+  ind$shannon_1000 ~ ind$Study_ID,
+  las = 2,
+  ylab = "Shannon",
+  xlab = "",
+  main = "Shannon diversity - Buffer 1000m"
+)
+abline(h = median(ind$shannon_1000, na.rm = TRUE), lwd = 2, lty = 3)
+```
+
+## table
+
+```{r}
+#| label: tbl-shannon
+#| tbl-cap: "Summary statistics per project of the Shannon diversity in land cover buffer of 1000m"
+shannon <- sapply(
+  tapply(ind$shannon_1000, ind$Study_ID, summary),
+  function(x) x[1:6]
+)
+
+knitr::kable(t(round(shannon, 2)))
+```
+
+:::
+
+
+**Remarks:**    
+
+- All buffers include some amount of forest (5-20%) and sealed area (5-10%), while the crop composition is highly project specific. 
+
+
+
+
+## Summary and questions about metrics
+
+```{r}
+#| label: fig-corr
+#| fig-cap: "Correlation among field diversity metrics"
+out <- data.frame(
+  "Area\nha" = ind$Area_ha,
+  "Field size\nB500 ha" = ind$Median_fieldsize_500m_ha,
+  "Field size\nB1000 ha" = ind$Median_fieldsize_1000m_ha,
+  "Crop rotation\n5yr N" = ind$rot5_Ncrop,
+  "Hedgerow\nperc" = ind$haie_cover,
+  "Shannon\nB1000" = ind$shannon_1000,
+  "Forest\nB1000 perc" = ind$frac1000_forest,
+  "Sealed\nB1000 perc" = ind$frac1000_sealed,
+  "Vineyard\nB1000 perc" = ind$frac1000_vignes,
+  "Wheat\nB1000 perc" = ind$frac_wheat,
+  check.names = FALSE
+)
+
+pairs(out, lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+
+**Remarks:**  
+
+- Most observations have a corresponding crop field in RPG dataset or in complementary dataset (@tbl-inrpg).    
+
+- The sampling location within the field might influence the results (different impact of hedgerows, or of agricultural practices). We might want to add an indicator reflecting the distance to the center of the field and/or the distance to the closest field boundary?  
+
+

@@ -4,7 +4,42 @@ Extraction des métriques de diversification depuis les coordonnées des sites d
 
 Les données sont sauvegardées dans le répertoire Nextcloud WP2/gis-diversification/data/
 
-## Exploration of the French dataset
+
+## Calculation and summary of diversification metrics
+
+Updated calculation considering France and Switzerland. The file `make.R` run all the calculations while the file `10_summary_FRCH.qmd` provides a summary of the calculated metrics.
+
+```r
+# compute all the indicators
+source("make.R")
+```
+
+An [overview of the field coordinates](https://funbiodiv.github.io/gis-diversification/analysis/Q1_overview_fields.html):
+```r
+quarto::quarto_render("analysis/Q1_overview_fields.qmd")
+```
+
+A [summary of the diversification metrics](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html): 
+```r
+quarto::quarto_render("analysis/Q2_summary_metrics.qmd")
+```
+
+
+Field characteristics were calculated from national agricultural dataset.
+We complmented 
+
+
+
+
+#### Mise à jour de l'index:
+```r
+quarto::quarto_render("index.qmd")
+```
+
+
+
+
+## DEPRECATED: Exploration of the French dataset
 
 #### 1. exploration des données RPG, RPG complété et BD haies  
 ```r
@@ -43,23 +78,4 @@ quarto::quarto_render("analysis/06_haie.qmd")
 
 ```r
 quarto::quarto_render("analysis/07_fields_Toulouse.qmd")
-```
-
-
-
-## Calculation and summary of French+Swiss metrics
-
-Updated calculation considering France and Switzerland. The file `make.R` run all the calculations while the file `10_summary_FRCH.qmd` provides a summary of the calculated metrics.
-
-```r
-# re compute all the indicators
-source("make.R")
-# or only compute the summary 
-quarto::quarto_render("analysis/10_summary_FRCH.qmd")
-```
-
-
-#### Mise à jour de l'index:
-```r
-quarto::quarto_render("index.qmd")
 ```

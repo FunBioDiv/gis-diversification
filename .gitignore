@@ -5,7 +5,8 @@ data/poc
 data/rpg
 data/rpgc
 data/toulouse
-data/derived-data/rpg
+data/old
+data/derived-data/lulc
 *.tif*
 *.gpkg*
 
