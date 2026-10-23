@@ -38,7 +38,7 @@ datafolder <- here::here("data", "raw-data")
 
 # directory to save raw Corine Land cover data
 zipfolder <- file.path(here("data", "zip"))
-clcfolder <- file.path(file.path(datafolder, "clcplus"))
+clcfolder <- file.path(datafolder, "clcplus")
 
 # from shinyFunbiodiv/analysis/03_update_data.R
 df <- read.csv(here::here("data", "derived-data", "coordinates_year_crop.csv"))

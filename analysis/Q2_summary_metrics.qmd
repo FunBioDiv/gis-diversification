@@ -8,6 +8,9 @@ format:
 execute:
   echo: false
   warning: false
+bibliography: ../references.bib
+nocite: |
+  @*
 ---
 
 
@@ -17,29 +20,29 @@ execute:
 
 |**Indicator**                               |**Data**              |**Format**       |
 |:-------------------------------------------|:---------------------|:----------------|
-| [perimeter and area of the field](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#field-size)             | RPG*                  | vectoriel   |
-| [mean field size within buffer](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#field-size-within-buffer) | RPG*                  | vectoriel   |
-| [crop rotation (N-4:N)](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#crop-rotation-n-4n)               | RPG*                  | vectoriel   |
-| [hedgerows around field](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#hedgerows-length)         | RPG* <br> Liu 2023       | vectoriel <br> raster 30m   |
-| [% land cover within buffer](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#land-cover-within-buffer)    | RPG* + CLCplus        | raster 10m  |
-| *edge density*                             | Not available        | NA              | 
+| [perimeter and area of the field](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#field-size)             | RPG+                  | vectoriel   |
+| [mean field size within buffer](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#field-size-within-buffer) | RPG+                  | vectoriel   |
+| [crop rotation (N-4:N)](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#crop-rotation-n-4n)               | RPG+                  | vectoriel   |
+| [hedgerows around field](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#hedgerows-length)         | RPG+ & BD Haie <br> Liu 2023       | vectoriel <br> raster 30m   |
+| [% land cover within buffer](https://funbiodiv.github.io/gis-diversification/analysis/Q2_summary_metrics.html#land-cover-within-buffer)    | RPG+ & CLCplus        | raster 10m  |
+| *edge density*                             | *Not available*        | *NA*              | 
 
 
 ### Datasets 
 
-- **Registre Parcellaire Graphique (RPG)**: annual field crop data for the period 2015-2024 available for France on IGN website: <https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_RPG>. The dataset differentiates [366 crop categories](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/rpg_classes.csv)   
+- **Registre Parcellaire Graphique (RPG)**: annual field crop data for the period 2015-2024 available for France on IGN website: <https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_RPG>. The dataset differentiates [366 crop categories](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_rpg.csv)   
 
-- **Geodienste - nutzungsflaechen (Nutzung)**: Swiss equivalent of the RPG, not entirely open yet but raw data provided by Selma Cadot: <https://geodienste.ch/services/lwb_nutzungsflaechen>. The dataset differentiates [146 crop categories](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/nutzung_classes.csv). It also contains hedgerows and semi-natural habitat.
+- **Geodienste - nutzungsflaechen (Nutzung)**: Swiss equivalent of the RPG with annual field crop data for the period 2020-2025: <https://geodienste.ch/services/lwb_nutzungsflaechen>. The data is not entirely open yet but raw data were provided by Selma Cadot. The dataset differentiates [146 categories](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_nutzung.csv) including hedgerows and semi-natural habitat.
 
-- **Corine Land Cover plus (CLCplus)**: land cover at European scale with 10m resolution and [11 basic land cover classes](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/clc_classes.csv), available on Corine Land Monitoring Service <https://land.copernicus.eu/en/products/clc-backbone>. 
+- **Corine Land Cover plus (CLCplus)**: land use land cover at European scale with 10m resolution and [11 basic land cover classes](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_clc.csv), available on Corine Land Monitoring Service <https://land.copernicus.eu/en/products/clc-backbone>. The data is availble for 2018, 2021 and 2023.
 
 - **Liu *et al.* (2023)**: European tree cover and biomass map at 30m resolution for Europe <https://zenodo.org/records/8154445> derived from 3m resolution PlanetScope imagery of 2019.
 
-- **BD Haies v2** (6.8Gb): hedgerows dataset for France available on the IGN website: <https://geoservices.ign.fr/bdhaie>. BD Haie v2 was produced from satellite images of 2020-2022.  
+- **BD Haie v2** (6.8Gb): hedgerows dataset for France available on the IGN website: <https://geoservices.ign.fr/bdhaie>. BD Haie v2 was produced from satellite images of 2020-2022.  
 
-- [Land cover class harmonization](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_rpg_nutzung_clc.csv): list all classes from **RPG**, **Nutzung** and **CLCplus** and how to categorize them. This file has been completed during WS3 and can be further customized for the project objectives.
+- [Land cover class harmonization](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_rpg_nutzung_clc.csv): list all classes from **RPG**, **Nutzung** and **CLCplus** and how to harmonize them. This file has been completed during WS3 and can be further customized for the project objectives. It groups all crops and land cover classes into 57 groups.
 
-- Orchards and vineyards from individual projects to further complete the agricultural land use in France.
+- Orchards and vineyards from individual projects to further complete the agricultural land use for perenial crops in France.
 
 
 ## Field observations
@@ -160,6 +163,7 @@ tm_basemap("OpenStreetMap") +
       values.repeat = FALSE
     )
   ) +
+  tm_legend(show = FALSE) +
   tm_view(
     set_zoom_limits = c(3, 8),
     set_view = c(mean(ext(pts)[1:2]), mean(ext(pts)[3:4]), zoom = 5)
@@ -171,9 +175,9 @@ More detailled overview of the field observations can be found [here](https://fu
 
 ### Identification of the crop field
 
-Because of data availability, we will only focus on the observations made in the period 2015-2024 with field coordinates. The project `DURUM_MIX_GM` has only one coordinates leading to the entrance of the Institut Agro-Montpellier, without registered crop field within 1000m from the coordinates so it was also excluded.  
+Because of data availability, we will only focus on the observations made in the period 2015-2025 with field coordinates. The project `DURUM_MIX_GM` has a single coordinate leading to the entrance of the Institut Agro-Montpellier, without registered crop field within 1000m from the coordinates so it was excluded.  
 
-We identified the crop field from `RPG` or `Nutzung` dataset corresponding to the observations based on the coordinates and the year of the sampling.
+We identified the crop field from `RPG` or `Nutzung` dataset based on the coordinates and the year of the sampling.
 
 ```{r}
 #| label: tbl-inrpg
@@ -203,8 +207,8 @@ knitr::kable(in_rpg)
 
 **Remarks:**   
 
-- In total, ```r round(sum(!is.na(ind$CropCode_N)) / nrow(ind) * 100)``` % of the fields observations are covered with information on crop field.   
-- It is important to know and acknowledge that `RPG` is incomplete but the vineyards and orchards provided by data providers helps characterizing projects with permanent crops.
+- In total, ```r round(sum(!is.na(ind$CropCode_N)) / nrow(ind) * 100)``` % of the fields observations (N=```r sum(!is.na(ind$CropCode_N))```) are covered with information on crop field.   
+- It is important to acknowledge that `RPG` is incomplete but the vineyards and orchards provided by data providers helps characterizing projects with permanent crops.
 
 
 ## Field size
@@ -354,16 +358,21 @@ mapview(
 
 **Remarks:**  
 
-- Some fields are defines as a strip (large perimeter, small area), e.g. @fig-highperim
+The overall pattern of field size per projects matches the expectations. Project focussing on wineyards (e.g. Bacchus, OSCAR), orchards (in BVD - Basse Vallée de la Durance) have smaller fields than average; while project focusing on large cereals (e.g. muesli, Plaine de Dijon) have larger fields.
 
+Yet, when looking for outliers, we can see that:  
+
+- Some fields are defined as a strip (large perimeter, small area), e.g. @fig-highperim
 - Some fields include many sub-plots, e.g. @fig-largearea.
-
-
 
 
 ## Field size within buffer
     
-Using the coordinates of the sampling sites, we calculated the average area of all crop fields within a buffer (500m, and 1000m).
+Using the coordinates of the sampling sites, we calculated the average area of all crop fields within a buffer (500m and 1000m).
+
+::: {.panel-tabset}
+
+## Table
 
 ```{r}
 #| label: tbl-fsizebuffer
@@ -375,45 +384,6 @@ buff_size <- cbind(
 
 knitr::kable(round(buff_size, 2))
 ```
-
-We see that some observations don't have crop field within 500m (N=2). These observations (listed in @tbl-nofield500) would need to be checked and ensure that they are close to agricultural lands.  
-
-```{r}
-#| label: tbl-nofield500
-#| tbl-cap: "Observations with no fields within a 500m buffer."
-miss_b500 <- ind[is.na(ind$Median_fieldsize_500m_ha), ]
-miss_b500[
-  order(miss_b500$Study_ID, miss_b500$Year),
-  c("Study_ID", "Plot_ID", "Year")
-] |>
-  knitr::kable()
-```
-
-```{r}
-#| label: fig-corfsize
-#| fig-cap: "Correlation among field areas per buffer size"
-plot_ly(ind) |>
-  add_markers(
-    x = ~Median_fieldsize_500m_ha,
-    y = ~Median_fieldsize_1000m_ha,
-    color = ~Study_ID,
-    colors = rainbow(nlevels(ind$Study_fac)),
-    text = ~ID,
-    hoverinfo = "text"
-  ) |>
-  layout(
-    xaxis = list(title = "500m buffer"), #, type = "log"),
-    yaxis = list(title = "1000m buffer"), #, type = "log")
-    title = 'Median field size per buffer'
-  ) |>
-  config(
-    modeBarButtons = list(list("toImage")),
-    displaylogo = FALSE
-  )
-```
-
-
-::: {.panel-tabset}
 
 ## 500m 
 
@@ -452,6 +422,46 @@ abline(
 ```
 
 :::
+
+
+
+We see that some observations don't have crop field within 500m (N=2 in @tbl-fsizebuffer). These observations (listed in @tbl-nofield500) would need to be checked and ensure that they are close to agricultural lands.  
+
+```{r}
+#| label: tbl-nofield500
+#| tbl-cap: "Observations with no fields within a 500m buffer."
+miss_b500 <- ind[is.na(ind$Median_fieldsize_500m_ha), ]
+miss_b500[
+  order(miss_b500$Study_ID, miss_b500$Year),
+  c("Study_ID", "Plot_ID", "Year")
+] |>
+  knitr::kable()
+```
+
+```{r}
+#| label: fig-corfsize
+#| fig-cap: "Correlation among field areas per buffer size"
+plot_ly(ind) |>
+  add_markers(
+    x = ~Median_fieldsize_500m_ha,
+    y = ~Median_fieldsize_1000m_ha,
+    color = ~Study_ID,
+    colors = rainbow(nlevels(ind$Study_fac)),
+    text = ~ID,
+    hoverinfo = "text"
+  ) |>
+  layout(
+    xaxis = list(title = "500m buffer"), #, type = "log"),
+    yaxis = list(title = "1000m buffer"), #, type = "log")
+    title = 'Median field size per buffer'
+  ) |>
+  config(
+    modeBarButtons = list(list("toImage")),
+    displaylogo = FALSE
+  )
+```
+
+
 
 
 
@@ -610,6 +620,10 @@ legend(
 ::::
 
 
+**Remarks:**  
+
+- The field size within buffer is a good proxy for agricultural practices at landscape level. 
+- The values with a buffer of 500m and 1km are highly correlated (r = ```r round(cor(ind$Median_fieldsize_500m_ha, ind$Median_fieldsize_1000m_ha, use = "complete.obs"),2)```). Yet values with a buffer of 1km are slightly less extreme (higher minimum and lower maximum). 
 
 
 ## Crop rotation (N-4:N)
@@ -654,7 +668,7 @@ The number of observations in the period N-4:N in @tbl-cropy is a results of the
 Most observations have 5 years of data on crop rotation (```r round(sum(ind$rot5_Nyear==5)/nrow(ind)*100)```%, N=```r sum(ind$rot5_Nyear==5)```).
 
 
-Let's have a look at the crop rotations over the 5-year period (N:N-4).  
+Let's zoom on the crop rotations over the 5-year period (i.e. excluding observations with incomplete crop rotation data).  
 
 ::: {.panel-tabset}
 ## crop
@@ -713,7 +727,7 @@ plot_ly(
 ## crop
 ```{r}
 #| label: fig-crop5
-#| fig-cap: "Number of different crops cultivated in the past 5 years"
+#| fig-cap: "Number of different crops cultivated in the past 5 years per project"
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$rot5_Ncrop ~ ind$Study_ID,
@@ -728,7 +742,7 @@ abline(h = mean(ind$rot5_Ncrop, na.rm = TRUE), lwd = 2, lty = 3)
 ## cropgroup
 ```{r}
 #| label: fig-cropgroup5
-#| fig-cap: "Number of different crop groups cultivated in the past 5 years"
+#| fig-cap: "Number of different crop groups cultivated in the past 5 years per project"
 par(mar = c(8, 4, 4, 1))
 boxplot(
   ind$rot5_Ngroup ~ ind$Study_ID,
@@ -742,7 +756,7 @@ abline(h = mean(ind$rot5_Ngroup, na.rm = TRUE), lwd = 2, lty = 3)
 
 ::: 
 
-From ```r sum(ind$rot5_Nyear==5)``` observations with complete crop rotation information in [N-4:N], ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 1)``` have the same crop for the whole time period, while ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 4)``` fields have four different crop groups in the past 5 years (@fig-ncroprot).
+From the ```r sum(ind$rot5_Nyear==5)``` observations with complete crop rotation information in [N-4:N], ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 1)``` have the same crop for the whole time period, while ```r sum(ind$rot5_Ncrop[ind$rot5_Nyear == 5] == 5)``` fields have five different crop groups in the past 5 years (@fig-ncroprot).
 
 ```{r}
 #| label: tbl-grprot
@@ -759,13 +773,13 @@ head(sort(table(gpu[ind$rot5_Nyear == 5]), decreasing = TRUE), 20) |>
 
 **Remarks:**    
 
-- Crop rotations depends a lot on the project targeting either annual vs perrenial cropping systems.
-
+- The level of crop rotation depends strongly on the project targeting either annual vs perrenial cropping systems.  
+- In France, the spatial dataset about orchard and wineyards was set as constant during the study period, which artificially ignores any changes in agricultural practices in these perrenial systems. So **crop rotation information must be ignored for the perrenial crops in France**. 
 
 
 ## Hedgerows length
 
-We overlaid the field as defined in `RPG*` (+ a 10m buffer) with the tree cover density from `Liu et al. 2023` and with other national information on hedgerows (`BDHaie` and `Nutzung`).
+We overlaid the field as defined in **RPG+** (+ a 10m buffer) with the tree cover density from **Liu et al. 2023** and with other national information on hedgerows (**BD Haie** and **Nutzung**).
 
 
 ```{r}
@@ -914,21 +928,23 @@ mapview::mapview(
 
 :::
 
+**Remarks:**    
 
-
-
+- There is a relatively good correlation among the percentage of hedgerows cover in Liu_2023 dataset and the national dataset (r= ```r round(cor(ind$haie_cover, ind$haie_bdhaie_perc, use = "complete.obs"),2)``` for France, and ```r round(cor(ind$haie_cover, ind$haie_nutzung_perc, use = "complete.obs"),2)``` for Switzerland).   
+- Liu et al. 2023 might consider orchards as hedgerow as seen for the BVD projects in @fig-boxhaieliu.   
+- In Switzerland, the percentage of fields with hedgerows is extremely low (```r round(phaie["PestiRed", "National"], 2)``` %, @tbl-haiebiomass) while the values are not so different when considering Liu_2023. This observation seems to indicate a difference in how hedgerows were defined in France and in Switzerland and would suggest the use of Liu_2023 when comparing both datasets.
 
 
 ## Land cover within buffer 
 
 ```{r}
 #| label: tbl-bcover
-#| tbl-cap: "Number of land cover classes and percentage of cover from RPG* in 1000m buffer per project"
+#| tbl-cap: "Number of land cover classes and percentage of cover from RPG+ in 1000m buffer per project"
 m1000 <- grep("frac1000", names(ind))
 l1000 <- gsub("frac1000_", "", names(ind)[m1000])
 
 noag <- unique(ref$name_grp2[ref$source == "clcplus"])
-
+noag <- gsub(" ", ".", noag)
 # pc1000 <- ind[, m1000]
 # pc1000 <- pc1000[complete.cases(pc1000),]
 # plotly_df(pc1000)
@@ -958,17 +974,16 @@ knitr::kable(info)
 
 After grouping, there are ```r length(m1000)``` different categories covered by the 1000m buffers . 
 
-In average, roughly 75% of the buffer areas are filled with land cover classes from `RPG` (and the remaining quarter with `CLC` classes) (@tbl-bcover).
-
 ```{r}
 #| label: tbl-topcover
-#| tbl-cap: "Top 10 most frequent land cover classes"
+#| tbl-cap: "Top 10 most frequent land cover classes in cover"
 mean_frac <- apply(ind[, m1000], 2, mean, na.rm = TRUE)
 top10 <- sort(mean_frac, decreasing = TRUE)[1:10]
 names(top10) <- gsub("frac1000_", "", names(top10))
 round(top10, 2)
 ```
 
+In average, ```r round(mean(100-rowSums(ind[, m1000[l1000 %in% noag]])))``` % of the buffer areas are filled with land cover classes from **RPG+** (@tbl-bcover). The remaining ```r round(mean(rowSums(ind[, m1000[l1000 %in% noag]])))```% are filled with **CLCplus** classes, especially forest (```r round(top10["forest"],1)```%), permanent harbaceous (```r round(top10["permanent.herbaceous"],1)```%) and sealed (```r round(top10["sealed"],1)```%) (@tbl-topcover).
 
 ```{r}
 #| label: fig-coverstudy
@@ -1100,12 +1115,10 @@ knitr::kable(t(round(shannon, 2)))
 
 **Remarks:**    
 
-- All buffers include some amount of forest (5-20%) and sealed area (5-10%), while the crop composition is highly project specific. 
+- All buffers include some amount of forest (5-20%) and sealed area (5-10%), while the crop composition is highly project specific with project with perrenial crops (Bacchus, BVD, Oscar) being less diverse than project focussing on annual crops.
 
 
-
-
-## Summary and questions about metrics
+## Correlation
 
 ```{r}
 #| label: fig-corr
@@ -1127,9 +1140,43 @@ out <- data.frame(
 pairs(out, lower.panel = panel.smooth, upper.panel = panel.cor)
 ```
 
-
 **Remarks:**  
 
+- There is a high positive correlation between field size and the median field size within buffer : the size of the field is related to the average field size in the landscape.
+- There is a high positive correlation between spatial and temporal crop diversity (land cover within a buffer and crop rotation). 
+- Landscape with high percentage of vineyards have low diversity of landscape and low crop rotation. On the contrary, landscape with high percentage of wheat have larger field size, and higher diversity of crop spatially and temporally. This observation might be bias by the high number of crop groups compare to other classes of land cover considered. 
+
+
+## Summary
+
+### Material and method
+
+
+To characterize the cropping practices, we used the [Registre Parcellaire Graphique](https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_RPG) (RPG) for France and the [Geodienste - nutzungsflaechen](https://geodienste.ch/services/lwb_nutzungsflaechen) (Nutzung) for Switzerland.
+The two datasets are vectorial spatial data that provide the crop field boundaries and categorize the crops into refined categories: 366 crops are considered in France, and 146 in Swizerland. RPG is available annually since 2015 while Nutzung is available since 2019. Because RPG is known to lack data for small wineyards and orchards (*ref needed?*), we complemented the crop data with local dataset for the samples made in regions dominated by permanent crops.
+
+We intersected the sampling coordinates with the national crop dataset corresponding to the sampling year and extracted the perimeter and the area of the fields. Additionnally, we calculated the mean field size within a buffer of 1km around the sampling position. When available, we exctracted information about the cropping patterns for the 4 years before sampling.
+
+We complemented the crop dataset with the land use land cover data from [Corine Land Cover plus](https://land.copernicus.eu/en/products/clc-backbone) (CLCplus). It caracterize the land cover into 11 classes. The dataset is available for Europe with a spatial resolution of 10 m. There has been three release: 2018, 2021, and 2023. We filled the holes of the national crop dataset with the  CLCplus information closest to the year of sampling. Then, we extracted the percentage of cover per buffer of 1km around the sampling location. We grouped the land cover and crop classes into [57 classes](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_rpg_nutzung_clc.csv) and calculated the Shannon index of the simplified land cover classes.
+
+Hedgerow density was quantify from national datasets: [BD Haies v2](https://geoservices.ign.fr/bdhaie) for France in 2021 and [Geodienste - nutzungsflaechen](https://geodienste.ch/services/lwb_nutzungsflaechen) for Switzerland in 2023. **or** Hedgerow density was quantify using European dataset (Liu et al. 2023) providing estimates of the cover and the biomass of trees at 30m resolution for 2019. We extracted the length/area of hedgerows within the fieldw and a 10m buffer around them. 
+
+All analysis were performed in R 4.4.1() using terra() and exactextract() packages. 
+
+
+### Results
+
+
+In total, 95 % of the fields samplings are covered with information on crop field, and 73% of the samples (N=1682) have complete 5 years crop rotation data.
+
+
 - Most observations have a corresponding crop field in RPG dataset or in complementary dataset (@tbl-inrpg).    
+- All buffers include some amount of forest (5-20%) and sealed area (5-10%), while the crop composition is highly project specific. 
+
+
+## References
+
+::: {#refs}
+:::
 
 
