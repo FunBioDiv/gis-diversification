@@ -117,6 +117,7 @@ leaflet(sd) |>
   addTiles(
     options = providerTileOptions(minZoom = 3, maxZoom = 15)
   ) |>
+  addProviderTiles(providers$Esri.WorldStreetMap) |>
   addCircleMarkers(
     data = sd,
     fillColor = ~ stablePal(Study_ID),

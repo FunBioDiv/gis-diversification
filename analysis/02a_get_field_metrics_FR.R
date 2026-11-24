@@ -31,10 +31,13 @@ outfolder <- here("data", "derived-data")
 # check out which RPG layer is available
 # meta_vect <- get_layers_metadata("wfs") # all layers for altimetrie wms
 # look_up <- "RPG"
-# #fmt: skip
-# found <- grepl(tolower(look_up), tolower(meta_vect$Name)) | grepl(tolower(look_up), tolower(meta_vect$Name))
+# # #fmt: skip
+# found <- grepl(tolower(look_up), tolower(meta_vect$Name)) |
+#   grepl(tolower(look_up), tolower(meta_vect$Name))
 # meta_vect$Name[found]
 rpg_layer <- "RPG.XXXX:parcelles_graphiques"
+# 2025 is called "LANDUSE.AGRICULTURE2025:parcelles_graphiques"
+# not sure why the format is so different, would need to be checked before use
 
 period <- 2015:2024
 
