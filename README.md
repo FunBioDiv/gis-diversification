@@ -53,7 +53,7 @@ quarto::quarto_render("analysis/Q2_summary_metrics.qmd")
 ```
 
 
-## Material and method
+### Material and method
 
 To characterize the cropping practices, we used the [Registre Parcellaire Graphique](https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_RPG) (RPG) for France and the [Geodienste - nutzungsflaechen](https://geodienste.ch/services/lwb_nutzungsflaechen) (Nutzung) for Switzerland.
 The two datasets are vectorial spatial datasets that provide crop field boundaries and categorize crops into precise categories: 366 crops are considered in France, and 146 in Switzerland. RPG is available annually since 2015 and Nutzung since 2019 (*to be confirmed*). Because RPG is known to lack data for small vineyards and orchards (*ref needed?*), we complemented the crop data with local datasets for the samples made in regions dominated by perennial cropping systems.
@@ -62,10 +62,9 @@ We intersected the sampling coordinates with the national crop dataset correspon
 
 We complemented the crop dataset with the land-use/land-cover data from [Corine Land Cover plus](https://land.copernicus.eu/en/products/clc-backbone) (CLCplus). The dataset characterizes the land cover into 11 classes and is available for Europe with a spatial resolution of 10 m. There has been three releases: 2018, 2021, and 2023. To estimate the land cover within a 1km buffer around the sampling location, we used preferentially the national crop dataset of the sampling year filled with CLCplus data closest to the year of sampling. We grouped the land cover and crop classes into [57 classes](https://github.com/FunBioDiv/gis-diversification/blob/main/data/derived-data/classes_rpg_nutzung_clc.csv) and calculated the Shannon diversity index of the simplified land cover classes.
 
-Hedgerow density was quantified from national datasets: [BD Haies v2](https://geoservices.ign.fr/bdhaie) for France in 2021 and [Geodienste - nutzungsflaechen](https://geodienste.ch/services/lwb_nutzungsflaechen) for Switzerland in 2023. **or** Hedgerow density was quantify using European dataset (Liu et al. 2023) providing estimates of the cover and the biomass of trees at 30m resolution for 2019. We extracted the length/area of hedgerows within the field and a 10m buffer around them. 
+Hedgerow density was quantified from national datasets: [BD Haies v2](https://geoservices.ign.fr/bdhaie) for France in 2021 and [Geodienste - nutzungsflaechen](https://geodienste.ch/services/lwb_nutzungsflaechen) for Switzerland in 2023. **or** Hedgerow density was quantified using European dataset (Liu et al. 2023) providing estimates of the cover and the biomass of trees at 30m resolution for 2019. We extracted the length/area of hedgerows within the field and a 10m buffer around them. 
 
 All analyses were performed in *R 4.4.1* (R Core Team 2024) using *terra* (Hijmans et al. 2026) and *exactextract* (Baston 2023) packages. 
-
 
 
 ## References

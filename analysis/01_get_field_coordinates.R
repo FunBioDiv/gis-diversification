@@ -228,6 +228,7 @@ outfolder <- here::here("data", "derived-data")
 meta <- read.csv(file.path(datafolder, "coordFunBioDiv_191126.csv"), dec = ",")
 meta <- meta[, c("Study_ID", "Plot_ID", "Year", "Crop_species", "Lat", "Long")]
 
+# table(duplicated(meta)) # 2655
 # table(is.na(meta$Lat), meta$Study_ID, useNA = "ifany")
 write.csv(
     meta,

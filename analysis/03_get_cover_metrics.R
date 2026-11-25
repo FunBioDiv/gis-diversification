@@ -42,7 +42,7 @@ colRPG <- c("id_parcel", "code_cultu", "id_cultu")
 rmRPG <- sort(unique(ref$code[ref$keep_ag == "0" & ref$source == "rpg"]))
 
 # file with nutz dataset
-nutz_layer <- file.path(datafolder, "CH", "nutz_XXXX.gpkg")
+nutz_layer <- file.path(datafolder, "nutzung", "nutz_XXXX.gpkg")
 # remove non agricultural fields from NUTZ
 rmNUTZ <- sort(unique(ref$name[ref$keep_ag == "0" & ref$source == "nutzung"]))
 
@@ -80,7 +80,9 @@ pts <- project(pts, "EPSG:3035")
 
 # select only observation in France between 2015 and 2024
 keep <- pts$Year %in% period & !is.na(df$Lat) & pts$Study_ID != "Agro4st"
-# table(keep) # 2615 points
+keep <- keep & (pts$Year != 2025 | pts$Study_ID == "PestiRed")
+# table(keep) # 2603 points
+# "SEBIOPAG_VcG_T01_2025" %in% pts$ID[keep2]
 
 df_out <- list() # save the metrics
 # for testing: sample(which(keep), 10)

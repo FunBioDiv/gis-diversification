@@ -2332,8 +2332,8 @@
     },
     "happign": {
       "Package": "happign",
-      "Version": "0.3.8",
-      "Source": "Repository",
+      "Version": "0.3.8.9000",
+      "Source": "GitHub",
       "Title": "R Interface to 'IGN' Web Services",
       "Authors@R": "person(\"Paul\", \"Carteron\", , \"carteronpaul@gmail.com\", role = c(\"aut\", \"cre\"), comment = c(ORCID = \"0000-0002-6942-6662\"))",
       "Maintainer": "Paul Carteron <carteronpaul@gmail.com>",
@@ -2366,10 +2366,17 @@
       "LazyData": "true",
       "NeedsCompilation": "no",
       "Encoding": "UTF-8",
+      "Roxygen": "list(markdown = TRUE)",
       "RoxygenNote": "7.3.3",
       "Config/Needs/website": "rmarkdown",
-      "Author": "Paul Carteron [aut, cre] (ORCID: <https://orcid.org/0000-0002-6942-6662>)",
-      "Repository": "CRAN"
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "happign",
+      "RemoteUsername": "paul-carteron",
+      "RemotePkgRef": "paul-carteron/happign",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "18d8429d4b46dc3b9c195059862040af591d0f8d",
+      "Author": "Paul Carteron [aut, cre] (<https://orcid.org/0000-0002-6942-6662>)"
     },
     "hdar": {
       "Package": "hdar",

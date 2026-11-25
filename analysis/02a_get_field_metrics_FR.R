@@ -108,8 +108,9 @@ pts <- vect(df, geom = c("Long", "Lat"), crs = "EPSG:4326")
 
 # select only observation in France between 2015 and 2024
 keep <- pts$Year %in% period & !pts$Study_ID %in% c("PestiRed", "Agro4st")
-# table(keep) # 2206 points
-
+# make sure points have complete coordinates
+keep <- keep & complete.cases(df[, c("Long", "Lat")])
+# table(keep) # 2139 points
 rpg_out <- c() # save the rpg information
 df_out <- c() # save the parameters
 # for testing: sample(which(keep), 10)
@@ -129,10 +130,14 @@ for (i in which(keep)) {
   if (file.exists(outi)) {
     rpgi <- vect(outi)
   } else {
-    rpgi <- get_wfs(
+    rpgi <- get_wfs_retry(
       x = st_as_sf(buffi),
       layer = gsub("XXXX", pti$Year, rpg_layer)
     )
+    if (is.null(rpgi)) {
+      warning(sprintf("Skipping ID %s", pti$ID))
+      next
+    }
     if (nrow(rpgi) > 0) {
       # transform as terra SpatVect object
       rpgi <- vect(rpgi)
@@ -247,6 +252,8 @@ for (i in which(keep)) {
       } else {
         rpgi_rot <- vect()
       }
+
+      error_server <- FALSE
       for (y in 1:years) {
         out_i[paste0("N-", y)] <- pti$Year - y
         lab <- paste0(colRPG, "_N-", y)
@@ -260,10 +267,14 @@ for (i in which(keep)) {
           rpgi_rot <- rbind(rpgi_rot, rpgy[c(colRPG, "Year")])
         } else {
           if ((pti$Year - y) %in% period) {
-            rpgy <- get_wfs(
+            rpgy <- get_wfs_retry(
               x = st_as_sf(pti),
               layer = gsub("XXXX", pti$Year - y, rpg_layer)
             )
+            if (is.null(rpgy)) {
+              error_server <- TRUE
+              break
+            }
             # add id_cultu
             if (nrow(rpgy) > 0) {
               rpgy <- vect(rpgy)
@@ -281,9 +292,9 @@ for (i in which(keep)) {
           }
         }
       }
-      #if (nrow(rpgi_rot) > 1) {
-      writeVector(rpgi_rot, outi, overwrite = TRUE)
-      #}
+      if (!error_server) {
+        writeVector(rpgi_rot, outi, overwrite = TRUE)
+      }
     }
 
     df_out <- rbind(df_out, out_i)
